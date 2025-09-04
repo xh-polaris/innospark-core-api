@@ -37,3 +37,5 @@ new:
 	hz new $(IDL_OPTIONS) $(OUTPUT_OPTIONS) --service $(SERVICE_NAME) --mod $(MODULE_NAME) $(EXTRA_OPTIONS)
 clean:
 	rm -r ./output
+wire:
+	wire gen ./provider

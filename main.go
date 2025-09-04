@@ -10,11 +10,11 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/xh-polaris/gopkg/hertz/middleware"
-	logx "github.com/xh-polaris/gopkg/util/logx"
-	"github.com/xh-polaris/innospark-core-api/adaptor"
+	xhlog "github.com/xh-polaris/gopkg/util/log"
+	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"github.com/xh-polaris/innospark-core-api/provider"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -26,7 +26,7 @@ func Init() {
 	// 初始化依赖注入
 	provider.Init()
 	// 初始化自定义日志
-	hlog.SetLogger(logx.NewHlogLogger())
+	hlog.SetLogger(xhlog.NewHlogLogger())
 	// 设置openTelemetry的传播器，用于分布式追踪中传递上下文信息
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(b3.New(), propagation.Baggage{}, propagation.TraceContext{}))
 	http.DefaultTransport = otelhttp.NewTransport(http.DefaultTransport)

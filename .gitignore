@@ -31,6 +31,7 @@ _testmain.go
 .DS_Store
 /.idea
 /.vscode
+/etc
 /output
 *.local.yml
 dumped_hertz_remote_config.json

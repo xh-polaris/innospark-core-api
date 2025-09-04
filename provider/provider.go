@@ -2,7 +2,7 @@ package provider
 
 import (
 	"github.com/google/wire"
-	"github.com/xh-polaris/innospark-core-api/biz/infrastructure/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 )
 
 var provider *Provider
@@ -30,7 +30,7 @@ var ApplicationSet = wire.NewSet()
 
 var DomainSet = wire.NewSet()
 
-var InfrastructureSet = wire.NewSet(
+var InfraSet = wire.NewSet(
 	config.NewConfig,
 	RPCSet,
 )
@@ -38,5 +38,5 @@ var InfrastructureSet = wire.NewSet(
 var AllProvider = wire.NewSet(
 	ApplicationSet,
 	DomainSet,
-	InfrastructureSet,
+	InfraSet,
 )
