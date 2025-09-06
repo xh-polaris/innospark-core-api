@@ -2,6 +2,7 @@ package provider
 
 import (
 	"github.com/google/wire"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 )
 
@@ -17,7 +18,8 @@ func Init() {
 
 // Provider 提供controller依赖的对象
 type Provider struct {
-	Config *config.Config
+	Config             *config.Config
+	CompletionsService service.ICompletionsService
 }
 
 func Get() *Provider {
@@ -26,7 +28,9 @@ func Get() *Provider {
 
 var RPCSet = wire.NewSet()
 
-var ApplicationSet = wire.NewSet()
+var ApplicationSet = wire.NewSet(
+	service.CompletionsServiceSet,
+)
 
 var DomainSet = wire.NewSet()
 

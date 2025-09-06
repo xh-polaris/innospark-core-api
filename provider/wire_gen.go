@@ -7,6 +7,7 @@
 package provider
 
 import (
+	"github.com/xh-polaris/innospark-core-api/biz/application/service"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 )
 
@@ -17,8 +18,10 @@ func NewProvider() (*Provider, error) {
 	if err != nil {
 		return nil, err
 	}
+	completionsService := &service.CompletionsService{}
 	providerProvider := &Provider{
-		Config: configConfig,
+		Config:             configConfig,
+		CompletionsService: completionsService,
 	}
 	return providerProvider, nil
 }

@@ -7,54 +7,55 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	basic "github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	core_api "github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/provider"
 )
 
-// Completion .
-// @router /v1/completion [POST]
-func Completion(ctx context.Context, c *app.RequestContext) {
+// Completions .
+// @router /v1/completions [POST]
+func Completions(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req core_api.CompletionReq
+	var req core_api.CompletionsReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(core_api.SSEEvent)
+	resp, err := provider.Get().CompletionsService.Completions(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// ListConversation .
+// @router /conversation/list [POST]
+func ListConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.ListConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(core_api.ListConversationResp)
 
 	c.JSON(consts.StatusOK, resp)
 }
 
-// ListHistory .
-// @router /history/list [POST]
-func ListHistory(ctx context.Context, c *app.RequestContext) {
+// GetConversation .
+// @router /conversation/get [POST]
+func GetConversation(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req core_api.ListHistoryReq
+	var req core_api.GetConversationReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(core_api.ListHistoryResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// GetHistory .
-// @router /history/get [POST]
-func GetHistory(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req core_api.GetHistoryReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	resp := new(core_api.GetHistoryResp)
+	resp := new(core_api.GetConversationResp)
 
 	c.JSON(consts.StatusOK, resp)
 }

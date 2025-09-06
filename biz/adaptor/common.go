@@ -4,11 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
+	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol"
+	hertz "github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/hertz/pkg/protocol/sse"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/xh-polaris/gopkg/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 const hertzContext = "hertz_context"
@@ -69,6 +78,10 @@ func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err 
 
 	// 无错, 正常响应
 	if err == nil {
+		if v, ok := resp.(SSEStream); ok {
+			makeSSE(c, v)
+			return
+		}
 		response := makeResponse(resp)
 		c.JSON(hertz.StatusOK, response)
 		return
@@ -76,7 +89,7 @@ func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err 
 
 	if ex, ok := err.(cst.IErrorx); ok { // errorx错误
 		StatusCode := hertz.StatusOK
-		c.JSON(StatusCode, &errorx.Errorx{
+		c.JSON(StatusCode, &cst.Errorx{
 			Code: ex.GetCode(),
 			Msg:  ex.GetMsg(),
 		})
@@ -112,4 +125,49 @@ func makeResponse(resp any) map[string]any {
 		response["data"] = data
 	}
 	return response
+}
+
+func makeSSE(c *app.RequestContext, stream SSEStream) {
+	w := sse.NewWriter(c)
+	defer func(w *sse.Writer) {
+		if err := w.Close(); err != nil {
+			logx.Error("close sse writer fail, err=%v", err)
+		}
+	}(w)
+
+	for event := range stream {
+		if err := w.Write(event); err != nil {
+			logx.Error("write sse-event error, err=%s", err.Error())
+			return
+		}
+	}
+}
+
+type SSEStream chan *sse.Event
+
+var _ propagation.TextMapCarrier = &headerProvider{}
+
+type headerProvider struct {
+	headers *protocol.ResponseHeader
+}
+
+// Get a value from metadata by key
+func (m *headerProvider) Get(key string) string {
+	return m.headers.Get(key)
+}
+
+// Set a value to metadata by k/v
+func (m *headerProvider) Set(key, value string) {
+	m.headers.Set(key, value)
+}
+
+// Keys Iteratively get all keys of metadata
+func (m *headerProvider) Keys() []string {
+	out := make([]string, 0)
+
+	m.headers.VisitAll(func(key, value []byte) {
+		out = append(out, string(key))
+	})
+
+	return out
 }

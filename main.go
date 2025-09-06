@@ -10,6 +10,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	prometheus "github.com/hertz-contrib/monitor-prometheus"
 	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/xh-polaris/gopkg/hertz/middleware"
 	xhlog "github.com/xh-polaris/gopkg/util/log"
@@ -41,7 +42,7 @@ func main() {
 	// 创造hertz服务器实例
 	h := server.New(
 		server.WithHostPorts(c.ListenOn),
-		//server.WithTracer(prometheus.NewServerTracer(":9091", "/server/metrics")),
+		server.WithTracer(prometheus.NewServerTracer(":9091", "/server/metrics")),
 		tracer,
 	)
 

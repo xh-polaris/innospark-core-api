@@ -50,3 +50,23 @@ func _completionMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _completionsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _conversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

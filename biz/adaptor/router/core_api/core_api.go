@@ -23,12 +23,12 @@ func Register(r *server.Hertz) {
 		_agents.POST("/list", append(_listagentsMw(), core_api.ListAgents)...)
 	}
 	{
-		_history := root.Group("/history", _historyMw()...)
-		_history.POST("/get", append(_gethistoryMw(), core_api.GetHistory)...)
-		_history.POST("/list", append(_listhistoryMw(), core_api.ListHistory)...)
+		_conversation := root.Group("/conversation", _conversationMw()...)
+		_conversation.POST("/get", append(_getconversationMw(), core_api.GetConversation)...)
+		_conversation.POST("/list", append(_listconversationMw(), core_api.ListConversation)...)
 	}
 	{
 		_v1 := root.Group("/v1", _v1Mw()...)
-		_v1.POST("/completion", append(_completionMw(), core_api.Completion)...)
+		_v1.POST("/completions", append(_completionsMw(), core_api.Completions)...)
 	}
 }

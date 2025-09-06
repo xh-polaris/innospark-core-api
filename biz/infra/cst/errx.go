@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+var (
+	UnAuthErr = New(1000, "身份认证失败")
+	HisErr    = New(20000, "获取对话记录失败")
+)
+
 const unknowCode = 999
 
 // Errorx 是HTTP服务的业务异常
