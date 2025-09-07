@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -22,10 +23,10 @@ const (
 )
 
 var info = &callbacks.RunInfo{Name: "Model-Completion", Type: "History", Component: "History"}
-var DefaultHandler = callbacks.NewHandlerBuilder().OnStartFn(nil).OnEndFn(updateHistory).Build()
-var RegenHandler = callbacks.NewHandlerBuilder().OnStartFn(nil).OnEndFn(nil).Build()
-var SelectRegenHandler = callbacks.NewHandlerBuilder().OnStartFn(nil).OnEndFn(updateHistory).Build()
-var ReplaceHandler = callbacks.NewHandlerBuilder().OnStartFn(nil).OnEndFn(nil).Build()
+var DefaultHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
+var RegenHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
+var SelectRegenHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
+var ReplaceHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
 
 // CMsgToMMsgList 将 core_api.Message 切片转换为 message.Message
 func CMsgToMMsgList(cid, sid primitive.ObjectID, messages []*core_api.Message) (msgs []*mmsg.Message) {
@@ -50,19 +51,20 @@ func CMsgToMMsg(cid, sid primitive.ObjectID, messages *core_api.Message) (msgs *
 	}
 }
 
-// ConvToEinoList 将 core_api.Message 切片转换为 eino/schema.Message 切片
-func ConvToEinoList(messages []*core_api.Message) (msgs []*schema.Message) {
+// MMsgToEMsgList 将 core_api.Message 切片转换为 eino/schema.Message 切片
+func MMsgToEMsgList(messages []*mmsg.Message) (msgs []*schema.Message) {
 	for _, msg := range messages {
-		msgs = append(msgs, ConvToEino(msg))
+		msgs = append(msgs, MMsgToEMsg(msg))
 	}
 	return
 }
 
-// ConvToEino 将单个 core_api.Message 转换为 eino/schema.Message
-func ConvToEino(msg *core_api.Message) *schema.Message {
+// MMsgToEMsg 将单个 core_api.Message 转换为 eino/schema.Message
+func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 	return &schema.Message{
-		Role:    schema.RoleType(msg.Role),
+		Role:    schema.RoleType(mmsg.RoleItoS[msg.Role]),
 		Content: msg.Content,
+		Name:    msg.MessageId.String(),
 	}
 }
 
@@ -143,7 +145,7 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 	default: // 默认情况, 生成对话, 更新历史记录
 		nc = callbacks.InitCallbacks(nc, info, DefaultHandler)
 	}
-	return nc, messages, err
+	return nc, MMsgToEMsgList(mmsgs), err
 }
 
 // getHistory TODO 获取历史记录
@@ -160,9 +162,12 @@ func getHistory(conversation string) (messages []*mmsg.Message) {
 // 返回一个channel, 等待获取新历史记录并更新
 // 更新逻辑: 先更新redis, 然后同步到数据库中
 func updateHistory(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
+	util.DPrintf("[updateHistory callbacks] %+v\n%+v\n", info, output)
 	return ctx
 }
 
-func doUpdate(conversation string, sig chan []*schema.Message) {
-
+// initMessage
+func initMessage(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
+	util.DPrintf("OnStart initMessage: %+v\n%+v\n", info, input)
+	return ctx
 }

@@ -5,8 +5,9 @@ import (
 )
 
 var (
-	UnAuthErr = New(1000, "身份认证失败")
-	HisErr    = New(20000, "获取对话记录失败")
+	UnAuthErr      = New(1000, "身份认证失败")
+	HisErr         = New(20000, "获取对话记录失败")
+	UnImplementErr = New(888, "尚未实现的功能")
 )
 
 const unknowCode = 999

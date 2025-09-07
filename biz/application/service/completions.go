@@ -6,6 +6,7 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	_ "github.com/xh-polaris/innospark-core-api/biz/domain/deyu"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
@@ -13,7 +14,7 @@ import (
 )
 
 type ICompletionsService interface {
-	Completions(ctx context.Context, req *core_api.CompletionsReq) (chan any, error)
+	Completions(ctx context.Context, req *core_api.CompletionsReq) (any, error)
 }
 
 type CompletionsService struct {
@@ -30,6 +31,11 @@ func (s *CompletionsService) Completions(ctx context.Context, req *core_api.Comp
 	if err != nil {
 		logx.Error("extract user id error: %v", err)
 		return nil, cst.UnAuthErr
+	}
+
+	// 暂时只支持一个新增对话
+	if len(req.Messages) > 1 {
+		return nil, cst.UnImplementErr
 	}
 
 	// 构建聊天记录和注入切面

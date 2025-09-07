@@ -18,8 +18,9 @@ type Auth struct {
 
 type Config struct {
 	service.ServiceConf
-	ListenOn string
-	Auth     Auth
+	ListenOn   string
+	Auth       Auth
+	DeyuAPIKey string
 }
 
 func NewConfig() (*Config, error) {

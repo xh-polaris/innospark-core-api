@@ -3,12 +3,13 @@ package message
 import (
 	"time"
 
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
-	RoleStoI = map[string]int32{"System": 0, "Assistant": 1, "User": 2, "Tool": 3}
-	RoleItoS = map[int32]string{0: "System", 1: "Assistant", 2: "User", 3: "Tool"}
+	RoleStoI = map[string]int32{cst.System: 0, cst.Assistant: 1, cst.User: 2, cst.Tool: 3}
+	RoleItoS = map[int32]string{0: cst.System, 1: cst.Assistant, 2: cst.User, 3: cst.Tool}
 )
 
 type Message struct {
