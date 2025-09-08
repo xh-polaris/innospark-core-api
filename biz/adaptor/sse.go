@@ -80,7 +80,7 @@ type EventChat struct {
 	ReplyId          string       `json:"replyId"`
 	IsDeleted        bool         `json:"isDeleted"`
 	Status           int          `json:"status"`
-	InputContentType string       `json:"inputContentType"`
+	InputContentType int          `json:"inputContentType"`
 	MessageIndex     int          `json:"messageIndex"`
 	BotId            string       `json:"botId"`
 }

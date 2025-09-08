@@ -4,29 +4,26 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloudwego/eino/callbacks"
 	"github.com/cloudwego/eino/schema"
 	"github.com/jinzhu/copier"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
 	Text        = 1
-	Id          = "Id"
-	Brief       = "brief"
 	Regen       = "regen"
 	Replace     = "replace"
 	SelectRegen = "select_regen"
 )
 
-var info = &callbacks.RunInfo{Name: "Model-Completion", Type: "History", Component: "History"}
-var DefaultHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
-var RegenHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
-var SelectRegenHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
-var ReplaceHandler = callbacks.NewHandlerBuilder().OnStartFn(initMessage).OnEndFn(updateHistory).Build()
+type OptionInfo struct {
+	Typ         string
+	Regen       []*mmsg.Message
+	Replace     []*mmsg.Message
+	SelectRegen []*mmsg.Message
+}
 
 // CMsgToMMsgList 将 core_api.Message 切片转换为 message.Message
 func CMsgToMMsgList(cid, sid primitive.ObjectID, messages []*core_api.Message) (msgs []*mmsg.Message) {
@@ -64,7 +61,7 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 	return &schema.Message{
 		Role:    schema.RoleType(mmsg.RoleItoS[msg.Role]),
 		Content: msg.Content,
-		Name:    msg.MessageId.String(),
+		Name:    msg.MessageId.Hex(),
 	}
 }
 
@@ -86,7 +83,8 @@ func ConvFromEino(msg *schema.Message) *core_api.Message {
 // GetMessagesAndCallBacks
 // 消息顺序: 按时间倒序
 // 处理得到合适的对话记录以供模型生成使用, 同时根据不同的配置项注入不同的切面
-func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) (nc context.Context, messages []*schema.Message, err error) {
+func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) (_ context.Context, messages []*schema.Message, err error) {
+	info := &OptionInfo{}
 	// 获取历史记录
 	cid, err := primitive.ObjectIDFromHex(req.ConversationId)
 	if err != nil {
@@ -95,8 +93,7 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 	mmsgs := append(CMsgToMMsgList(cid, cid, req.Messages), getHistory(req.ConversationId)...)
 
 	// 据自定义配置, 对消息进行处理
-	nc = ctx
-	option := req.CompletionsOption
+	nc, option := ctx, req.CompletionsOption
 	switch {
 	case option.IsRegen: // 重新生成, 覆盖掉最新的模型输出, 生成regen_list
 		mmsgs = mmsgs[1:] // 因为是重新生成, 所以新的message没用
@@ -113,13 +110,13 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 				break
 			}
 		}
-		nc = context.WithValue(nc, Regen, regens) // 保存regen_list
-		nc = callbacks.InitCallbacks(nc, info, RegenHandler)
+		info.Typ, info.Regen = Regen, regens
+		nc = context.WithValue(nc, Regen, info) // 保存regen_list
 	case option.IsReplace: // 替换, 替换最新的一条用户消息, 实际是将最近一轮对话设为空且不保留
 		mmsgs[1].Ext.Brief, mmsgs[1].Content = mmsgs[1].Content, ""
 		mmsgs[2].Ext.Brief, mmsgs[2].Content = mmsgs[2].Content, ""
-		nc = context.WithValue(nc, Replace, []primitive.ObjectID{mmsgs[1].MessageId, mmsgs[2].MessageId})
-		nc = callbacks.InitCallbacks(nc, info, ReplaceHandler)
+		info.Typ, info.Replace = Replace, []*mmsg.Message{mmsgs[1], mmsgs[2]}
+		nc = context.WithValue(nc, Replace, info)
 	case option.SelectedRegenId != nil: // 选择一个重新生成的结果, 并开始新的对话
 		var sr []*mmsg.Message
 		reply := mmsgs[1].ReplyId
@@ -140,10 +137,8 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 				break
 			}
 		}
-		nc = context.WithValue(nc, SelectRegen, sr)
-		nc = callbacks.InitCallbacks(nc, info, SelectRegenHandler)
-	default: // 默认情况, 生成对话, 更新历史记录
-		nc = callbacks.InitCallbacks(nc, info, DefaultHandler)
+		info.Typ, info.SelectRegen = SelectRegen, sr
+		nc = context.WithValue(nc, SelectRegen, info)
 	}
 	return nc, MMsgToEMsgList(mmsgs), err
 }
@@ -155,19 +150,4 @@ func getHistory(conversation string) (messages []*mmsg.Message) {
 	// 从数据库中获取
 	// 转换为 schema.Message
 	return messages
-}
-
-// updateHistory TODO 更新历史记录
-//
-// 返回一个channel, 等待获取新历史记录并更新
-// 更新逻辑: 先更新redis, 然后同步到数据库中
-func updateHistory(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
-	util.DPrintf("[updateHistory callbacks] %+v\n%+v\n", info, output)
-	return ctx
-}
-
-// initMessage
-func initMessage(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
-	util.DPrintf("OnStart initMessage: %+v\n%+v\n", info, input)
-	return ctx
 }

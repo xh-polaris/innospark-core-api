@@ -29,6 +29,12 @@ type CompletionInfo struct {
 	SSE            *adaptor.SSEStream
 }
 
+type RefineContent struct {
+	Think   string `json:"think,omitempty"`
+	Text    string `json:"text,omitempty"`
+	Suggest string `json:"suggest,omitempty"`
+}
+
 // Completion 调用对话接口, 根据配置项选择流式或非流式
 func Completion(ctx context.Context, uid string, req *core_api.CompletionsReq, messages []*schema.Message) (any, error) {
 	info := &CompletionInfo{
@@ -37,6 +43,7 @@ func Completion(ctx context.Context, uid string, req *core_api.CompletionsReq, m
 		MessageId:      primitive.NewObjectID().Hex(),
 		MessageIndex:   len(messages),
 		ReplyId:        messages[0].Name,
+		Model:          req.Model,
 		BotId:          req.BotId,
 		UserId:         uid,
 	}
@@ -77,8 +84,8 @@ func doStream(ctx context.Context, info *CompletionInfo, m model.ToolCallingChat
 // 实际sse转换
 func doSSE(ctx context.Context, reader *schema.StreamReader[*schema.Message], s *adaptor.SSEStream) {
 	var err error
-	var chunk *schema.Message
 	var idx int
+	var msg *schema.Message
 	defer reader.Close()
 	defer close(s.C)
 
@@ -87,21 +94,25 @@ func doSSE(ctx context.Context, reader *schema.StreamReader[*schema.Message], s 
 	s.C <- eventModel(info) // 模型信息事件
 
 	for {
-		chunk, err = reader.Recv()
-		if err != nil {
-			if err != io.EOF { // optimize 错误处理
-				logx.Error("[domain model] do conv error: %v", err)
-			}
+		msg, err = reader.Recv()
+		if err != nil { // optimize 错误处理
+			logx.CondError(err != io.EOF, "[domain model] do conv error: %v", err)
 			s.C <- eventEnd() // 结束事件
 			return
 		}
-		s.C <- eventChat(idx, info, chunk) // 模型消息事件
+		var typ = cst.MessageContentTypeText
+		if msg.Extra != nil { // 存在额外消息
+			if t, ok := msg.Extra[cst.MessageContentType].(int); ok { // 消息类型
+				typ = t
+			}
+			// TODO 历史记录
+		}
+
+		s.C <- eventChat(idx, info, msg, typ) // 模型消息事件
 	}
 }
 
 func eventMeta(info *CompletionInfo) *sse.Event {
-	var err error
-	var data []byte
 	meta := &adaptor.EventMeta{
 		MessageId:        info.MessageId,
 		ConversationId:   info.ConversationId,
@@ -109,29 +120,18 @@ func eventMeta(info *CompletionInfo) *sse.Event {
 		MessageIndex:     info.MessageIndex,
 		ConversationType: cst.ConversationTypeText,
 	}
-	if data, err = json.Marshal(meta); err != nil {
-		logx.Error("[domain model] event meta marshal error: %v", err)
-	}
-	return &sse.Event{Type: cst.EventMeta, Data: data}
+	return event(meta, cst.EventMeta)
 }
 
 func eventModel(info *CompletionInfo) *sse.Event {
-	var err error
-	var data []byte
 	m := &adaptor.EventModel{Model: info.Model, BotId: info.BotId, BotName: info.BotName}
-	if data, err = json.Marshal(m); err != nil {
-		logx.Error("[domain m] event m marshal error: %v", err)
-	}
-	return &sse.Event{Type: cst.EventModel, Data: data}
+	return event(m, cst.EventModel)
 }
 
 // 将模型流式响应转换为sse事件
-func eventChat(idx int, info *CompletionInfo, msg *schema.Message) *sse.Event {
-	var err error
-	var data []byte
-
-	event := &adaptor.EventChat{
-		Message:          &adaptor.ChatMessage{Content: msg.Content, ContentType: cst.MessageContentType},
+func eventChat(idx int, info *CompletionInfo, msg *schema.Message, typ int) *sse.Event {
+	chat := &adaptor.EventChat{
+		Message:          &adaptor.ChatMessage{Content: msg.Content, ContentType: typ},
 		ConversationId:   info.ConversationId,
 		SectionId:        info.SectionId,
 		ReplyId:          info.ReplyId,
@@ -141,12 +141,18 @@ func eventChat(idx int, info *CompletionInfo, msg *schema.Message) *sse.Event {
 		MessageIndex:     idx,
 		BotId:            info.BotId,
 	}
-	if data, err = json.Marshal(event); err != nil {
-		logx.Error("[domain model] event chat marshal error: %v", err)
-	}
-	return &sse.Event{Type: cst.EventChat, Data: data}
+	return event(chat, cst.EventChat)
 }
 
 func eventEnd() *sse.Event {
 	return &sse.Event{Type: cst.EventEnd, Data: []byte(cst.EventEndValue)}
+}
+
+func event(obj any, typ string) *sse.Event {
+	var err error
+	var data []byte
+	if data, err = json.Marshal(obj); err != nil {
+		logx.Error("[domain model] event marshal error: %v", err)
+	}
+	return &sse.Event{Type: typ, Data: data}
 }

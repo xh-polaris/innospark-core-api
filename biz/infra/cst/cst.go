@@ -32,8 +32,23 @@ const (
 
 // Event中各种类型枚举值
 const (
-	MessageContentType   = 0
-	MessageStatus        = 0
-	InputContentTypeText = "text"
-	ConversationTypeText = 0
+	MessageContentTypeText    = 0
+	MessageContentTypeThink   = 1
+	MessageContentTypeSuggest = 2
+	MessageStatus             = 0
+	InputContentTypeText      = 0
+	ConversationTypeText      = 0
+)
+
+// schema.Message 中Extra携带信息
+const (
+	MessageContentType = "message_content_type" // 模型消息
+	FinalMessage       = "final_message"        // 最终消息
+)
+
+const (
+	ThinkStart   = "<think>"
+	ThinkEnd     = "</think>"
+	SuggestStart = "<suggest>"
+	SuggestEnd   = "</suggest>"
 )

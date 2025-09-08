@@ -7,6 +7,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/deyu"
+	_ "github.com/xh-polaris/innospark-core-api/biz/domain/innospark"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"

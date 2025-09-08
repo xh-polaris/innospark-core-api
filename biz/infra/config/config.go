@@ -2,13 +2,18 @@ package config
 
 import (
 	"os"
+	"sync"
 
 	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/core/stores/cache"
 
 	"github.com/zeromicro/go-zero/core/conf"
 )
 
-var config *Config
+var (
+	config *Config
+	once   sync.Once
+)
 
 type Auth struct {
 	SecretKey    string
@@ -16,11 +21,31 @@ type Auth struct {
 	AccessExpire int64
 }
 
+type Mongo struct {
+	URL string
+	DB  string
+}
+
+type Deyu struct {
+	APIKey  string
+	BaseURL string
+}
+
+type InnoSpark struct {
+	DefaultAPIKey    string
+	DefaultBaseURL   string
+	DeepThinkAPIKey  string
+	DeepThinkBaseURL string
+}
+
 type Config struct {
 	service.ServiceConf
-	ListenOn   string
-	Auth       Auth
-	DeyuAPIKey string
+	ListenOn  string
+	Auth      Auth
+	Deyu      Deyu
+	InnoSpark InnoSpark
+	Cache     cache.CacheConf
+	Mongo     Mongo
 }
 
 func NewConfig() (*Config, error) {
@@ -38,7 +63,7 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 	config = c
-	return c, nil
+	return config, nil
 }
 
 func GetConfig() *Config {
