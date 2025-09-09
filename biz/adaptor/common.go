@@ -46,7 +46,7 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	}
 	tokenString := c.GetHeader("Authorization")
 	if string(tokenString) == "xh-polaris" {
-		return "test-user", nil
+		return "67aac4d14e8825731a1503d8", nil
 	}
 	token, err := jwt.Parse(string(tokenString), func(_ *jwt.Token) (interface{}, error) {
 		return jwt.ParseECPublicKeyFromPEM([]byte(config.GetConfig().Auth.PublicKey))
@@ -108,12 +108,38 @@ func makeResponse(resp any) map[string]any {
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		return nil
 	}
-	// 构建返回数据
 	v = v.Elem()
-	response := map[string]any{
-		"code": v.FieldByName("Code").Int(),
-		"msg":  v.FieldByName("Msg").String(),
+
+	response := map[string]any{}
+
+	// 修改点1：先尝试从Resp字段获取Code/Msg
+	if respField := v.FieldByName("Resp"); respField.IsValid() && !respField.IsNil() {
+		respVal := respField.Elem()
+		if code := respVal.FieldByName("Code"); code.IsValid() {
+			response["code"] = code.Int()
+		}
+		if msg := respVal.FieldByName("Msg"); msg.IsValid() {
+			response["msg"] = msg.String()
+		}
 	}
+
+	// 修改点2：如果Resp不存在或无效，尝试直接获取顶级字段
+	if _, ok := response["code"]; !ok {
+		if code := v.FieldByName("Code"); code.IsValid() {
+			response["code"] = code.Int()
+		} else {
+			response["code"] = 200 // 默认值
+		}
+	}
+	if _, ok := response["msg"]; !ok {
+		if msg := v.FieldByName("Msg"); msg.IsValid() {
+			response["msg"] = msg.String()
+		} else {
+			response["msg"] = "success" // 默认值
+		}
+	}
+
+	// 以下保持原有逻辑...
 	data := make(map[string]any)
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)

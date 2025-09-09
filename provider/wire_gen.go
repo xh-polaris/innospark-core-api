@@ -9,6 +9,7 @@ package provider
 import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 )
 
 // Injectors from wire.go:
@@ -19,9 +20,14 @@ func NewProvider() (*Provider, error) {
 		return nil, err
 	}
 	completionsService := &service.CompletionsService{}
+	mongoMapper := conversation.NewConversationMongoMapper(configConfig)
+	conversationService := &service.ConversationService{
+		ConversationMapper: mongoMapper,
+	}
 	providerProvider := &Provider{
-		Config:             configConfig,
-		CompletionsService: completionsService,
+		Config:              configConfig,
+		CompletionsService:  completionsService,
+		ConversationService: conversationService,
 	}
 	return providerProvider, nil
 }
