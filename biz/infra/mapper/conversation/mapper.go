@@ -21,7 +21,13 @@ const (
 	cacheKeyPrefix = "cache:conversation:"
 )
 
-type MongoMapper interface{}
+type MongoMapper interface {
+	CreateNewConversation(ctx context.Context, uid string) (c *Conversation, err error)
+	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, err error)
+	DeleteConversation(ctx context.Context, uid, cid string) (err error)
+	UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error)
+	// TODO 实现GetConversation方法
+}
 
 type mongoMapper struct {
 	conn *monc.Model

@@ -8,6 +8,11 @@ var (
 	UnAuthErr      = New(1000, "身份认证失败")
 	HisErr         = New(20000, "获取对话记录失败")
 	UnImplementErr = New(888, "尚未实现的功能")
+
+	//conversation相关
+	ConversationCreationErr = New(20001, "创建对话失败")
+	ConversationRenameErr   = New(20002, "对话标题重命名失败")
+	ConversationListErr     = New(20003, "分页获取历史对话失败")
 )
 
 const unknowCode = 999

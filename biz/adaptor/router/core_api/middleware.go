@@ -70,3 +70,13 @@ func _listconversationMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _createconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _renameconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -39,9 +39,8 @@ func ListConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(core_api.ListConversationResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := provider.Get().ConversationService.ListConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
 // GetConversation .
@@ -55,9 +54,8 @@ func GetConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(core_api.GetConversationResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := provider.Get().ConversationService.GetConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
 // ListAgents .
@@ -90,4 +88,34 @@ func Feedback(ctx context.Context, c *app.RequestContext) {
 	resp := new(basic.Response)
 
 	c.JSON(consts.StatusOK, resp)
+}
+
+// CreateConversation 创建新对话
+// @router /conversation/create [POST]
+func CreateConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.CreateConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.CreateConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// RenameConversation 重命名对话标题
+// @router /conversation/rename [POST]
+func RenameConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.RenameConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.RenameConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

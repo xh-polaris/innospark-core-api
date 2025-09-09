@@ -456,6 +456,7 @@ var file_basic_http_proto_depIdxs = []int32{
 	0,  // [0:0] is the sub-list for field type_name
 }
 
+func init() { file_basic_http_proto_init() }
 func file_basic_http_proto_init() {
 	if File_basic_http_proto != nil {
 		return

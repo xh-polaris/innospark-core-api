@@ -18,8 +18,9 @@ func Init() {
 
 // Provider 提供controller依赖的对象
 type Provider struct {
-	Config             *config.Config
-	CompletionsService service.ICompletionsService
+	Config              *config.Config
+	CompletionsService  service.ICompletionsService
+	ConversationService service.IConversationService
 }
 
 func Get() *Provider {
@@ -30,6 +31,7 @@ var RPCSet = wire.NewSet()
 
 var ApplicationSet = wire.NewSet(
 	service.CompletionsServiceSet,
+	service.ConversationServiceSet,
 )
 
 var DomainSet = wire.NewSet()
