@@ -5,14 +5,17 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var _ MongoMapper = (*mongoMapper)(nil)
@@ -26,6 +29,7 @@ type MongoMapper interface {
 	UpdateMany(ctx context.Context, msg []*Message) (err error)
 	CreateNewMessage(ctx context.Context, nm *Message) (err error)
 	AllMessage(ctx context.Context, conversation string) ([]*Message, error)
+	ListMessage(ctx context.Context, conversation string, page *basic.Page) (msgs []*Message, hasMore bool, err error)
 }
 
 type mongoMapper struct {
@@ -64,7 +68,7 @@ func (m *mongoMapper) UpdateMany(ctx context.Context, msgs []*Message) (err erro
 	if _, err = session.WithTransaction(ctx, func(sessCtx context.Context) (any, error) {
 		var operations []mongo.WriteModel
 		for _, msg := range msgs { // 设置批量更新行为
-			filter := bson.M{cst.MessageId: msg.MessageId}
+			filter := bson.M{cst.Id: msg.MessageId}
 			update := bson.M{cst.Set: msg}
 			operations = append(operations, mongo.NewUpdateOneModel().SetFilter(filter).SetUpdate(update))
 		}
@@ -91,7 +95,8 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 	if err != nil {
 		return nil, err
 	}
-	if err = m.conn.Find(ctx, msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NQ: cst.DeletedStatus}}); err != nil {
+	if err = m.conn.Find(ctx, msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
+		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil {
 		logx.Error("[message mapper] find err:%v", err)
 		return nil, err
 	}
@@ -106,6 +111,23 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 		return msgs, nil
 	}
 	return msgs, nil
+}
+
+func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page *basic.Page) (msgs []*Message, hasMore bool, err error) {
+	ocid, err := primitive.ObjectIDFromHex(conversation)
+	if err != nil {
+		return nil, false, err
+	}
+	var total int64
+	if total, err = m.conn.CountDocuments(ctx, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}); err != nil {
+		logx.Error("[message mapper] count documents err:%v", err)
+	}
+	if err = m.conn.Find(ctx, &msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
+		util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})); err != nil {
+		logx.Error("[message mapper] find err:%v", err)
+		return nil, false, err
+	}
+	return msgs, total > page.GetPage()*page.GetSize(), nil
 }
 
 // 向redis中加入一个msg
@@ -135,7 +157,7 @@ func (m *mongoMapper) listAllMsg(ctx context.Context, key string) ([]*Message, e
 			logx.Error("[message mapper] listAllMsg: json.Unmarshal err:%v", err)
 			return nil, err
 		}
-		msgs[msg.Index] = &msg
+		msgs[len(result)-1-int(msg.Index)] = &msg // 倒序
 	}
 	return msgs, nil
 }

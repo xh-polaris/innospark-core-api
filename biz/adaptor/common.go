@@ -104,20 +104,22 @@ func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err 
 
 // makeResponse 通过反射构造嵌套格式的响应体
 func makeResponse(resp any) map[string]any {
+	if resp == nil {
+		return nil
+	}
 	v := reflect.ValueOf(resp)
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+	if v.IsZero() || v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		return nil
 	}
 	// 构建返回数据
 	v = v.Elem()
-	response := map[string]any{
-		"code": v.FieldByName("Code").Int(),
-		"msg":  v.FieldByName("Msg").String(),
-	}
+	r := v.FieldByName("Resp").Elem()
+	response := map[string]any{"code": r.FieldByName("Code").Int(), "msg": r.FieldByName("Msg").String()}
+
 	data := make(map[string]any)
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
-		if jsonTag := field.Tag.Get("json"); jsonTag != "" && field.Name != "Code" && field.Name != "Msg" {
+		if jsonTag := field.Tag.Get("json"); jsonTag != "" && field.Name != "Resp" {
 			if fieldValue := v.Field(i).Interface(); !reflect.ValueOf(fieldValue).IsZero() || !strings.Contains(jsonTag, "omitempty") {
 				data[jsonTag] = fieldValue
 			}

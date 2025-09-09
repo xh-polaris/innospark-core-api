@@ -73,19 +73,38 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 	}
 }
 
-func ConvFromEinoList(messages []*schema.Message) (msgs []*core_api.Message) {
+func MMsgToFMsgList(messages []*mmsg.Message) (msgs []*core_api.FullMessage) {
 	for _, msg := range messages {
-		msgs = append(msgs, ConvFromEino(msg))
+		msgs = append(msgs, MMsgToFMsg(msg))
 	}
 	return
 }
 
-func ConvFromEino(msg *schema.Message) *core_api.Message {
-	return &core_api.Message{
-		Content:     msg.Content,
-		ContentType: Text, // 目前都是Content, 所以忽略不管
-		Role:        string(msg.Role),
+func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
+	fm := &core_api.FullMessage{
+		ConversationId: msg.ConversationId.Hex(),
+		SectionId:      msg.SectionId.Hex(),
+		MessageId:      msg.MessageId.Hex(),
+		Index:          msg.Index,
+		Status:         msg.Status,
+		CreateTime:     msg.CreateTime.Unix(),
+		MessageType:    msg.MessageType,
+		ContentType:    msg.ContentType,
+		Content:        msg.Content,
+		Ext: &core_api.Ext{
+			BotState: msg.Ext.BotState,
+			Brief:    msg.Ext.Brief,
+			Think:    msg.Ext.Think,
+			Suggest:  msg.Ext.Suggest,
+		},
+		Feedback: msg.Feedback,
+		UserType: msg.Role,
 	}
+	if !msg.ReplyId.IsZero() {
+		reply := msg.ReplyId.Hex()
+		fm.ReplyId = &reply
+	}
+	return fm
 }
 
 // GetMessagesAndCallBacks

@@ -10,11 +10,13 @@ func BuildFindOption(p *basic.Page) (opts *options.FindOptionsBuilder) {
 	opts = options.Find()
 
 	var page, size int64 = 1, 10
-	if p.Page != nil {
-		page = *p.Page
-	}
-	if p.Size != nil {
-		size = *p.Size
+	if p != nil {
+		if p.Page != nil {
+			page = *p.Page
+		}
+		if p.Size != nil {
+			size = *p.Size
+		}
 	}
 	opts.SetSkip((page - 1) * size)
 	return

@@ -46,6 +46,6 @@ func (s *CompletionsService) Completions(ctx context.Context, req *core_api.Comp
 		return nil, err
 	}
 
-	// 进行对话, 利用切面在最后更新历史记录
+	// 进行对话, 利用切面在最后更新历史记录Q
 	return s.CompletionDomain.Completion(ctx, uid, req, messages)
 }

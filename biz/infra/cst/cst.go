@@ -67,6 +67,7 @@ const (
 
 // mapper层字段枚举
 const (
+	Id             = "_id"
 	ConversationId = "conversation_id"
 	MessageId      = "message_id"
 	UserId         = "user_id"
@@ -78,6 +79,6 @@ const (
 	Status        = "status"
 	DeletedStatus = -1
 
-	NQ  = "$ne"
+	NE  = "$ne"
 	Set = "$set"
 )

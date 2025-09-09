@@ -28,6 +28,36 @@ func Completions(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// CreateConversation .
+// @router /conversation/create [POST]
+func CreateConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.CreateConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.CreateConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// RenameConversation .
+// @router /conversation/rename [POST]
+func RenameConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.RenameConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.RenameConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // ListConversation .
 // @router /conversation/list [POST]
 func ListConversation(ctx context.Context, c *app.RequestContext) {
@@ -39,9 +69,8 @@ func ListConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(core_api.ListConversationResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := provider.Get().ConversationService.ListConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
 // GetConversation .
@@ -55,9 +84,8 @@ func GetConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(core_api.GetConversationResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := provider.Get().ConversationService.GetConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
 // ListAgents .

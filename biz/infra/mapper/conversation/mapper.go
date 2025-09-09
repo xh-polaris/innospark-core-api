@@ -21,7 +21,12 @@ const (
 	cacheKeyPrefix = "cache:conversation:"
 )
 
-type MongoMapper interface{}
+type MongoMapper interface {
+	CreateNewConversation(ctx context.Context, uid string) (c *Conversation, err error)
+	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, err error)
+	UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error)
+	DeleteConversation(ctx context.Context, uid, cid string) (err error)
+}
 
 type mongoMapper struct {
 	conn *monc.Model
@@ -66,7 +71,7 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 
 	// 分页, 创建时间倒序
 	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
-	err = m.conn.Find(ctx, cs, bson.M{cst.UserId: oid}, opts)
+	err = m.conn.Find(ctx, &cs, bson.M{cst.UserId: oid}, opts)
 	return cs, err
 }
 
@@ -83,7 +88,7 @@ func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (
 	}
 
 	// 更新对应uid,cid且未删除的对话
-	filter := bson.M{cst.ConversationId: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NQ: cst.DeletedStatus}}
+	filter := bson.M{cst.Id: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	_, err = m.conn.UpdateOne(ctx, cacheKeyPrefix+cid, filter,
 		bson.M{cst.Set: bson.M{cst.UpdateTime: time.Now(), cst.DeleteTime: time.Now(), cst.Status: cst.DeletedStatus}})
 	return err
@@ -97,7 +102,7 @@ func (m *mongoMapper) UpdateConversationBrief(ctx context.Context, uid, cid, bri
 		return err
 	}
 	ouid, ocid := oids[0], oids[1]
-	filter := bson.M{cst.ConversationId: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NQ: cst.DeletedStatus}}
+	filter := bson.M{cst.Id: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	_, err = m.conn.UpdateOne(ctx, cacheKeyPrefix+cid, filter,
 		bson.M{cst.Set: bson.M{cst.UpdateTime: time.Now(), cst.Brief: brief}})
 	return err

@@ -10,6 +10,14 @@ var (
 	UnImplementErr = New(888, "尚未实现的功能")
 )
 
+// conversation 相关
+var (
+	ConversationCreationErr = New(30001, "创建对话失败")
+	ConversationRenameErr   = New(30002, "对话标题重命名失败")
+	ConversationListErr     = New(30003, "分页获取历史对话失败")
+	ConversationGetErr      = New(30004, "获取对话历史记录失败")
+)
+
 const unknowCode = 999
 
 // Errorx 是HTTP服务的业务异常
