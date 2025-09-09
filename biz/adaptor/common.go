@@ -46,7 +46,7 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	}
 	tokenString := c.GetHeader("Authorization")
 	if string(tokenString) == "xh-polaris" {
-		return "test-user", nil
+		return "67aac4d14e8825731a1503d8", nil
 	}
 	token, err := jwt.Parse(string(tokenString), func(_ *jwt.Token) (interface{}, error) {
 		return jwt.ParseECPublicKeyFromPEM([]byte(config.GetConfig().Auth.PublicKey))
