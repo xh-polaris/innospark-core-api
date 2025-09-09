@@ -89,7 +89,7 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 	}
 
 	// 返回响应
-	return &core_api.ListConversationResp{Response: util.Success(), Conversations: items}, nil
+	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items}, nil
 }
 
 func (s *ConversationService) GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error) {

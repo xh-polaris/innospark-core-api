@@ -4,6 +4,7 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 )
 
 var provider *Provider
@@ -39,6 +40,7 @@ var DomainSet = wire.NewSet()
 var InfraSet = wire.NewSet(
 	config.NewConfig,
 	RPCSet,
+	conversation.NewConversationMongoMapper,
 )
 
 var AllProvider = wire.NewSet(

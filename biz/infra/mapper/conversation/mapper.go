@@ -72,7 +72,7 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 
 	// 分页, 创建时间倒序
 	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
-	err = m.conn.Find(ctx, cs, bson.M{cst.UserId: oid}, opts)
+	err = m.conn.Find(ctx, &cs, bson.M{cst.UserId: oid}, opts)
 	return cs, err
 }
 
@@ -103,7 +103,7 @@ func (m *mongoMapper) UpdateConversationBrief(ctx context.Context, uid, cid, bri
 		return err
 	}
 	ouid, ocid := oids[0], oids[1]
-	filter := bson.M{cst.ConversationId: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NQ: cst.DeletedStatus}}
+	filter := bson.M{cst.ConversationId: ocid, cst.UserId: ouid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	_, err = m.conn.UpdateOne(ctx, cacheKeyPrefix+cid, filter,
 		bson.M{cst.Set: bson.M{cst.UpdateTime: time.Now(), cst.Brief: brief}})
 	return err

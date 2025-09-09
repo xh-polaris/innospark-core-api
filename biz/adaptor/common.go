@@ -46,7 +46,7 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	}
 	tokenString := c.GetHeader("Authorization")
 	if string(tokenString) == "xh-polaris" {
-		return "test-user", nil
+		return "67aac4d14e8825731a1503d8", nil
 	}
 	token, err := jwt.Parse(string(tokenString), func(_ *jwt.Token) (interface{}, error) {
 		return jwt.ParseECPublicKeyFromPEM([]byte(config.GetConfig().Auth.PublicKey))
@@ -108,16 +108,14 @@ func makeResponse(resp any) map[string]any {
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		return nil
 	}
-	// 构建返回数据
 	v = v.Elem()
-	response := map[string]any{
-		"code": v.FieldByName("Code").Int(),
-		"msg":  v.FieldByName("Msg").String(),
-	}
+	r := v.FieldByName("Resp").Elem()
+	response := map[string]any{"code": r.FieldByName("Code").Int(), "msg": r.FieldByName("Msg").String()}
+
 	data := make(map[string]any)
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
-		if jsonTag := field.Tag.Get("json"); jsonTag != "" && field.Name != "Code" && field.Name != "Msg" {
+		if jsonTag := field.Tag.Get("json"); jsonTag != "" && field.Name != "Resp" {
 			if fieldValue := v.Field(i).Interface(); !reflect.ValueOf(fieldValue).IsZero() || !strings.Contains(jsonTag, "omitempty") {
 				data[jsonTag] = fieldValue
 			}

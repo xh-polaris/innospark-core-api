@@ -66,6 +66,7 @@ const (
 	Status        = "status"
 	DeletedStatus = -1
 
+	NE  = "$ne"
 	NQ  = "$nq"
 	Set = "$set"
 )
