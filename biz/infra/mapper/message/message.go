@@ -17,6 +17,7 @@ type Message struct {
 	MessageId      primitive.ObjectID `json:"message_id" bson:"_id"`                              // 主键
 	ConversationId primitive.ObjectID `json:"conversation_id" bson:"conversation_id"`             // 归属的对话id
 	SectionId      primitive.ObjectID `json:"section_id" bson:"section_id"`                       // 归属的段落id
+	UserId         primitive.ObjectID `json:"user_id" bson:"user_id"`                             // 用户id
 	Index          int32              `json:"index" bson:"index"`                                 // 消息索引
 	ReplyId        primitive.ObjectID `json:"reply_id,omitempty" bson:"reply_id,omitempty"`       // 回复id, 只有模型消息有
 	Content        string             `json:"content" bson:"content"`                             // 消息内容, json字符串

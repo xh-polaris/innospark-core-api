@@ -1,18 +1,24 @@
-package msg
+package model
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/cloudwego/eino/schema"
+	"github.com/google/wire"
 	"github.com/jinzhu/copier"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
 	Text        = 1
+	Default     = "default"
 	Regen       = "regen"
 	Replace     = "replace"
 	SelectRegen = "select_regen"
@@ -23,6 +29,8 @@ type OptionInfo struct {
 	Regen       []*mmsg.Message
 	Replace     []*mmsg.Message
 	SelectRegen []*mmsg.Message
+	CreateTime  time.Time
+	UserMessage *mmsg.Message
 }
 
 // CMsgToMMsgList 将 core_api.Message 切片转换为 message.Message
@@ -83,14 +91,41 @@ func ConvFromEino(msg *schema.Message) *core_api.Message {
 // GetMessagesAndCallBacks
 // 消息顺序: 按时间倒序
 // 处理得到合适的对话记录以供模型生成使用, 同时根据不同的配置项注入不同的切面
-func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) (_ context.Context, messages []*schema.Message, err error) {
-	info := &OptionInfo{}
+func (m *MessageDomain) GetMessagesAndCallBacks(ctx context.Context, user string, req *core_api.CompletionsReq) (_ context.Context, messages []*schema.Message, err error) {
+	info := &OptionInfo{CreateTime: time.Now(), Typ: Default}
 	// 获取历史记录
 	cid, err := primitive.ObjectIDFromHex(req.ConversationId)
 	if err != nil {
 		return nil, nil, err
 	}
-	mmsgs := append(CMsgToMMsgList(cid, cid, req.Messages), getHistory(req.ConversationId)...)
+	uid, err := primitive.ObjectIDFromHex(user)
+	if err != nil {
+		return nil, nil, err
+	}
+	his, err := m.getHistory(ctx, req.ConversationId)
+	if err != nil {
+		return nil, nil, err
+	}
+	// 构造用户消息
+	// 增加用户消息
+	um := &mmsg.Message{
+		MessageId:      primitive.NewObjectID(),
+		ConversationId: cid,
+		SectionId:      cid,
+		UserId:         uid,
+		Index:          int32(len(his)),
+		Content:        req.Messages[0].Content,
+		ContentType:    cst.ContentTypeText,
+		MessageType:    cst.MessageTypeText,
+		Ext:            &mmsg.Ext{Brief: req.Messages[0].Content},
+		Feedback:       0,
+		Role:           cst.UserEnum,
+		CreateTime:     info.CreateTime,
+		UpdateTime:     info.CreateTime,
+		Status:         0,
+	}
+	info.UserMessage = um
+	mmsgs := append([]*mmsg.Message{um}, his...)
 
 	// 据自定义配置, 对消息进行处理
 	nc, option := ctx, req.CompletionsOption
@@ -98,8 +133,8 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 	case option.IsRegen: // 重新生成, 覆盖掉最新的模型输出, 生成regen_list
 		mmsgs = mmsgs[1:] // 因为是重新生成, 所以新的message没用
 		var regens []*mmsg.Message
-		for _, msg := range mmsgs { // 将此前同一个replyId的消息置为空
-			if msg.ReplyId.Hex() == *req.ReplyId {
+		for _, msg := range mmsgs { // 将此前同一个replyId且不为空的消息置为空
+			if msg.ReplyId.Hex() == *req.ReplyId && msg.Content != "" {
 				rmsg := &mmsg.Message{Ext: &mmsg.Ext{}}
 				if err = copier.Copy(msg, rmsg); err != nil {
 					return nil, nil, err
@@ -110,13 +145,11 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 				break
 			}
 		}
-		info.Typ, info.Regen = Regen, regens
-		nc = context.WithValue(nc, Regen, info) // 保存regen_list
+		info.Typ, info.Regen = Regen, regens // 保存regen_list
 	case option.IsReplace: // 替换, 替换最新的一条用户消息, 实际是将最近一轮对话设为空且不保留
 		mmsgs[1].Ext.Brief, mmsgs[1].Content = mmsgs[1].Content, ""
 		mmsgs[2].Ext.Brief, mmsgs[2].Content = mmsgs[2].Content, ""
 		info.Typ, info.Replace = Replace, []*mmsg.Message{mmsgs[1], mmsgs[2]}
-		nc = context.WithValue(nc, Replace, info)
 	case option.SelectedRegenId != nil: // 选择一个重新生成的结果, 并开始新的对话
 		var sr []*mmsg.Message
 		reply := mmsgs[1].ReplyId
@@ -138,16 +171,70 @@ func GetMessagesAndCallBacks(ctx context.Context, req *core_api.CompletionsReq) 
 			}
 		}
 		info.Typ, info.SelectRegen = SelectRegen, sr
-		nc = context.WithValue(nc, SelectRegen, info)
 	}
+	nc = context.WithValue(nc, cst.OptionInfo, info)
 	return nc, MMsgToEMsgList(mmsgs), err
 }
 
-// getHistory TODO 获取历史记录
-// 获取逻辑: 优先从redis中获取, 若不存在再尝试从数据库中装配
-func getHistory(conversation string) (messages []*mmsg.Message) {
-	// 从redis中获取
-	// 从数据库中获取
-	// 转换为 schema.Message
-	return messages
+type MessageDomain struct {
+	MsgMapper mmsg.MongoMapper
+}
+
+var MessageDomainSet = wire.NewSet(wire.Struct(new(MessageDomain), "*"))
+
+// getHistory
+func (m *MessageDomain) getHistory(ctx context.Context, conversation string) (messages []*mmsg.Message, err error) {
+	msgs, err := m.MsgMapper.AllMessage(ctx, conversation)
+	if err != nil {
+		return nil, err
+	}
+	return msgs, nil
+}
+
+func (m *MessageDomain) ProcessHistory(ctx context.Context, info *CompletionInfo) {
+	option := ctx.Value(cst.OptionInfo).(*OptionInfo)
+	if option.Typ != Default {
+		var msg []*mmsg.Message
+		// 处理选项
+		switch option.Typ {
+		case Regen: // 重新生成, 更新regen列表中的消息
+			msg = append(msg, option.Regen...)
+		case Replace: // 替换, 更新replace列表中的消息
+			msg = append(msg, option.Replace...)
+		case SelectRegen: // 选择重新生成, 更新SelectRegen中的消息
+			msg = append(msg, option.SelectRegen...)
+		}
+		if err := m.MsgMapper.UpdateMany(ctx, msg); err != nil {
+			logx.Error("[domain message] process history option err: %v", err)
+			return
+		}
+	}
+
+	oids, err := util.ObjectIDsFromHex(info.MessageId, info.ConversationId, info.SectionId, info.UserId, info.ReplyId)
+	if err != nil {
+		logx.Error("[domain message] process history new message err: %v", err)
+		return
+	}
+	// 增加模型消息
+	now := time.Now()
+	mm := &mmsg.Message{
+		MessageId: oids[0], ConversationId: oids[1], SectionId: oids[2], UserId: oids[3],
+		Index: int32(info.MessageIndex), ReplyId: oids[4],
+		Content: info.Text, ContentType: int32(info.ContentType), MessageType: int32(info.MessageType),
+		Ext: &mmsg.Ext{
+			BotState: fmt.Sprintf("{\"model\":\"%s\",\"bot_id\":\"%s\",\"bot_name\":\"%s\"}", info.Model, info.BotId, info.BotName),
+			Brief:    info.Text,
+			Think:    info.Think,
+			Suggest:  info.Suggest,
+		},
+		Feedback: 0, Role: cst.AssistantEnum,
+		CreateTime: now, UpdateTime: now, Status: 0,
+	}
+	if err = m.MsgMapper.CreateNewMessage(ctx, option.UserMessage); err != nil {
+		logx.Error("[domain message] process history new message err: %v", err)
+	}
+	if err = m.MsgMapper.CreateNewMessage(ctx, mm); err != nil {
+		logx.Error("[domain message] process history create new err: %v]", err)
+	}
+	return
 }

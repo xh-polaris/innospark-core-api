@@ -8,7 +8,9 @@ package provider
 
 import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 )
 
 // Injectors from wire.go:
@@ -18,10 +20,22 @@ func NewProvider() (*Provider, error) {
 	if err != nil {
 		return nil, err
 	}
-	completionsService := &service.CompletionsService{}
+	mongoMapper := message.NewMessageMongoMapper(configConfig)
+	messageDomain := &model.MessageDomain{
+		MsgMapper: mongoMapper,
+	}
+	completionDomain := &model.CompletionDomain{
+		MsgDomain: messageDomain,
+	}
+	completionsService := &service.CompletionsService{
+		MsgMaMsgDomain:   messageDomain,
+		CompletionDomain: completionDomain,
+	}
 	providerProvider := &Provider{
 		Config:             configConfig,
 		CompletionsService: completionsService,
+		MessageDomain:      messageDomain,
+		CompletionDomain:   completionDomain,
 	}
 	return providerProvider, nil
 }

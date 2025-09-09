@@ -6,6 +6,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 
 	"github.com/zeromicro/go-zero/core/conf"
 )
@@ -45,6 +46,7 @@ type Config struct {
 	Deyu      Deyu
 	InnoSpark InnoSpark
 	Cache     cache.CacheConf
+	Redis     redis.RedisConf
 	Mongo     Mongo
 }
 

@@ -3,6 +3,7 @@ package deyu
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"sync"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
@@ -59,19 +60,25 @@ func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...mo
 		return nil, err
 	}
 	sr, sw := schema.Pipe[*schema.Message](5)
-	go process(reader, sw)
+	go process(ctx, reader, sw)
 	return sr, nil
 }
 
-func process(reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
 	defer reader.Close()
 	defer writer.Close()
 
 	var err error
 	var data []byte
 	var msg *schema.Message
+	var text, think, suggest strings.Builder
+	defer func() {
+		info := ctx.Value(cst.CompletionInfo).(*dm.CompletionInfo)
+		info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String()
+	}()
+
 	var pass bool // 跳过一个\n\n
-	var status = cst.MessageContentTypeText
+	var status = cst.EventMessageContentTypeText
 	for {
 		if msg, err = reader.Recv(); err != nil {
 			writer.Send(nil, err)
@@ -86,29 +93,32 @@ func process(reader *schema.StreamReader[*schema.Message], writer *schema.Stream
 		// 处理消息
 		switch msg.Content {
 		case cst.ThinkStart: // 深度思考内容开始
-			status, pass = cst.MessageContentTypeThink, true
+			status, pass = cst.EventMessageContentTypeThink, true
 			continue
 		case cst.SuggestStart: // 建议内容开始
-			status, pass = cst.MessageContentTypeSuggest, true
+			status, pass = cst.EventMessageContentTypeSuggest, true
 			continue
 		case cst.ThinkEnd:
 			fallthrough // 切回普通内容
 		case cst.SuggestEnd:
-			status, pass = cst.MessageContentTypeText, true
+			status, pass = cst.EventMessageContentTypeText, true
 			continue
 		}
 		switch status {
-		case cst.MessageContentTypeText:
+		case cst.EventMessageContentTypeText:
 			refine.Text = msg.Content
-		case cst.MessageContentTypeThink:
+			text.WriteString(msg.Content)
+		case cst.EventMessageContentTypeThink:
 			refine.Think = msg.Content
-		case cst.MessageContentTypeSuggest:
+			think.WriteString(msg.Content)
+		case cst.EventMessageContentTypeSuggest:
 			refine.Suggest = msg.Content
+			suggest.WriteString(msg.Content)
 		}
 		if data, err = json.Marshal(&refine); err != nil {
 			continue
 		}
-		msg.Content, msg.Extra = string(data), map[string]any{cst.MessageContentType: status}
+		msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
 		writer.Send(msg, nil)
 	}
 }

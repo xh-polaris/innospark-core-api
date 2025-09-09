@@ -80,21 +80,27 @@ func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...mo
 	}
 	sr, sw := schema.Pipe[*schema.Message](5)
 	if c.model == DefaultModel {
-		go process(reader, sw)
+		go process(ctx, reader, sw)
 	} else {
-		go deepThinkProcess(reader, sw)
+		go deepThinkProcess(ctx, reader, sw)
 	}
 	return sr, nil
 }
 
-func process(reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
 	defer reader.Close()
 	defer writer.Close()
 
 	var err error
 	var data []byte
 	var msg *schema.Message
-	var status = cst.MessageContentTypeText
+	var text, suggest strings.Builder
+	defer func() {
+		info := ctx.Value(cst.CompletionInfo).(*dm.CompletionInfo)
+		info.Text, info.Suggest = text.String(), suggest.String()
+	}()
+
+	var status = cst.EventMessageContentTypeText
 	for {
 		if msg, err = reader.Recv(); err != nil {
 			writer.Send(nil, err)
@@ -105,36 +111,44 @@ func process(reader *schema.StreamReader[*schema.Message], writer *schema.Stream
 		// 处理消息
 		switch msg.Content {
 		case cst.SuggestStart: // 建议内容开始
-			status = cst.MessageContentTypeSuggest
+			status = cst.EventMessageContentTypeSuggest
 			continue
 		case cst.SuggestEnd: // 切回普通内容
-			status = cst.MessageContentTypeText
+			status = cst.EventMessageContentTypeText
 			continue
 		}
 		switch status {
-		case cst.MessageContentTypeText:
+		case cst.EventMessageContentTypeText:
 			refine.Text = msg.Content
-		case cst.MessageContentTypeSuggest:
+			text.WriteString(msg.Content)
+		case cst.EventMessageContentTypeSuggest:
 			refine.Suggest = msg.Content // optimize 建议内容处理
+			suggest.WriteString(msg.Content)
 		}
 		if data, err = json.Marshal(&refine); err != nil {
 			continue
 		}
-		msg.Content, msg.Extra = string(data), map[string]any{cst.MessageContentType: status}
+		msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
 		writer.Send(msg, nil)
 	}
 }
 
-func deepThinkProcess(reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
 	defer reader.Close()
 	defer writer.Close()
 
 	var err error
 	var data []byte
 	var msg *schema.Message
+	var text, think, suggest strings.Builder
+	defer func() {
+		info := ctx.Value(cst.CompletionInfo).(*dm.CompletionInfo)
+		info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String()
+	}()
+
 	var pass int       // 跳过次数
 	var collect string // 收集跳过的内容
-	var status = cst.MessageContentTypeText
+	var status = cst.EventMessageContentTypeText
 	for {
 		if msg, err = reader.Recv(); err != nil {
 			writer.Send(nil, err)
@@ -154,24 +168,27 @@ func deepThinkProcess(reader *schema.StreamReader[*schema.Message], writer *sche
 		switch strings.Trim(collect, "\n") {
 		case cst.ThinkStart:
 			collect = ""
-			status = cst.MessageContentTypeThink
+			status = cst.EventMessageContentTypeThink
 		case cst.ThinkEnd:
 			collect = ""
-			status = cst.MessageContentTypeText
+			status = cst.EventMessageContentTypeText
 		}
 
 		switch status {
-		case cst.MessageContentTypeText:
+		case cst.EventMessageContentTypeText:
 			refine.Text = msg.Content
-		case cst.MessageContentTypeSuggest: // optimize 需要处理建议
+			text.WriteString(msg.Content)
+		case cst.EventMessageContentTypeSuggest: // optimize 需要处理建议
 			refine.Suggest = msg.Content
-		case cst.MessageContentTypeThink:
+			suggest.WriteString(msg.Content)
+		case cst.EventMessageContentTypeThink:
 			refine.Think = msg.Content
+			think.WriteString(msg.Content)
 		}
 		if data, err = json.Marshal(&refine); err != nil {
 			continue
 		}
-		msg.Content, msg.Extra = string(data), map[string]any{cst.MessageContentType: status}
+		msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
 		writer.Send(msg, nil)
 	}
 }

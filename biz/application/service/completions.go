@@ -9,7 +9,6 @@ import (
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/deyu"
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/innospark"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
@@ -19,6 +18,8 @@ type ICompletionsService interface {
 }
 
 type CompletionsService struct {
+	MsgMaMsgDomain   *model.MessageDomain
+	CompletionDomain *model.CompletionDomain
 }
 
 var CompletionsServiceSet = wire.NewSet(
@@ -40,11 +41,11 @@ func (s *CompletionsService) Completions(ctx context.Context, req *core_api.Comp
 	}
 
 	// 构建聊天记录和注入切面
-	ctx, messages, err := msg.GetMessagesAndCallBacks(ctx, req)
+	ctx, messages, err := s.MsgMaMsgDomain.GetMessagesAndCallBacks(ctx, uid, req)
 	if err != nil {
 		return nil, err
 	}
 
 	// 进行对话, 利用切面在最后更新历史记录
-	return model.Completion(ctx, uid, req, messages)
+	return s.CompletionDomain.Completion(ctx, uid, req, messages)
 }
