@@ -53,6 +53,7 @@ func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid string) (c 
 		UserId:         oid,
 		CreateTime:     now,
 		UpdateTime:     now,
+		Brief:          "未命名对话",
 	}
 
 	// 插入

@@ -8,12 +8,14 @@ require (
 	github.com/cloudwego/hertz v0.10.2
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/wire v0.7.0
+	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/monitor-prometheus v0.1.3
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.4.1
 	github.com/jinzhu/copier v0.3.5
 	github.com/xh-polaris/gopkg v0.0.0-20250312141711-7327267f4ea6
 	github.com/zeromicro/go-zero v1.9.0
 	go.mongodb.org/mongo-driver v1.12.0
+	go.mongodb.org/mongo-driver/v2 v2.3.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
 	go.opentelemetry.io/contrib/propagators/b3 v1.38.0
 	go.opentelemetry.io/otel v1.38.0
@@ -89,7 +91,6 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
-	go.mongodb.org/mongo-driver/v2 v2.3.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect

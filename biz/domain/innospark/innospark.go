@@ -69,13 +69,27 @@ func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.Comple
 	return &ChatModel{cli: cli, model: DeepThinkModel}
 }
 
-func (c *ChatModel) Generate(ctx context.Context, input []*schema.Message, opts ...model.Option) (*schema.Message, error) {
-	return c.cli.Generate(ctx, input, opts...)
+func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		if in[i].Content != "" {
+			reverse = append(reverse, in[i])
+		}
+	}
+	return c.cli.Generate(ctx, reverse, opts...)
 }
 
 func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (sr *schema.StreamReader[*schema.Message], err error) {
 	var reader *schema.StreamReader[*schema.Message]
-	if reader, err = c.cli.Stream(ctx, in, opts...); err != nil {
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		if in[i].Content != "" {
+			reverse = append(reverse, in[i])
+		}
+	}
+	if reader, err = c.cli.Stream(ctx, reverse, opts...); err != nil {
 		return nil, err
 	}
 	sr, sw := schema.Pipe[*schema.Message](5)

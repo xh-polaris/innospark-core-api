@@ -165,10 +165,22 @@ func (m *MessageDomain) GetMessagesAndCallBacks(ctx context.Context, user string
 			}
 		}
 		info.Typ, info.Regen = Regen, regens // 保存regen_list
-	case option.IsReplace: // 替换, 替换最新的一条用户消息, 实际是将最近一轮对话设为空且不保留
-		mmsgs[1].Ext.Brief, mmsgs[1].Content = mmsgs[1].Content, ""
-		mmsgs[2].Ext.Brief, mmsgs[2].Content = mmsgs[2].Content, ""
-		info.Typ, info.Replace = Replace, []*mmsg.Message{mmsgs[1], mmsgs[2]}
+	case option.IsReplace: // 替换, 替换最新的一条用户消息, 实际是将最近一轮有效对话设为空且不保留
+		info.Typ = Replace
+		for _, msg := range mmsgs[1:] {
+			if msg.Content != "" {
+				switch msg.Role {
+				case cst.UserEnum:
+					msg.Ext.Brief, msg.Content = msg.Content, ""
+					info.Replace = append(info.Replace, msg)
+				case cst.AssistantEnum:
+					msg.Ext.Brief, msg.Content = msg.Content, ""
+					info.Replace = append(info.Replace, msg)
+				}
+			} else if len(info.Replace) == 2 {
+				break
+			}
+		}
 	case option.SelectedRegenId != nil: // 选择一个重新生成的结果, 并开始新的对话
 		var sr []*mmsg.Message
 		reply := mmsgs[1].ReplyId
@@ -180,7 +192,7 @@ func (m *MessageDomain) GetMessagesAndCallBacks(ctx context.Context, user string
 				}
 				sr = append(sr, rmsg)
 
-				if msg.MessageId.Hex() != *option.SelectedRegenId {
+				if msg.MessageId.Hex() == *option.SelectedRegenId {
 					msg.Content = msg.Ext.Brief
 				} else {
 					msg.Ext.Brief, msg.Content = msg.Content, ""
