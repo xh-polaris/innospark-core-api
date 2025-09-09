@@ -46,9 +46,26 @@ const (
 	FinalMessage       = "final_message"        // 最终消息
 )
 
+// 流式响应标签
 const (
 	ThinkStart   = "<think>"
 	ThinkEnd     = "</think>"
 	SuggestStart = "<suggest>"
 	SuggestEnd   = "</suggest>"
+)
+
+// mapper层字段枚举
+const (
+	ConversationId = "conversation_id"
+	UserId         = "user_id"
+	CreateTime     = "create_time"
+	UpdateTime     = "update_time"
+	DeleteTime     = "delete_time"
+	Brief          = "brief"
+
+	Status        = "status"
+	DeletedStatus = -1
+
+	NQ  = "$nq"
+	Set = "$set"
 )

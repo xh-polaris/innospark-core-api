@@ -14,7 +14,7 @@ var (
 
 // Message 一条消息, 可能归属于用户或模型
 type Message struct {
-	MessageId      primitive.ObjectID `json:"message_id" bson:"message_id"`                       // 主键
+	MessageId      primitive.ObjectID `json:"message_id" bson:"_id"`                              // 主键
 	ConversationId primitive.ObjectID `json:"conversation_id" bson:"conversation_id"`             // 归属的对话id
 	SectionId      primitive.ObjectID `json:"section_id" bson:"section_id"`                       // 归属的段落id
 	Index          int32              `json:"index" bson:"index"`                                 // 消息索引

@@ -8,7 +8,7 @@ import (
 
 // Conversation 记录一次对话, 包含用户和模型的所有消息以及对话的基本信息
 type Conversation struct {
-	ConversationId primitive.ObjectID `json:"conversation_id" bson:"conversation_id"`             // 主键
+	ConversationId primitive.ObjectID `json:"conversation_id" bson:"_id"`                         // 主键
 	UserId         primitive.ObjectID `json:"user_id" bson:"user_id"`                             // 索引
 	Brief          string             `json:"brief" bson:"brief"`                                 // 对话标题
 	CreateTime     time.Time          `json:"create_time" bson:"create_time"`                     // 创建时间
