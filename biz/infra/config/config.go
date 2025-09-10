@@ -42,6 +42,7 @@ type InnoSpark struct {
 type Config struct {
 	service.ServiceConf
 	ListenOn  string
+	State     string
 	Auth      Auth
 	Deyu      Deyu
 	InnoSpark InnoSpark

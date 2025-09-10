@@ -12,6 +12,7 @@ import (
 	dm "github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 func init() {
@@ -38,6 +39,7 @@ func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.Completi
 		APIVersion: APIVersion,
 		Model:      DefaultModel,
 		User:       &uid,
+		HTTPClient: util.NewDebugClient(),
 	})
 	if err != nil {
 		return nil, err
@@ -54,6 +56,7 @@ func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.Comple
 		APIVersion: APIVersion,
 		Model:      DeepThinkModel,
 		User:       &uid,
+		HTTPClient: util.NewDebugClient(),
 	})
 	if err != nil {
 		return nil, err
@@ -78,6 +81,7 @@ func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...mo
 	var reverse []*schema.Message
 	for i := len(in) - 1; i >= 0; i-- {
 		if in[i].Content != "" {
+			in[i].Name = ""
 			reverse = append(reverse, in[i])
 		}
 	}

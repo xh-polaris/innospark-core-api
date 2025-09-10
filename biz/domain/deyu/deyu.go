@@ -13,6 +13,7 @@ import (
 	dm "github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 func init() {
@@ -40,6 +41,7 @@ func NewChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq)
 		APIVersion: APIVersion,
 		Model:      DefaultModel,
 		User:       &uid,
+		HTTPClient: util.NewDebugClient(),
 	})
 	if err != nil {
 		return nil, err
