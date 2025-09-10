@@ -33,10 +33,10 @@ type Deyu struct {
 }
 
 type InnoSpark struct {
-	DefaultAPIKey    string
 	DefaultBaseURL   string
-	DeepThinkAPIKey  string
+	DefaultAPIKey    string
 	DeepThinkBaseURL string
+	DeepThinkAPIKey  string
 }
 
 type Config struct {

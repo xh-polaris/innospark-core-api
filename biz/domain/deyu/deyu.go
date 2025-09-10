@@ -33,21 +33,18 @@ type ChatModel struct {
 	cli *openai.ChatModel
 }
 
-func NewChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) model.ToolCallingChatModel {
-	once.Do(func() {
-		var err error
-		cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-			APIKey:     config.GetConfig().Deyu.APIKey,
-			BaseURL:    config.GetConfig().Deyu.BaseURL,
-			APIVersion: APIVersion,
-			Model:      DefaultModel,
-			User:       &uid,
-		})
-		if err != nil {
-			panic(err)
-		}
+func NewChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) (_ model.ToolCallingChatModel, err error) {
+	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		APIKey:     config.GetConfig().Deyu.APIKey,
+		BaseURL:    config.GetConfig().Deyu.BaseURL,
+		APIVersion: APIVersion,
+		Model:      DefaultModel,
+		User:       &uid,
 	})
-	return &ChatModel{cli: cli}
+	if err != nil {
+		return nil, err
+	}
+	return &ChatModel{cli: cli}, nil
 }
 
 func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"strings"
-	"sync"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
@@ -21,11 +20,6 @@ func init() {
 }
 
 var (
-	defaultCli    *openai.ChatModel
-	deepThinkCli  *openai.ChatModel
-	defaultOnce   sync.Once
-	deepThinkOnce sync.Once
-
 	DefaultModel   = "InnoSpark"
 	DeepThinkModel = "InnoSpark-R"
 	APIVersion     = "v1"
@@ -36,38 +30,35 @@ type ChatModel struct {
 	model string
 }
 
-func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) model.ToolCallingChatModel {
-	defaultOnce.Do(func() {
-		var err error
-		defaultCli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-			APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
-			BaseURL:    config.GetConfig().InnoSpark.DefaultBaseURL,
-			APIVersion: APIVersion,
-			Model:      DefaultModel,
-			User:       &uid,
-		})
-		if err != nil {
-			panic(err)
-		}
+func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) (_ model.ToolCallingChatModel, err error) {
+	var cli *openai.ChatModel
+	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
+		BaseURL:    config.GetConfig().InnoSpark.DefaultBaseURL,
+		APIVersion: APIVersion,
+		Model:      DefaultModel,
+		User:       &uid,
 	})
-	return &ChatModel{cli: defaultCli, model: DefaultModel}
+	if err != nil {
+		return nil, err
+	}
+
+	return &ChatModel{cli: cli, model: DefaultModel}, nil
 }
 
-func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) model.ToolCallingChatModel {
-	deepThinkOnce.Do(func() {
-		var err error
-		deepThinkCli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-			APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,
-			BaseURL:    config.GetConfig().InnoSpark.DeepThinkBaseURL,
-			APIVersion: APIVersion,
-			Model:      DeepThinkModel,
-			User:       &uid,
-		})
-		if err != nil {
-			panic(err)
-		}
+func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) (_ model.ToolCallingChatModel, err error) {
+	var cli *openai.ChatModel
+	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,
+		BaseURL:    config.GetConfig().InnoSpark.DeepThinkBaseURL,
+		APIVersion: APIVersion,
+		Model:      DeepThinkModel,
+		User:       &uid,
 	})
-	return &ChatModel{cli: deepThinkCli, model: DeepThinkModel}
+	if err != nil {
+		return nil, err
+	}
+	return &ChatModel{cli: cli, model: DeepThinkModel}, nil
 }
 
 func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
@@ -96,8 +87,10 @@ func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...mo
 	sr, sw := schema.Pipe[*schema.Message](5)
 	if c.model == DefaultModel {
 		go process(ctx, reader, sw)
-	} else {
+	} else if c.model == DeepThinkModel {
 		go deepThinkProcess(ctx, reader, sw)
+	} else {
+		reader.Close()
 	}
 	return sr, nil
 }

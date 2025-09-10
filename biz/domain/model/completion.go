@@ -61,7 +61,10 @@ func (d *CompletionDomain) Completion(ctx context.Context, uid string, req *core
 		ContentType:    cst.ContentTypeText,
 		MessageType:    cst.MessageTypeText,
 	}
-	m := getModel(ctx, uid, req)
+	m, err := getModel(ctx, uid, req)
+	if err != nil {
+		return nil, err
+	}
 	// 调用模型
 	if req.CompletionsOption.Stream {
 		return d.doStream(ctx, info, m, uid, req, messages)
