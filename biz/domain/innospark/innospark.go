@@ -21,7 +21,8 @@ func init() {
 }
 
 var (
-	cli           *openai.ChatModel
+	defaultCli    *openai.ChatModel
+	deepThinkCli  *openai.ChatModel
 	defaultOnce   sync.Once
 	deepThinkOnce sync.Once
 
@@ -38,7 +39,7 @@ type ChatModel struct {
 func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) model.ToolCallingChatModel {
 	defaultOnce.Do(func() {
 		var err error
-		cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		defaultCli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 			APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
 			BaseURL:    config.GetConfig().InnoSpark.DefaultBaseURL,
 			APIVersion: APIVersion,
@@ -49,13 +50,13 @@ func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.Completi
 			panic(err)
 		}
 	})
-	return &ChatModel{cli: cli, model: DefaultModel}
+	return &ChatModel{cli: defaultCli, model: DefaultModel}
 }
 
 func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) model.ToolCallingChatModel {
 	deepThinkOnce.Do(func() {
 		var err error
-		cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		deepThinkCli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 			APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,
 			BaseURL:    config.GetConfig().InnoSpark.DeepThinkBaseURL,
 			APIVersion: APIVersion,
@@ -66,7 +67,7 @@ func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.Comple
 			panic(err)
 		}
 	})
-	return &ChatModel{cli: cli, model: DeepThinkModel}
+	return &ChatModel{cli: deepThinkCli, model: DeepThinkModel}
 }
 
 func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
