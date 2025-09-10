@@ -30,7 +30,7 @@ func (s *SSEStream) Nex() (*sse.Event, bool) {
 	return event, true
 }
 
-// 实现sse流响应
+// 实现sse流响应, TODO 实现中断
 func makeSSE(c *app.RequestContext, stream *SSEStream) {
 	w := sse.NewWriter(c)
 	defer func(w *sse.Writer) {
