@@ -18,7 +18,7 @@ func DPrintf(format string, a ...interface{}) {
 // Success 返回成功的basic.Response指针
 func Success() *basic.Response {
 	return &basic.Response{
-		Code: 200,
+		Code: 0,
 		Msg:  "success",
 	}
 }
