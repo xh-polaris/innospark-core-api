@@ -29,7 +29,7 @@ type Message struct {
 	CreateTime     time.Time          `json:"create_time" bson:"create_time"`                     // 创建时间
 	UpdateTime     time.Time          `json:"update_time" bson:"update_time"`                     // 更新时间
 	DeleteTime     time.Time          `json:"delete_time,omitempty" bson:"delete_time,omitempty"` // 删除时间
-	Status         int32              `json:"status" bson:"status"`                               // 状态, 默认/regen未选择/regen被选择/替换过, 依次是0,1,2,3
+	Status         int32              `json:"status" bson:"status"`                               // 状态, 默认/regen未选择/regen被选择/替换过/中断, 依次是0,1,2,3
 }
 
 type Ext struct {

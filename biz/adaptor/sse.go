@@ -10,13 +10,14 @@ import (
 
 // SSEStream SSE事件流
 type SSEStream struct {
-	C  chan *sse.Event
-	id int
+	C    chan *sse.Event
+	id   int
+	Done chan struct{}
 }
 
 // NewSSEStream 创建事件流
 func NewSSEStream() *SSEStream {
-	return &SSEStream{C: make(chan *sse.Event, 5), id: 0}
+	return &SSEStream{C: make(chan *sse.Event, 5), id: 0, Done: make(chan struct{})}
 }
 
 // Nex 获取下一个事件并返回是否关闭
@@ -32,9 +33,11 @@ func (s *SSEStream) Nex() (*sse.Event, bool) {
 
 // 实现sse流响应, TODO 实现中断
 func makeSSE(c *app.RequestContext, stream *SSEStream) {
+	var err error
 	w := sse.NewWriter(c)
 	defer func(w *sse.Writer) {
-		if err := w.Close(); err != nil {
+		close(stream.Done) // 关闭结束channel
+		if closeErr := w.Close(); err != nil && closeErr != nil {
 			logx.Error("close sse writer fail, err=%v", err)
 		}
 	}(w)
@@ -45,7 +48,8 @@ func makeSSE(c *app.RequestContext, stream *SSEStream) {
 		if event, ok = stream.Nex(); !ok {
 			return
 		}
-		if err := w.Write(event); err != nil {
+		if err = w.Write(event); err != nil {
+			stream.Done <- struct{}{} // 给这个流写入提前终止信号
 			logx.Error("write sse-event error, err=%s", err.Error())
 			return
 		}

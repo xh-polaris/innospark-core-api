@@ -3,7 +3,6 @@ package deyu
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"sync"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
@@ -80,55 +79,52 @@ func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], 
 	var err error
 	var data []byte
 	var msg *schema.Message
-	var text, think, suggest strings.Builder
-	defer func() {
-		info := ctx.Value(cst.CompletionInfo).(*dm.CompletionInfo)
-		info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String()
-	}()
 
 	var pass bool // 跳过一个\n\n
 	var status = cst.EventMessageContentTypeText
 	for {
-		if msg, err = reader.Recv(); err != nil {
-			writer.Send(nil, err)
+		select {
+		case <-ctx.Done():
 			return
-		}
-		if pass && msg.Content == "\n\n" {
-			pass = false
-			continue
-		}
+		default:
+			if msg, err = reader.Recv(); err != nil {
+				writer.Send(nil, err)
+				return
+			}
+			if pass && msg.Content == "\n\n" {
+				pass = false
+				continue
+			}
 
-		refine := &dm.RefineContent{}
-		// 处理消息
-		switch msg.Content {
-		case cst.ThinkStart: // 深度思考内容开始
-			status, pass = cst.EventMessageContentTypeThink, true
-			continue
-		case cst.SuggestStart: // 建议内容开始
-			status, pass = cst.EventMessageContentTypeSuggest, true
-			continue
-		case cst.ThinkEnd:
-			fallthrough // 切回普通内容
-		case cst.SuggestEnd:
-			status, pass = cst.EventMessageContentTypeText, true
-			continue
+			refine := &dm.RefineContent{}
+			// 处理消息
+			switch msg.Content {
+			case cst.ThinkStart: // 深度思考内容开始
+				status, pass = cst.EventMessageContentTypeThink, true
+				continue
+			case cst.SuggestStart: // 建议内容开始
+				status, pass = cst.EventMessageContentTypeSuggest, true
+				continue
+			case cst.ThinkEnd:
+				fallthrough // 切回普通内容
+			case cst.SuggestEnd:
+				status, pass = cst.EventMessageContentTypeText, true
+				continue
+			}
+			switch status {
+			case cst.EventMessageContentTypeText:
+				refine.Text = msg.Content
+			case cst.EventMessageContentTypeThink:
+				refine.Think = msg.Content
+			case cst.EventMessageContentTypeSuggest:
+				refine.Suggest = msg.Content
+			}
+			if data, err = json.Marshal(&refine); err != nil {
+				continue
+			}
+			msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
+			writer.Send(msg, nil)
 		}
-		switch status {
-		case cst.EventMessageContentTypeText:
-			refine.Text = msg.Content
-			text.WriteString(msg.Content)
-		case cst.EventMessageContentTypeThink:
-			refine.Think = msg.Content
-			think.WriteString(msg.Content)
-		case cst.EventMessageContentTypeSuggest:
-			refine.Suggest = msg.Content
-			suggest.WriteString(msg.Content)
-		}
-		if data, err = json.Marshal(&refine); err != nil {
-			continue
-		}
-		msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
-		writer.Send(msg, nil)
 	}
 }
 

@@ -8,6 +8,7 @@ var (
 	UnAuthErr      = New(1000, "身份认证失败")
 	UnImplementErr = New(888, "尚未实现的功能")
 	OIDErr         = New(777, "id错误")
+	Interrupt      = New(666, "中断")
 )
 
 // conversation 相关

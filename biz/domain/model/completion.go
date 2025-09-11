@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"strings"
 
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
@@ -88,18 +89,20 @@ func (d *CompletionDomain) doStream(ctx context.Context, info *CompletionInfo, m
 	// 注入基本消息, 提前创建sse流, 并注入到ctx中
 	info.SSE = adaptor.NewSSEStream()
 	ctx = context.WithValue(ctx, cst.CompletionInfo, info)
+	ctx, cancel := context.WithCancelCause(ctx)
 
 	var reader *schema.StreamReader[*schema.Message]
 	if reader, err = m.Stream(ctx, messages, getOpts(req.CompletionsOption)...); err != nil {
 		logx.Error("[domain model] do stream error: %v", err)
+		cancel(err)
 		return nil, err
 	}
-	go d.doSSE(ctx, reader, info.SSE)
+	go d.doSSE(ctx, cancel, reader, info.SSE)
 	return info.SSE, nil
 }
 
 // 实际sse转换
-func (d *CompletionDomain) doSSE(ctx context.Context, reader *schema.StreamReader[*schema.Message], s *adaptor.SSEStream) {
+func (d *CompletionDomain) doSSE(ctx context.Context, cancel context.CancelCauseFunc, reader *schema.StreamReader[*schema.Message], s *adaptor.SSEStream) {
 	var err error
 	var idx int
 	var msg *schema.Message
@@ -107,25 +110,36 @@ func (d *CompletionDomain) doSSE(ctx context.Context, reader *schema.StreamReade
 	defer close(s.C)
 
 	info := ctx.Value(cst.CompletionInfo).(*CompletionInfo)
+	var text, think, suggest strings.Builder
 	s.C <- eventMeta(info)  // 对话元数据事件
 	s.C <- eventModel(info) // 模型信息事件
+	defer func() {          // 记录各类型信息
+		info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String()
+	}()
 
 	for {
-		msg, err = reader.Recv()
-		if err != nil { // optimize 错误处理
-			logx.CondError(err != io.EOF, "[domain model] do conv error: %v", err)
-			d.MsgDomain.ProcessHistory(ctx, info) // 处理历史记录, 这里不异步, 是考虑到如果异步, 可能历史记录还没存, 用户就发下一条, 导致历史记录不对
-			s.C <- eventEnd()                     // 结束事件
+		select {
+		case <-s.Done: // 提前结束
+			cancel(cst.Interrupt)
+			d.MsgDomain.ProcessHistory(ctx, info) // 处理历史记录
 			return
-		}
-		var typ = cst.EventMessageContentTypeText
-		if msg.Extra != nil { // 存在额外消息
-			if t, ok := msg.Extra[cst.EventMessageContentType].(int); ok { // 消息类型
-				typ = t
+		default: // 正常情况
+			msg, err = reader.Recv()
+			if err != nil { // optimize 错误处理
+				logx.CondError(err != io.EOF, "[domain model] do conv error: %v", err)
+				d.MsgDomain.ProcessHistory(ctx, info) // 处理历史记录, 这里不异步, 是考虑到如果异步, 可能历史记录还没存, 用户就发下一条, 导致历史记录不对
+				s.C <- eventEnd()                     // 结束事件
+				return
 			}
+			var typ = cst.EventMessageContentTypeText
+			if msg.Extra != nil { // 存在额外消息
+				if t, ok := msg.Extra[cst.EventMessageContentType].(int); ok { // 消息类型
+					typ = t
+				}
+			}
+			s.C <- eventChat(idx, info, msg, typ)         // 模型消息事件
+			collectMsg(&text, &think, &suggest, msg, typ) // 收集各类型消息
 		}
-
-		s.C <- eventChat(idx, info, msg, typ) // 模型消息事件
 	}
 }
 
@@ -172,4 +186,15 @@ func event(obj any, typ string) *sse.Event {
 		logx.Error("[domain model] event marshal error: %v", err)
 	}
 	return &sse.Event{Type: typ, Data: data}
+}
+
+func collectMsg(text, think, suggest *strings.Builder, msg *schema.Message, typ int) {
+	switch typ {
+	case cst.EventMessageContentTypeText:
+		text.WriteString(msg.Content)
+	case cst.EventMessageContentTypeSuggest:
+		suggest.WriteString(msg.Content)
+	case cst.EventMessageContentTypeThink:
+		think.WriteString(msg.Content)
+	}
 }
