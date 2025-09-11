@@ -11,6 +11,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 )
 
@@ -37,10 +38,16 @@ func NewProvider() (*Provider, error) {
 		ConversationMapper: conversationMongoMapper,
 		MessageMapper:      mongoMapper,
 	}
+	feedbackMongoMapper := feedback.NewFeedbackMongoMapper(configConfig)
+	feedbackService := &service.FeedbackService{
+		MessageMapper:  mongoMapper,
+		FeedbackMapper: feedbackMongoMapper,
+	}
 	providerProvider := &Provider{
 		Config:              configConfig,
 		CompletionsService:  completionsService,
 		ConversationService: conversationService,
+		FeedbackService:     feedbackService,
 		MessageDomain:       messageDomain,
 		CompletionDomain:    completionDomain,
 	}
