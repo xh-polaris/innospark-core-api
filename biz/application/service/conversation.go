@@ -95,7 +95,7 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 	}
 
 	// 返回响应
-	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}, nil
+	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore, Cursor: conversations[len(conversations)-1].CreateTime.Unix()}, nil
 }
 
 func (s *ConversationService) GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error) {
@@ -129,6 +129,7 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 		MessageList: dm.MMsgToFMsgList(msgs),
 		RegenList:   dm.MMsgToFMsgList(regen),
 		HasMore:     hasMore,
+		Cursor:      msgs[len(msgs)-1].CreateTime.Unix(),
 	}, nil
 }
 
@@ -170,5 +171,5 @@ func (s *ConversationService) SearchConversation(ctx context.Context, req *core_
 	}
 
 	// 返回响应
-	return &core_api.SearchConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}, nil
+	return &core_api.SearchConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore, Cursor: conversations[len(conversations)-1].CreateTime.Unix()}, nil
 }

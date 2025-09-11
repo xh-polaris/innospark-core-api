@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -119,16 +119,16 @@ func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page
 	if err != nil {
 		return nil, false, err
 	}
-	var total int64
-	if total, err = m.conn.CountDocuments(ctx, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}); err != nil {
-		logx.Error("[message mapper] count documents err:%v", err)
+	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
+	filter := bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
+	if page != nil && page.Cursor != nil { // 创建时间更小的
+		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
 	}
-	if err = m.conn.Find(ctx, &msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
-		util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})); err != nil {
+	if err = m.conn.Find(ctx, &msgs, filter, opts); err != nil {
 		logx.Error("[message mapper] find err:%v", err)
 		return nil, false, err
 	}
-	return msgs, util.HasMore(total, page), nil
+	return msgs[:page.GetSize()], int64(len(msgs)) > page.GetSize(), nil
 }
 
 // 向redis中加入一个msg

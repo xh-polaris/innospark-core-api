@@ -12,6 +12,7 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var _ MongoMapper = (*mongoMapper)(nil)
@@ -71,17 +72,16 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 		return nil, false, err
 	}
 
-	// 分页, 创建时间倒序
-	var total int64
-	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
+	// 创建时间倒序
+	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
 	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
+	if page != nil && page.Cursor != nil { // 存在cursor时, 查询创建时间小于Cursor的
+		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
+	}
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
 	}
-	if total, err = m.conn.CountDocuments(ctx, filter); err != nil {
-		return nil, false, err
-	}
-	return cs, util.HasMore(total, page), err
+	return cs[:page.GetSize()], int64(len(cs)) > page.GetSize(), err
 }
 
 func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (err error) {
@@ -125,16 +125,15 @@ func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, 
 		return nil, false, err
 	}
 
-	var total int64
 	// 分词搜索key
 	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}, cst.Brief: bson.M{cst.Regex: key, cst.Options: "i"}}
+	if page != nil && page.Cursor != nil { // cursor不为空时, 查询创建时间更小的
+		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
+	}
 	// 分页, 创建时间倒序
-	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
+	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
 	}
-	if total, err = m.conn.CountDocuments(ctx, filter); err != nil {
-		return nil, false, err
-	}
-	return cs, util.HasMore(total, page), err
+	return cs[:page.GetSize()], int64(len(cs)) > page.GetSize(), err
 }
