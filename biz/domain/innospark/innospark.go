@@ -180,14 +180,16 @@ func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.M
 			case cst.ThinkEnd:
 				collect = ""
 				status = cst.EventMessageContentTypeText
+			default: // 都不是, 保持原状态
 			}
+			content := collect + msg.Content
 			switch status {
 			case cst.EventMessageContentTypeText:
-				refine.Text = msg.Content
+				refine.Text = content
 			case cst.EventMessageContentTypeSuggest: // optimize 需要处理建议
-				refine.Suggest = msg.Content
+				refine.Suggest = content
 			case cst.EventMessageContentTypeThink:
-				refine.Think = msg.Content
+				refine.Think = content
 			}
 			if data, err = json.Marshal(&refine); err != nil {
 				continue
