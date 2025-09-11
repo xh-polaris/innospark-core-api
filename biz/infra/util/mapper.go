@@ -33,3 +33,7 @@ func ObjectIDsFromHex(ids ...string) ([]primitive.ObjectID, error) {
 	}
 	return objectIDs, nil
 }
+
+func HasMore(total int64, page *basic.Page) bool {
+	return total > page.GetPage()*page.GetSize()
+}

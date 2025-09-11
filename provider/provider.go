@@ -6,6 +6,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 )
 
@@ -24,6 +25,7 @@ type Provider struct {
 	Config              *config.Config
 	CompletionsService  service.ICompletionsService
 	ConversationService service.IConversationService
+	FeedbackService     service.IFeedbackService
 	MessageDomain       *model.MessageDomain
 	CompletionDomain    *model.CompletionDomain
 }
@@ -37,6 +39,7 @@ var RPCSet = wire.NewSet()
 var ApplicationSet = wire.NewSet(
 	service.CompletionsServiceSet,
 	service.ConversationServiceSet,
+	service.FeedbackServiceSet,
 )
 
 var DomainSet = wire.NewSet(
@@ -49,6 +52,7 @@ var InfraSet = wire.NewSet(
 	RPCSet,
 	conversation.NewConversationMongoMapper,
 	message.NewMessageMongoMapper,
+	feedback.NewFeedbackMongoMapper,
 )
 
 var AllProvider = wire.NewSet(

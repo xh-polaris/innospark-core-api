@@ -19,6 +19,8 @@ type IConversationService interface {
 	RenameConversation(ctx context.Context, req *core_api.RenameConversationReq) (*core_api.RenameConversationResp, error)
 	ListConversation(ctx context.Context, req *core_api.ListConversationReq) (*core_api.ListConversationResp, error)
 	GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error)
+	DeleteConversation(ctx context.Context, req *core_api.DeleteConversationReq) (*core_api.DeleteConversationResp, error)
+	SearchConversation(ctx context.Context, req *core_api.SearchConversationReq) (*core_api.SearchConversationResp, error)
 }
 
 type ConversationService struct {
@@ -77,14 +79,14 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 	}
 
 	// 分页获取Conversation列表，并转化为ListConversationResp_ConversationItem
-	conversations, err := s.ConversationMapper.ListConversations(ctx, uid, req.GetPage())
+	conversations, hasMore, err := s.ConversationMapper.ListConversations(ctx, uid, req.GetPage())
 	if err != nil {
 		logx.Error("list conversation error: %v", err)
 		return nil, cst.ConversationListErr
 	}
-	items := make([]*core_api.ListConversationResp_ConversationItem, len(conversations))
+	items := make([]*core_api.Conversation, len(conversations))
 	for i, conv := range conversations {
-		items[i] = &core_api.ListConversationResp_ConversationItem{
+		items[i] = &core_api.Conversation{
 			ConversationId: conv.ConversationId.Hex(),
 			Brief:          conv.Brief,
 			CreateTime:     conv.CreateTime.Unix(),
@@ -93,7 +95,7 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 	}
 
 	// 返回响应
-	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items}, nil
+	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}, nil
 }
 
 func (s *ConversationService) GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error) {
@@ -128,4 +130,45 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 		RegenList:   dm.MMsgToFMsgList(regen),
 		HasMore:     hasMore,
 	}, nil
+}
+
+func (s *ConversationService) DeleteConversation(ctx context.Context, req *core_api.DeleteConversationReq) (*core_api.DeleteConversationResp, error) {
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logx.Error("extract user id error: %v", err)
+		return nil, cst.UnAuthErr
+	}
+	if err = s.ConversationMapper.DeleteConversation(ctx, uid, req.ConversationId); err != nil {
+		logx.Error("delete conversation error: %v", err)
+		return nil, cst.ConversationDeleteErr
+	}
+	return &core_api.DeleteConversationResp{Resp: util.Success()}, nil
+}
+
+func (s *ConversationService) SearchConversation(ctx context.Context, req *core_api.SearchConversationReq) (*core_api.SearchConversationResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logx.Error("extract user id error: %v", err)
+		return nil, cst.UnAuthErr
+	}
+
+	// 分页获取存储域Conversation列表，并转化为交互域中Conversation
+	conversations, hasMore, err := s.ConversationMapper.SearchConversations(ctx, uid, req.GetKey(), req.GetPage())
+	if err != nil {
+		logx.Error("list conversation error: %v", err)
+		return nil, cst.ConversationSearchErr
+	}
+	items := make([]*core_api.Conversation, len(conversations))
+	for i, conv := range conversations {
+		items[i] = &core_api.Conversation{
+			ConversationId: conv.ConversationId.Hex(),
+			Brief:          conv.Brief,
+			CreateTime:     conv.CreateTime.Unix(),
+			UpdateTime:     conv.UpdateTime.Unix(),
+		}
+	}
+
+	// 返回响应
+	return &core_api.SearchConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}, nil
 }

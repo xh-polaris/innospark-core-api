@@ -75,10 +75,17 @@ const (
 	UpdateTime     = "update_time"
 	DeleteTime     = "delete_time"
 	Brief          = "brief"
+	Feedback       = "feedback"
 
 	Status        = "status"
 	DeletedStatus = -1
-
-	NE  = "$ne"
-	Set = "$set"
+	Meta          = "$meta"
+	TextScore     = "textScore"
+	Score         = "score"
+	NE            = "$ne"
+	Set           = "$set"
+	Text          = "$text"
+	Search        = "$search"
+	Regex         = "$regex"
+	Options       = "$options"
 )

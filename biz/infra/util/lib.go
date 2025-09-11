@@ -6,10 +6,9 @@ import (
 	"net/http/httputil"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 )
 
-var debug = config.GetConfig().State == "debug"
+var debug = true
 
 func DPrintf(format string, a ...interface{}) {
 	if debug {

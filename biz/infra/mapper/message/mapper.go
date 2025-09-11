@@ -30,6 +30,7 @@ type MongoMapper interface {
 	CreateNewMessage(ctx context.Context, nm *Message) (err error)
 	AllMessage(ctx context.Context, conversation string) ([]*Message, error)
 	ListMessage(ctx context.Context, conversation string, page *basic.Page) (msgs []*Message, hasMore bool, err error)
+	Feedback(ctx context.Context, mid primitive.ObjectID, feedback int32) (err error)
 }
 
 type mongoMapper struct {
@@ -127,7 +128,7 @@ func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page
 		logx.Error("[message mapper] find err:%v", err)
 		return nil, false, err
 	}
-	return msgs, total > page.GetPage()*page.GetSize(), nil
+	return msgs, util.HasMore(total, page), nil
 }
 
 // 向redis中加入一个msg
@@ -178,4 +179,10 @@ func (m *mongoMapper) buildCache(ctx context.Context, msgs []*Message) (err erro
 
 func genCacheKey(msg *Message) string {
 	return cacheKeyPrefix + msg.ConversationId.Hex()
+}
+
+// Feedback 修改消息反馈状态, 这里没有修改redis中消息缓存状态, 因为redis中的状态只用于模型对话, 与反馈状态无关
+func (m *mongoMapper) Feedback(ctx context.Context, mid primitive.ObjectID, feedback int32) (err error) {
+	_, err = m.conn.UpdateOneNoCache(ctx, bson.M{cst.Id: mid}, bson.M{cst.Set: bson.M{cst.Feedback: feedback}})
+	return err
 }

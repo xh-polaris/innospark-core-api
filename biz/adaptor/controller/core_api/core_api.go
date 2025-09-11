@@ -8,7 +8,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	basic "github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	core_api "github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/provider"
 )
@@ -88,6 +87,36 @@ func GetConversation(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// DeleteConversation .
+// @router /conversation/delete [POST]
+func DeleteConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.DeleteConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.DeleteConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// SearchConversation .
+// @router /conversation/search [POST]
+func SearchConversation(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.SearchConversationReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.SearchConversation(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // ListAgents .
 // @router /agents/list [POST]
 func ListAgents(ctx context.Context, c *app.RequestContext) {
@@ -115,7 +144,6 @@ func Feedback(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(basic.Response)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := provider.Get().FeedbackService.Feedback(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

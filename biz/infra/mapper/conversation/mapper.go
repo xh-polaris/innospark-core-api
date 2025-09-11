@@ -23,9 +23,10 @@ const (
 
 type MongoMapper interface {
 	CreateNewConversation(ctx context.Context, uid string) (c *Conversation, err error)
-	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, err error)
+	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, hasMore bool, err error)
 	UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error)
 	DeleteConversation(ctx context.Context, uid, cid string) (err error)
+	SearchConversations(ctx context.Context, uid, key string, page *basic.Page) (cs []*Conversation, hasMore bool, err error)
 }
 
 type mongoMapper struct {
@@ -62,18 +63,25 @@ func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid string) (c 
 }
 
 // ListConversations 分页查询用户对话列表
-func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, err error) {
+func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, hasMore bool, err error) {
 	// 转换为ObjectID
 	oid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%v", err)
-		return nil, err
+		return nil, false, err
 	}
 
 	// 分页, 创建时间倒序
+	var total int64
 	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
-	err = m.conn.Find(ctx, &cs, bson.M{cst.UserId: oid}, opts)
-	return cs, err
+	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
+	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
+		return nil, false, err
+	}
+	if total, err = m.conn.CountDocuments(ctx, filter); err != nil {
+		return nil, false, err
+	}
+	return cs, util.HasMore(total, page), err
 }
 
 func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (err error) {
@@ -107,4 +115,26 @@ func (m *mongoMapper) UpdateConversationBrief(ctx context.Context, uid, cid, bri
 	_, err = m.conn.UpdateOne(ctx, cacheKeyPrefix+cid, filter,
 		bson.M{cst.Set: bson.M{cst.UpdateTime: time.Now(), cst.Brief: brief}})
 	return err
+}
+
+func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, page *basic.Page) (cs []*Conversation, hasMore bool, err error) {
+	// 转换为ObjectID
+	oid, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%v", err)
+		return nil, false, err
+	}
+
+	var total int64
+	// 分词搜索key
+	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}, cst.Brief: bson.M{cst.Regex: key, cst.Options: "i"}}
+	// 分页, 创建时间倒序
+	opts := util.BuildFindOption(page).SetSort(bson.M{cst.CreateTime: -1})
+	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
+		return nil, false, err
+	}
+	if total, err = m.conn.CountDocuments(ctx, filter); err != nil {
+		return nil, false, err
+	}
+	return cs, util.HasMore(total, page), err
 }

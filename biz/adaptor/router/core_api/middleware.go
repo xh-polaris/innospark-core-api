@@ -80,3 +80,13 @@ func _renameconversationMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _deleteconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _searchconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
