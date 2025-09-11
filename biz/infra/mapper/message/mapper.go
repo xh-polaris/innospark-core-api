@@ -183,6 +183,15 @@ func genCacheKey(msg *Message) string {
 
 // Feedback 修改消息反馈状态, 这里没有修改redis中消息缓存状态, 因为redis中的状态只用于模型对话, 与反馈状态无关
 func (m *mongoMapper) Feedback(ctx context.Context, mid primitive.ObjectID, feedback int32) (err error) {
-	_, err = m.conn.UpdateOneNoCache(ctx, bson.M{cst.Id: mid}, bson.M{cst.Set: bson.M{cst.Feedback: feedback}})
+	var ori Message
+	if err = m.conn.FindOneAndUpdateNoCache(ctx, &ori, bson.M{cst.Id: mid}, bson.M{cst.Set: bson.M{cst.Feedback: feedback}}); err != nil {
+		return err
+	}
+	if feedback == cst.FeedbackDelete {
+		key := genCacheKey(&ori)
+		if _, err = m.rs.HdelCtx(ctx, key, key+strconv.Itoa(int(ori.Index))); err != nil {
+			return err
+		}
+	}
 	return err
 }

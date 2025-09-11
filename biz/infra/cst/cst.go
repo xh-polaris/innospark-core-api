@@ -89,3 +89,10 @@ const (
 	Regex         = "$regex"
 	Options       = "$options"
 )
+
+const (
+	FeedbackNone = iota
+	FeedbackLike
+	FeedbackDislike
+	FeedbackDelete
+)
