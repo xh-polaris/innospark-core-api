@@ -4,11 +4,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-
-	"github.com/zeromicro/go-zero/core/conf"
 )
 
 var (
@@ -52,23 +51,29 @@ type Config struct {
 }
 
 func NewConfig() (*Config, error) {
-	c := new(Config)
-	path := os.Getenv("CONFIG_PATH")
-	if path == "" {
-		path = "etc/config.yaml"
-	}
-	err := conf.Load(path, c)
-	if err != nil {
-		return nil, err
-	}
-	err = c.SetUp()
-	if err != nil {
-		return nil, err
-	}
-	config = c
+	once.Do(func() {
+		c := new(Config)
+		path := os.Getenv("CONFIG_PATH")
+		if path == "" {
+			path = "etc/config.yaml"
+		}
+		err := conf.Load(path, c)
+		if err != nil {
+			panic(err)
+		}
+		err = c.SetUp()
+		if err != nil {
+			panic(err)
+		}
+		config = c
+	})
+
 	return config, nil
 }
 
 func GetConfig() *Config {
+	once.Do(func() {
+		_, _ = NewConfig()
+	})
 	return config
 }

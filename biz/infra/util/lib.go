@@ -6,12 +6,11 @@ import (
 	"net/http/httputil"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 )
 
-var debug = true
-
 func DPrintf(format string, a ...interface{}) {
-	if debug {
+	if config.GetConfig().State == "debug" {
 		fmt.Printf(format, a...)
 	}
 }
@@ -25,7 +24,7 @@ func Success() *basic.Response {
 }
 
 func NewDebugClient() *http.Client {
-	if debug {
+	if config.GetConfig().State == "debug" {
 		return &http.Client{
 			Transport: NewLoggingTransport(),
 		}
