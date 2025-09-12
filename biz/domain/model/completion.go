@@ -122,8 +122,8 @@ func (d *CompletionDomain) doSSE(ctx context.Context, cancel context.CancelCause
 			d.MsgDomain.ProcessHistory(ctx, info)                                                 // 处理历史记录
 			return
 		default: // 正常情况
-			msg, err = reader.Recv()
-			if err != nil { // optimize 错误处理
+			msg, err = reader.Recv() // 获取到的是refine后的msg
+			if err != nil {          // optimize 错误处理
 				logx.CondError(err != io.EOF, "[domain model] do conv error: %v", err)
 				info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String() // 记录各类型信息
 				d.MsgDomain.ProcessHistory(ctx, info)                                                 // 处理历史记录, 这里不异步, 是考虑到如果异步, 可能历史记录还没存, 用户就发下一条, 导致历史记录不对
@@ -188,12 +188,13 @@ func event(obj any, typ string) *sse.Event {
 }
 
 func collectMsg(text, think, suggest *strings.Builder, msg *schema.Message, typ int) {
+	content := msg.Extra[cst.RawMessage].(string)
 	switch typ {
 	case cst.EventMessageContentTypeText:
-		text.WriteString(msg.Content)
+		text.WriteString(content)
 	case cst.EventMessageContentTypeSuggest:
-		suggest.WriteString(msg.Content)
+		suggest.WriteString(content)
 	case cst.EventMessageContentTypeThink:
-		think.WriteString(msg.Content)
+		think.WriteString(content)
 	}
 }

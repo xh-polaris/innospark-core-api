@@ -122,7 +122,7 @@ func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], 
 			if data, err = json.Marshal(&refine); err != nil {
 				continue
 			}
-			msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status}
+			msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status, cst.RawMessage: msg.Content}
 			writer.Send(msg, nil)
 		}
 	}

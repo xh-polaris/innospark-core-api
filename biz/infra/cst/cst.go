@@ -55,6 +55,7 @@ const (
 const (
 	EventMessageContentType = "event_message_content_type" // 模型消息
 	FinalMessage            = "final_message"              // 最终消息
+	RawMessage              = "raw_message"                // 模型原始消息
 )
 
 // 流式响应标签
