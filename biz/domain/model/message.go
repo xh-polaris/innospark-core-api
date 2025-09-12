@@ -260,10 +260,10 @@ func (m *MessageDomain) ProcessHistory(ctx context.Context, info *CompletionInfo
 		Feedback: 0, Role: cst.AssistantEnum,
 		CreateTime: now, UpdateTime: now, Status: 0,
 	}
-	if err = m.MsgMapper.CreateNewMessage(ctx, option.UserMessage); err != nil {
+	if err = m.MsgMapper.CreateNewMessage(context.WithoutCancel(ctx), option.UserMessage); err != nil {
 		logx.Error("[domain message] process history new message err: %v", err)
 	}
-	if err = m.MsgMapper.CreateNewMessage(ctx, mm); err != nil {
+	if err = m.MsgMapper.CreateNewMessage(context.WithoutCancel(ctx), mm); err != nil {
 		logx.Error("[domain message] process history create new err: %v]", err)
 	}
 	return
