@@ -39,6 +39,9 @@ func HasMore(total int64, page *basic.Page) bool {
 }
 
 func SplitAndHasMore[T any](slice []T, page *basic.Page) (ans []T, hasMore bool) {
+	if slice == nil || len(slice) == 0 {
+		return slice, false
+	}
 	size, length := page.GetSize(), int64(len(slice))
 	hasMore = length > size
 	if size > length {
