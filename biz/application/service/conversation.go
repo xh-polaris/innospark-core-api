@@ -94,8 +94,12 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 		}
 	}
 
+	resp := &core_api.ListConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}
+	if len(conversations) > 0 {
+		resp.Cursor = conversations[len(conversations)-1].ConversationId.Hex()
+	}
 	// 返回响应
-	return &core_api.ListConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore, Cursor: conversations[len(conversations)-1].CreateTime.Unix()}, nil
+	return resp, nil
 }
 
 func (s *ConversationService) GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error) {
@@ -124,13 +128,16 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 			}
 		}
 	}
-	return &core_api.GetConversationResp{
+	resp := &core_api.GetConversationResp{
 		Resp:        util.Success(),
 		MessageList: dm.MMsgToFMsgList(msgs),
 		RegenList:   dm.MMsgToFMsgList(regen),
 		HasMore:     hasMore,
-		Cursor:      msgs[len(msgs)-1].CreateTime.Unix(),
-	}, nil
+	}
+	if len(resp.MessageList) > 0 {
+		resp.Cursor = msgs[len(msgs)-1].MessageId.Hex()
+	}
+	return resp, nil
 }
 
 func (s *ConversationService) DeleteConversation(ctx context.Context, req *core_api.DeleteConversationReq) (*core_api.DeleteConversationResp, error) {
@@ -170,6 +177,10 @@ func (s *ConversationService) SearchConversation(ctx context.Context, req *core_
 		}
 	}
 
+	resp := &core_api.SearchConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore}
+	if len(conversations) > 0 {
+		resp.Cursor = conversations[len(conversations)-1].ConversationId.Hex()
+	}
 	// 返回响应
-	return &core_api.SearchConversationResp{Resp: util.Success(), Conversations: items, HasMore: hasMore, Cursor: conversations[len(conversations)-1].CreateTime.Unix()}, nil
+	return resp, nil
 }

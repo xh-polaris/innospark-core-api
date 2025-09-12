@@ -73,10 +73,14 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 	}
 
 	// 创建时间倒序
-	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
+	opts := options.Find().SetSort(bson.M{cst.Id: -1}).SetLimit(page.GetSize() + 1)
 	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	if page != nil && page.Cursor != nil { // 存在cursor时, 查询创建时间小于Cursor的
-		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
+		cursor, err := primitive.ObjectIDFromHex(*page.Cursor)
+		if err != nil {
+			return nil, false, err
+		}
+		filter[cst.Id] = bson.M{cst.LT: cursor}
 	}
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
@@ -128,11 +132,15 @@ func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, 
 
 	// 分词搜索key
 	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}, cst.Brief: bson.M{cst.Regex: key, cst.Options: "i"}}
-	if page != nil && page.Cursor != nil { // cursor不为空时, 查询创建时间更小的
-		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
-	}
 	// 分页, 创建时间倒序
-	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
+	opts := options.Find().SetSort(bson.M{cst.Id: -1}).SetLimit(page.GetSize() + 1)
+	if page != nil && page.Cursor != nil { // 存在cursor时, 查询创建时间小于Cursor的
+		cursor, err := primitive.ObjectIDFromHex(*page.Cursor)
+		if err != nil {
+			return nil, false, err
+		}
+		filter[cst.Id] = bson.M{cst.LT: cursor}
+	}
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
 	}

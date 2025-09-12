@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
-	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
@@ -120,10 +119,14 @@ func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page
 	if err != nil {
 		return nil, false, err
 	}
-	opts := options.Find().SetSort(bson.M{cst.CreateTime: -1}).SetLimit(page.GetSize() + 1)
+	opts := options.Find().SetSort(bson.M{cst.Id: -1}).SetLimit(page.GetSize() + 1)
 	filter := bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	if page != nil && page.Cursor != nil { // 创建时间更小的
-		filter[cst.CreateTime] = bson.M{cst.LT: time.Unix(*page.Cursor, 0)}
+		cursor, err := primitive.ObjectIDFromHex(*page.Cursor)
+		if err != nil {
+			return nil, false, err
+		}
+		filter[cst.Id] = bson.M{cst.LT: cursor}
 	}
 	if err = m.conn.Find(ctx, &msgs, filter, opts); err != nil {
 		logx.Error("[message mapper] find err:%v", err)

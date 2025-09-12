@@ -19,6 +19,7 @@ func BuildFindOption(p *basic.Page) (opts *options.FindOptionsBuilder) {
 		}
 	}
 	opts.SetSkip((page - 1) * size)
+	opts.SetLimit(size)
 	return
 }
 
