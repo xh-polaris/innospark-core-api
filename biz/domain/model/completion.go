@@ -113,22 +113,21 @@ func (d *CompletionDomain) doSSE(ctx context.Context, cancel context.CancelCause
 	var text, think, suggest strings.Builder
 	s.C <- eventMeta(info)  // 对话元数据事件
 	s.C <- eventModel(info) // 模型信息事件
-	defer func() {          // 记录各类型信息
-		info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String()
-	}()
 
 	for {
 		select {
 		case <-s.Done: // 提前结束
 			cancel(cst.Interrupt)
-			d.MsgDomain.ProcessHistory(ctx, info) // 处理历史记录
+			info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String() // 记录各类型信息
+			d.MsgDomain.ProcessHistory(ctx, info)                                                 // 处理历史记录
 			return
 		default: // 正常情况
 			msg, err = reader.Recv()
 			if err != nil { // optimize 错误处理
 				logx.CondError(err != io.EOF, "[domain model] do conv error: %v", err)
-				d.MsgDomain.ProcessHistory(ctx, info) // 处理历史记录, 这里不异步, 是考虑到如果异步, 可能历史记录还没存, 用户就发下一条, 导致历史记录不对
-				s.C <- eventEnd()                     // 结束事件
+				info.Text, info.Think, info.Suggest = text.String(), think.String(), suggest.String() // 记录各类型信息
+				d.MsgDomain.ProcessHistory(ctx, info)                                                 // 处理历史记录, 这里不异步, 是考虑到如果异步, 可能历史记录还没存, 用户就发下一条, 导致历史记录不对
+				s.C <- eventEnd()                                                                     // 结束事件
 				return
 			}
 			var typ = cst.EventMessageContentTypeText
