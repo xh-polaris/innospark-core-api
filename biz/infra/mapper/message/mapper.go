@@ -170,8 +170,8 @@ func (m *mongoMapper) listAllMsg(ctx context.Context, key string) ([]*Message, e
 
 func (m *mongoMapper) buildCache(ctx context.Context, msgs []*Message) (err error) {
 	var data []byte
+	key := genCacheKey(msgs[0])
 	for _, msg := range msgs {
-		key := genCacheKey(msg)
 		field := key + strconv.Itoa(int(msg.Index))
 		if data, err = json.Marshal(msg); err != nil {
 			logx.Error("[message mapper] buildCache: json.Marshal err:%v", err)

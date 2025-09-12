@@ -72,7 +72,7 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 		return nil, false, err
 	}
 
-	// 创建时间倒序
+	// 创建ID倒序
 	opts := options.Find().SetSort(bson.M{cst.Id: -1}).SetLimit(page.GetSize() + 1)
 	filter := bson.M{cst.UserId: oid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}}
 	if page != nil && page.Cursor != nil { // 存在cursor时, 查询创建时间小于Cursor的

@@ -107,10 +107,10 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 	return fm
 }
 
-// GetMessagesAndCallBacks
+// GetMessagesAndInjectContext
 // 消息顺序: 按时间倒序
 // 处理得到合适的对话记录以供模型生成使用, 同时根据不同的配置项注入不同的切面
-func (m *MessageDomain) GetMessagesAndCallBacks(ctx context.Context, user string, req *core_api.CompletionsReq) (_ context.Context, messages []*schema.Message, err error) {
+func (m *MessageDomain) GetMessagesAndInjectContext(ctx context.Context, user string, req *core_api.CompletionsReq) (_ context.Context, messages []*schema.Message, err error) {
 	info := &OptionInfo{CreateTime: time.Now(), Typ: Default}
 	// 获取历史记录
 	cid, err := primitive.ObjectIDFromHex(req.ConversationId)
@@ -126,7 +126,6 @@ func (m *MessageDomain) GetMessagesAndCallBacks(ctx context.Context, user string
 		return nil, nil, err
 	}
 	// 构造用户消息
-	// 增加用户消息
 	um := &mmsg.Message{
 		MessageId:      primitive.NewObjectID(),
 		ConversationId: cid,

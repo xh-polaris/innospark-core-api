@@ -82,7 +82,7 @@ type EventChat struct {
 	ConversationId   string       `json:"conversationId"`
 	SectionId        string       `json:"sectionId"`
 	ReplyId          string       `json:"replyId"`
-	IsDeleted        bool         `json:"isDeleted"`
+	IsDelta          bool         `json:"isDelta"`
 	Status           int          `json:"status"`
 	InputContentType int          `json:"inputContentType"`
 	MessageIndex     int          `json:"messageIndex"`

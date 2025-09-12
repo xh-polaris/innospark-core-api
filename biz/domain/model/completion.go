@@ -165,7 +165,7 @@ func eventChat(idx int, info *CompletionInfo, msg *schema.Message, typ int) *sse
 		ConversationId:   info.ConversationId,
 		SectionId:        info.SectionId,
 		ReplyId:          info.ReplyId,
-		IsDeleted:        true,
+		IsDelta:          true,
 		Status:           cst.MessageStatus,
 		InputContentType: cst.InputContentTypeText,
 		MessageIndex:     idx,

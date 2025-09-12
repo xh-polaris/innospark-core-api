@@ -32,7 +32,7 @@ func NewFeedbackMongoMapper(config *config.Config) MongoMapper {
 
 // UpdateFeedback 更新(不存在则插入)反馈
 func (m *mongoMapper) UpdateFeedback(ctx context.Context, feedback *FeedBack) (err error) {
-	_, err = m.conn.UpdateOneNoCache(ctx, bson.M{cst.Id: feedback.MessageId, cst.UserId: feedback.UserId}, feedback,
+	_, err = m.conn.UpdateOneNoCache(ctx, bson.M{cst.Id: feedback.MessageId, cst.UserId: feedback.UserId}, bson.M{cst.Set: feedback},
 		options.UpdateOne().SetUpsert(true))
 	return
 }
