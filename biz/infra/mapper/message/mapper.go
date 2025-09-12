@@ -9,6 +9,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -128,7 +129,8 @@ func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page
 		logx.Error("[message mapper] find err:%v", err)
 		return nil, false, err
 	}
-	return msgs[:page.GetSize()], int64(len(msgs)) > page.GetSize(), nil
+	msgs, hasMore = util.SplitAndHasMore(msgs, page)
+	return msgs, hasMore, err
 }
 
 // 向redis中加入一个msg

@@ -81,7 +81,8 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
 	}
-	return cs[:page.GetSize()], int64(len(cs)) > page.GetSize(), err
+	cs, hasMore = util.SplitAndHasMore(cs, page)
+	return cs, hasMore, err
 }
 
 func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (err error) {
@@ -135,5 +136,6 @@ func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, 
 	if err = m.conn.Find(ctx, &cs, filter, opts); err != nil {
 		return nil, false, err
 	}
-	return cs[:page.GetSize()], int64(len(cs)) > page.GetSize(), err
+	cs, hasMore = util.SplitAndHasMore(cs, page)
+	return cs, hasMore, err
 }
