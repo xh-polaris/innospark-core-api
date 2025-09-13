@@ -40,12 +40,12 @@ func (s *CompletionsService) Completions(ctx context.Context, req *core_api.Comp
 		return nil, cst.UnImplementErr
 	}
 
-	// 构建聊天记录和注入info
-	ctx, messages, err := s.MsgMaMsgDomain.GetMessagesAndInjectContext(ctx, uid, req)
+	// 构建聊天记录和info
+	ctx, messages, info, err := s.MsgMaMsgDomain.GetMessagesAndInjectContext(ctx, uid, req)
 	if err != nil {
 		return nil, err
 	}
 
-	// 进行对话, 利用切面在最后更新历史记录
-	return s.CompletionDomain.Completion(ctx, uid, req, messages)
+	// 进行对话, 在最后更新历史记录
+	return s.CompletionDomain.Completion(ctx, uid, req, messages, info)
 }

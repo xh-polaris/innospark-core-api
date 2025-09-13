@@ -58,6 +58,7 @@ func makeSSE(c *app.RequestContext, stream *SSEStream) {
 
 // EventMeta 对话元数据
 type EventMeta struct {
+	ReplyId          string `json:"replyId"`
 	MessageId        string `json:"messageId"`
 	ConversationId   string `json:"conversationId"`
 	SectionId        string `json:"sectionId"`

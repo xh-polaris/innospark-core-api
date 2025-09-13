@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
@@ -46,6 +47,9 @@ func NewMessageMongoMapper(config *config.Config) MongoMapper {
 
 // CreateNewMessage 创建一条新的消息, 需要填充所有的字段
 func (m *mongoMapper) CreateNewMessage(ctx context.Context, message *Message) (err error) {
+	if message == nil {
+		return
+	}
 	if _, err = m.conn.InsertOneNoCache(ctx, message); err != nil {
 		logx.Error("[message mapper] insert one err:%+v", err)
 		return
@@ -146,7 +150,17 @@ func (m *mongoMapper) addOneMsg(ctx context.Context, msg *Message) error {
 		logx.Error("[message mapper] addOneMsg: json.Marshal err:%v", err)
 		return err
 	}
-	err = m.rs.HsetCtx(ctx, key, field, string(data))
+	err = m.rs.PipelinedCtx(ctx, func(pipeliner redis.Pipeliner) error {
+		if err := pipeliner.HSet(ctx, key, field, string(data)).Err(); err != nil {
+			logx.Error("[message mapper] addOneMsg: HSet err:%v", err)
+			return err
+		}
+		if err := pipeliner.Expire(ctx, key, 6*time.Hour).Err(); err != nil {
+			logx.Error("[message mapper] addOneMsg: Expire err:%v", err)
+			return err
+		}
+		return nil
+	})
 	return err
 }
 
@@ -169,16 +183,33 @@ func (m *mongoMapper) listAllMsg(ctx context.Context, key string) ([]*Message, e
 }
 
 func (m *mongoMapper) buildCache(ctx context.Context, msgs []*Message) (err error) {
-	var data []byte
+	if len(msgs) == 0 {
+		return nil
+	}
+
 	key := genCacheKey(msgs[0])
+	fields := make(map[string]string, len(msgs))
 	for _, msg := range msgs {
+		var data []byte
 		field := key + strconv.Itoa(int(msg.Index))
 		if data, err = json.Marshal(msg); err != nil {
 			logx.Error("[message mapper] buildCache: json.Marshal err:%v", err)
 			return err
 		}
-		err = m.rs.HsetCtx(ctx, key, field, string(data))
+		fields[field] = string(data)
 	}
+	// 构建缓存并设置过期时间
+	err = m.rs.PipelinedCtx(ctx, func(pipeliner redis.Pipeliner) error {
+		if err := pipeliner.HMSet(ctx, key, fields).Err(); err != nil {
+			logx.Error("[message mapper] buildCache: HMSET err:%v", err)
+			return err
+		}
+		if err := pipeliner.Expire(ctx, key, time.Hour*6).Err(); err != nil {
+			logx.Error("[message mapper] buildCache: Expire err:%v", err)
+			return err
+		}
+		return nil
+	})
 	return err
 }
 

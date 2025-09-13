@@ -19,6 +19,7 @@ import (
 
 // CompletionInfo 本轮对话的上下文信息
 type CompletionInfo struct {
+	OptionInfo     *OptionInfo
 	ConversationId string             // 对话id
 	SectionId      string             // 段落id
 	MessageId      string             // 消息id
@@ -49,13 +50,14 @@ type CompletionDomain struct {
 var CompletionDomainSet = wire.NewSet(wire.Struct(new(CompletionDomain), "*"))
 
 // Completion 调用对话接口, 根据配置项选择流式或非流式
-func (d *CompletionDomain) Completion(ctx context.Context, uid string, req *core_api.CompletionsReq, messages []*schema.Message) (any, error) {
+func (d *CompletionDomain) Completion(ctx context.Context, uid string, req *core_api.CompletionsReq, messages []*schema.Message, oi *OptionInfo) (any, error) {
 	info := &CompletionInfo{
+		OptionInfo:     oi,
 		ConversationId: req.ConversationId,
 		SectionId:      req.ConversationId,
 		MessageId:      primitive.NewObjectID().Hex(),
 		MessageIndex:   len(messages),
-		ReplyId:        messages[0].Name,
+		ReplyId:        oi.ReplyId,
 		Model:          req.Model,
 		BotId:          req.BotId,
 		UserId:         uid,
@@ -68,15 +70,13 @@ func (d *CompletionDomain) Completion(ctx context.Context, uid string, req *core
 	}
 	// 调用模型
 	if req.CompletionsOption.Stream {
-		return d.doStream(ctx, info, m, uid, req, messages)
+		return d.doStream(ctx, info, m, req, messages)
 	}
-	return d.doGenerate(ctx, info, m, uid, req, messages)
+	return d.doGenerate(ctx, info, m, req, messages)
 }
 
 // 非流式
-func (d *CompletionDomain) doGenerate(ctx context.Context, info *CompletionInfo, m model.ToolCallingChatModel, uid string, req *core_api.CompletionsReq, messages []*schema.Message) (any, error) {
-	// 注入基本消息
-	ctx = context.WithValue(ctx, cst.CompletionInfo, info)
+func (d *CompletionDomain) doGenerate(ctx context.Context, info *CompletionInfo, m model.ToolCallingChatModel, req *core_api.CompletionsReq, messages []*schema.Message) (any, error) {
 	resp, err := m.Generate(ctx, messages, getOpts(req.CompletionsOption)...)
 	if err != nil {
 		return nil, err
@@ -85,10 +85,9 @@ func (d *CompletionDomain) doGenerate(ctx context.Context, info *CompletionInfo,
 }
 
 // 流式
-func (d *CompletionDomain) doStream(ctx context.Context, info *CompletionInfo, m model.ToolCallingChatModel, uid string, req *core_api.CompletionsReq, messages []*schema.Message) (_ any, err error) {
-	// 注入基本消息, 提前创建sse流, 并注入到ctx中
+func (d *CompletionDomain) doStream(ctx context.Context, info *CompletionInfo, m model.ToolCallingChatModel, req *core_api.CompletionsReq, messages []*schema.Message) (_ any, err error) {
+	// 提前创建sse流
 	info.SSE = adaptor.NewSSEStream()
-	ctx = context.WithValue(ctx, cst.CompletionInfo, info)
 	ctx, cancel := context.WithCancelCause(ctx)
 
 	var reader *schema.StreamReader[*schema.Message]
@@ -97,19 +96,19 @@ func (d *CompletionDomain) doStream(ctx context.Context, info *CompletionInfo, m
 		cancel(err)
 		return nil, err
 	}
-	go d.doSSE(ctx, cancel, reader, info.SSE)
+	go d.doSSE(ctx, cancel, reader, info)
 	return info.SSE, nil
 }
 
 // 实际sse转换
-func (d *CompletionDomain) doSSE(ctx context.Context, cancel context.CancelCauseFunc, reader *schema.StreamReader[*schema.Message], s *adaptor.SSEStream) {
+func (d *CompletionDomain) doSSE(ctx context.Context, cancel context.CancelCauseFunc, reader *schema.StreamReader[*schema.Message], info *CompletionInfo) {
 	var err error
 	var idx int
 	var msg *schema.Message
-	defer reader.Close()
+	s := info.SSE
 	defer close(s.C)
+	defer reader.Close()
 
-	info := ctx.Value(cst.CompletionInfo).(*CompletionInfo)
 	var text, think, suggest strings.Builder
 	s.C <- eventMeta(info)  // 对话元数据事件
 	s.C <- eventModel(info) // 模型信息事件
@@ -149,6 +148,7 @@ func eventMeta(info *CompletionInfo) *sse.Event {
 		SectionId:        info.SectionId,
 		MessageIndex:     info.MessageIndex,
 		ConversationType: cst.ConversationTypeText,
+		ReplyId:          info.ReplyId,
 	}
 	return event(meta, cst.EventMeta)
 }

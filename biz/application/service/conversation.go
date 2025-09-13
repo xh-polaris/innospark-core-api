@@ -118,9 +118,9 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 	// 判断是否有regen
 	var regen []*mmsg.Message
 	if len(msgs) > 0 {
-		replyId := msgs[0].ReplyId
+		replyId := msgs[0].ReplyId.Hex()
 		for _, msg := range msgs[1:] {
-			if msg.ReplyId == replyId {
+			if msg.ReplyId.Hex() == replyId {
 				if regen == nil {
 					regen = []*mmsg.Message{msgs[0]}
 				}
