@@ -38,6 +38,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 
 	// 初始化GenLocalState
 	genGLS := compose.InvokableLambda(func(ctx context.Context, input Input) (_ *RelayContext, err error) {
+		input.SSEWriter = sse.NewWriter(input.RequestContext) // 提前创建SSE Writer, 以便中间节点能响应sse事件
 		err = compose.ProcessState(ctx, func(ctx context.Context, s *RelayContext) (err error) { *s = *input; return })
 		return input, err
 	})
@@ -109,6 +110,8 @@ func (g *CompletionGraph) CompileAndInvoke(ctx context.Context, input Input) (_ 
 	if err != nil {
 		return nil, err
 	}
+	defer close(input.SSE.C)                       // 关闭sse 事件流
+	defer func() { _ = input.SSEWriter.Close() }() // 关闭sse 响应流
 	return r.Invoke(ctx, input)
 }
 
@@ -117,6 +120,7 @@ func (g *CompletionGraph) CompileAndStream(ctx context.Context, input Input) (_ 
 	if err != nil {
 		return nil, err
 	}
+	defer func() { _ = input.SSEWriter.Close() }() // 关闭sse 响应流
 	return r.Stream(ctx, input)
 }
 

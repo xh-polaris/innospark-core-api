@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/sse"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,11 +19,17 @@ type RelayContext struct {
 	ConversationId    primitive.ObjectID // 对话id
 	SectionId         primitive.ObjectID // 段落id
 	UserId            primitive.ObjectID // 用户id
-	ReplyId           string
-	OriginMessage     *ReqMessage
+	ReplyId           string             // 响应ID
+	OriginMessage     *ReqMessage        // 用户原始消息
 	UserMessage       *mmsg.Message      // 用户消息
 	SSE               *adaptor.SSEStream // SSE流
+	SSEWriter         *sse.Writer        // SSE输出
 	ModelCancel       context.CancelFunc // 中断模型输出
+}
+
+// SSEEvent 写入一个sse事件
+func (r *RelayContext) SSEEvent(e *sse.Event) error {
+	return r.SSEWriter.Write(e)
 }
 
 // CompletionOptions 是对话相关配置

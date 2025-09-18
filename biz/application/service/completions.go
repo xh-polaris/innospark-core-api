@@ -7,7 +7,6 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
-	_ "github.com/xh-polaris/innospark-core-api/biz/domain/deyu"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/innospark"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"

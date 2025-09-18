@@ -141,6 +141,7 @@ func SSE(relay *RelayContext, input *schema.StreamReader[*sse.Event]) (_ *RelayC
 			break
 		}
 	}
+	input.Close()
 	_ = sw.Close()
 
 	if err == io.EOF {
