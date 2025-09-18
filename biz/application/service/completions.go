@@ -3,23 +3,27 @@ package service
 import (
 	"context"
 
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/deyu"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	_ "github.com/xh-polaris/innospark-core-api/biz/domain/innospark"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
 
 type ICompletionsService interface {
-	Completions(ctx context.Context, req *core_api.CompletionsReq) (any, error)
+	Completions(c *app.RequestContext, ctx context.Context, req *core_api.CompletionsReq) (any, error)
 }
 
 type CompletionsService struct {
 	MsgMaMsgDomain   *model.MessageDomain
 	CompletionDomain *model.CompletionDomain
+	CompletionGraph  *graph.CompletionGraph
 }
 
 var CompletionsServiceSet = wire.NewSet(
@@ -27,7 +31,7 @@ var CompletionsServiceSet = wire.NewSet(
 	wire.Bind(new(ICompletionsService), new(*CompletionsService)),
 )
 
-func (s *CompletionsService) Completions(ctx context.Context, req *core_api.CompletionsReq) (any, error) {
+func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Context, req *core_api.CompletionsReq) (any, error) {
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
@@ -40,12 +44,29 @@ func (s *CompletionsService) Completions(ctx context.Context, req *core_api.Comp
 		return nil, cst.UnImplementErr
 	}
 
-	// 构建聊天记录和info
-	ctx, messages, info, err := s.MsgMaMsgDomain.GetMessagesAndInjectContext(ctx, uid, req)
+	// 构建RelayContext
+	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
-		return nil, err
+		return nil, cst.UnImplementErr
+	}
+	state := &graph.RelayContext{
+		RequestContext: c,
+		CompletionOptions: &graph.CompletionOptions{
+			ReplyId:         req.ReplyId,
+			IsRegen:         req.CompletionsOption.IsRegen,
+			IsReplace:       req.CompletionsOption.IsReplace,
+			SelectedRegenId: req.CompletionsOption.SelectedRegenId},
+		ModelInfo:      &graph.ModelInfo{Model: req.Model, BotId: req.BotId},
+		MessageInfo:    &graph.MessageInfo{},
+		ConversationId: oids[1],
+		SectionId:      oids[1],
+		UserId:         oids[0],
+		OriginMessage: &graph.ReqMessage{
+			Content: req.Messages[0].Content, ContentType: req.Messages[0].ContentType,
+			Attaches: req.Messages[0].Attaches, References: req.Messages[0].References,
+		},
 	}
 
-	// 进行对话, 在最后更新历史记录
-	return s.CompletionDomain.Completion(ctx, uid, req, messages, info)
+	_, err = s.CompletionGraph.CompileAndStream(ctx, state)
+	return nil, err
 }

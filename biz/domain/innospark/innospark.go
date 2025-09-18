@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	dm "github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
@@ -16,8 +16,8 @@ import (
 )
 
 func init() {
-	dm.RegisterModel(DefaultModel, NewDefaultChatModel)
-	dm.RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
+	graph.RegisterModel(DefaultModel, NewDefaultChatModel)
+	graph.RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
 }
 
 var (
@@ -31,7 +31,7 @@ type ChatModel struct {
 	model string
 }
 
-func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) (_ model.ToolCallingChatModel, err error) {
+func NewDefaultChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
@@ -48,7 +48,7 @@ func NewDefaultChatModel(ctx context.Context, uid string, req *core_api.Completi
 	return &ChatModel{cli: cli, model: DefaultModel}, nil
 }
 
-func NewDeepThinkChatModel(ctx context.Context, uid string, req *core_api.CompletionsReq) (_ model.ToolCallingChatModel, err error) {
+func NewDeepThinkChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,

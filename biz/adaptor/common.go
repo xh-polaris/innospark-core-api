@@ -19,14 +19,14 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
-const hertzContext = "hertz_context"
+const HertzContext = "hertz_context"
 
 func InjectContext(ctx context.Context, c *app.RequestContext) context.Context {
-	return context.WithValue(ctx, hertzContext, c)
+	return context.WithValue(ctx, HertzContext, c)
 }
 
 func ExtractContext(ctx context.Context) (*app.RequestContext, error) {
-	c, ok := ctx.Value(hertzContext).(*app.RequestContext)
+	c, ok := ctx.Value(HertzContext).(*app.RequestContext)
 	if !ok {
 		return nil, errors.New("hertz context not found")
 	}

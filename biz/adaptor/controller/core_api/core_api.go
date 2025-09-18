@@ -23,8 +23,8 @@ func Completions(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().CompletionsService.Completions(ctx, &req)
-	adaptor.PostProcess(ctx, c, &req, resp, err)
+	_, err = provider.Get().CompletionsService.Completions(c, ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, nil, err)
 }
 
 // CreateConversation .

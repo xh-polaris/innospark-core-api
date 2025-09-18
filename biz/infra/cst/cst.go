@@ -16,11 +16,7 @@ const (
 )
 
 // ctx 存储键
-const (
-	SSEStream      = "sse_stream"
-	CompletionInfo = "completion_info"
-	OptionInfo     = "option_info"
-)
+const ()
 
 // sse事件类型
 const (

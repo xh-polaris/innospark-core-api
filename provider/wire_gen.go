@@ -8,6 +8,7 @@ package provider
 
 import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
@@ -29,9 +30,14 @@ func NewProvider() (*Provider, error) {
 	completionDomain := &model.CompletionDomain{
 		MsgDomain: messageDomain,
 	}
+	historyDomain := &graph.HistoryDomain{
+		MsgMapper: mongoMapper,
+	}
+	completionGraph := graph.DrawCompletionGraph(historyDomain)
 	completionsService := &service.CompletionsService{
 		MsgMaMsgDomain:   messageDomain,
 		CompletionDomain: completionDomain,
+		CompletionGraph:  completionGraph,
 	}
 	conversationMongoMapper := conversation.NewConversationMongoMapper(configConfig)
 	conversationService := &service.ConversationService{
@@ -50,6 +56,7 @@ func NewProvider() (*Provider, error) {
 		FeedbackService:     feedbackService,
 		MessageDomain:       messageDomain,
 		CompletionDomain:    completionDomain,
+		CompletionGraph:     completionGraph,
 	}
 	return providerProvider, nil
 }
