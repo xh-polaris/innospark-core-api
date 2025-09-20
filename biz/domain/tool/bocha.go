@@ -97,7 +97,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 	}
 
 	// SSE: 查找多少篇?
-	find := resp.Data.WebPages.TotalEstimatedMatches % 50
+	find := resp.Data.WebPages.TotalEstimatedMatches%50 + len(resp.Data.WebPages.Value)
 	if err = r.SSEEvent(r.SearchFindEvent(find)); err != nil {
 		return "", err
 	}
