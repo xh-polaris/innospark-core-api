@@ -8,8 +8,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
-	_ "github.com/xh-polaris/innospark-core-api/biz/domain/innospark"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
@@ -20,9 +19,7 @@ type ICompletionsService interface {
 }
 
 type CompletionsService struct {
-	MsgMaMsgDomain   *model.MessageDomain
-	CompletionDomain *model.CompletionDomain
-	CompletionGraph  *graph.CompletionGraph
+	CompletionGraph *graph.CompletionGraph
 }
 
 var CompletionsServiceSet = wire.NewSet(
@@ -48,19 +45,19 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	if err != nil {
 		return nil, cst.UnImplementErr
 	}
-	state := &graph.RelayContext{
+	state := &info.RelayContext{
 		RequestContext: c,
-		CompletionOptions: &graph.CompletionOptions{
+		CompletionOptions: &info.CompletionOptions{
 			ReplyId:         req.ReplyId,
 			IsRegen:         req.CompletionsOption.IsRegen,
 			IsReplace:       req.CompletionsOption.IsReplace,
 			SelectedRegenId: req.CompletionsOption.SelectedRegenId},
-		ModelInfo:      &graph.ModelInfo{Model: req.Model, BotId: req.BotId},
-		MessageInfo:    &graph.MessageInfo{},
+		ModelInfo:      &info.ModelInfo{Model: req.Model, BotId: req.BotId, WebSearch: req.CompletionsOption.GetWebSearch()},
+		MessageInfo:    &info.MessageInfo{},
 		ConversationId: oids[1],
 		SectionId:      oids[1],
 		UserId:         oids[0],
-		OriginMessage: &graph.ReqMessage{
+		OriginMessage: &info.ReqMessage{
 			Content: req.Messages[0].Content, ContentType: req.Messages[0].ContentType,
 			Attaches: req.Messages[0].Attaches, References: req.Messages[0].References,
 		},

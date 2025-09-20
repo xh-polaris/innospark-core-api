@@ -90,4 +90,15 @@ type EventChat struct {
 	BotId            string       `json:"botId"`
 }
 
+// EventSearchCite 引用内容
+type EventSearchCite struct {
+	Index         int32  `json:"index" bson:"index"`
+	Name          string `json:"name" bson:"name"`
+	URL           string `json:"url" bson:"url"`
+	Snippet       string `json:"snippet" bson:"snippet"`
+	SiteName      string `json:"siteName" bson:"siteName"`
+	SiteIcon      string `json:"siteIcon" bson:"siteIcon"`
+	DatePublished string `json:"datePublished" bson:"datePublished"`
+}
+
 type EventEnd struct{}

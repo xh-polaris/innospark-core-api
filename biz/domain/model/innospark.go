@@ -1,4 +1,4 @@
-package innospark
+package model
 
 import (
 	"context"
@@ -8,16 +8,15 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
-	dm "github.com/xh-polaris/innospark-core-api/biz/domain/model"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 func init() {
-	graph.RegisterModel(DefaultModel, NewDefaultChatModel)
-	graph.RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
+	RegisterModel(DefaultModel, NewDefaultChatModel)
+	RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
 }
 
 var (
@@ -117,7 +116,7 @@ func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], 
 				writer.Send(nil, err)
 				return
 			}
-			refine := &dm.RefineContent{}
+			refine := &info.RefineContent{}
 			// 处理消息
 			switch msg.Content {
 			case cst.SuggestStart: // 建议内容开始
@@ -167,7 +166,7 @@ func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.M
 				continue
 			}
 
-			refine := &dm.RefineContent{}
+			refine := &info.RefineContent{}
 			// 深度思考需要处理 Think标签
 			if len(msg.Content) > 0 && msg.Content[0] == '<' { // 如果是 < 开头, 可能为深度思考<think>标签, 考虑到都是三个, 所以收集三个
 				pass, collect = 2, msg.Content

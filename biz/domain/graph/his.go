@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/wire"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
@@ -16,13 +17,13 @@ type HistoryDomain struct {
 
 var HistoryDomainSet = wire.NewSet(wire.Struct(new(HistoryDomain), "*"))
 
-func (d *HistoryDomain) RetrieveHistory(ctx context.Context, relay *RelayContext) (mmsgs []*mmsg.Message, err error) {
+func (d *HistoryDomain) RetrieveHistory(ctx context.Context, relay *info.RelayContext) (mmsgs []*mmsg.Message, err error) {
 	// 获取历史记录
 	mmsgs, err = d.MsgMapper.AllMessage(ctx, relay.ConversationId.Hex())
 	return
 }
 
-func (d *HistoryDomain) StoreHistory(ctx context.Context, relay *RelayContext) (err error) {
+func (d *HistoryDomain) StoreHistory(ctx context.Context, relay *info.RelayContext) (err error) {
 	var update []*mmsg.Message
 	switch relay.CompletionOptions.Typ {
 	case Regen:
@@ -49,12 +50,13 @@ func (d *HistoryDomain) StoreHistory(ctx context.Context, relay *RelayContext) (
 	return
 }
 
-func completeAssistantMsg(relay *RelayContext) {
+func completeAssistantMsg(relay *info.RelayContext) {
 	am := relay.MessageInfo.AssistantMessage
 	am.Content, am.Ext = relay.MessageInfo.Text, &mmsg.Ext{
 		BotState: fmt.Sprintf("{\"model\":\"%s\",\"bot_id\":\"%s\",\"bot_name\":\"%s\"}", relay.ModelInfo.Model, relay.ModelInfo.BotId, relay.ModelInfo.BotName),
 		Brief:    relay.MessageInfo.Text,
 		Think:    relay.MessageInfo.Think,
 		Suggest:  relay.MessageInfo.Suggest,
+		Cite:     relay.SearchInfo.Cite,
 	}
 }

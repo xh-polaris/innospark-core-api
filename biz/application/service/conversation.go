@@ -6,7 +6,7 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
-	dm "github.com/xh-polaris/innospark-core-api/biz/domain/model"
+	dm "github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"

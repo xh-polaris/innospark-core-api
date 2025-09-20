@@ -1,6 +1,8 @@
 package graph
 
 import (
+	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 )
@@ -12,7 +14,7 @@ const (
 	SelectRegen = "select_regen"
 )
 
-func DoCompletionOption(relay *RelayContext, his []*mmsg.Message) ([]*mmsg.Message, error) {
+func DoCompletionOption(relay *info.RelayContext, his []*mmsg.Message) ([]*mmsg.Message, error) {
 	opt := relay.CompletionOptions
 	opt.Typ = Default
 	// 据自定义对话选项, 对消息进行处理
@@ -56,11 +58,11 @@ func DoCompletionOption(relay *RelayContext, his []*mmsg.Message) ([]*mmsg.Messa
 		}
 	}
 	if !opt.IsRegen { // 加上用户消息
-		um := UserMMsg(relay, len(his))
+		um := msg.UserMMsg(relay, len(his))
 		his = append([]*mmsg.Message{um}, his...)
 		relay.UserMessage = um
 		relay.ReplyId = um.MessageId.Hex()
 	}
-	relay.MessageInfo.AssistantMessage = NewModelMsg(relay, len(his))
+	relay.MessageInfo.AssistantMessage = msg.NewModelMsg(relay, len(his))
 	return his, nil
 }

@@ -27,8 +27,14 @@ const (
 	// EventChat 模型返回消息
 	EventChat = "chat"
 	// EventEnd 流结束
-	EventEnd      = "end"
-	EventEndValue = "{}"
+	EventEnd = "end"
+	// EventNotifyValue 仅作标记, 无实际值
+	EventNotifyValue  = "{}"
+	EventSearchStart  = "searchStart"
+	EventSearchEnd    = "searchEnd"
+	EventSearchFind   = "searchFind"
+	EventSearchChoose = "searchChoice"
+	EventSearchCite   = "searchCite"
 )
 
 // Event中各种类型枚举值
@@ -52,6 +58,7 @@ const (
 	EventMessageContentType = "event_message_content_type" // 模型消息
 	FinalMessage            = "final_message"              // 最终消息
 	RawMessage              = "raw_message"                // 模型原始消息
+	ModelCite               = "model_cite"
 )
 
 // 流式响应标签

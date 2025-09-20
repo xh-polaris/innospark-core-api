@@ -33,8 +33,20 @@ type Message struct {
 }
 
 type Ext struct {
-	BotState string `json:"bot_state" bson:"bot_state"`                 // json字符串, 模型信息
-	Brief    string `json:"brief,omitempty" bson:"brief,omitempty"`     // 内容备份
-	Think    string `json:"think,omitempty" bson:"think,omitempty"`     // 深度思考内容
-	Suggest  string `json:"suggest,omitempty" bson:"suggest,omitempty"` // 建议内容
+	BotState        string  `json:"bot_state" bson:"bot_state"`                 // json字符串, 模型信息
+	Brief           string  `json:"brief,omitempty" bson:"brief,omitempty"`     // 内容备份
+	Think           string  `json:"think,omitempty" bson:"think,omitempty"`     // 深度思考内容
+	Suggest         string  `json:"suggest,omitempty" bson:"suggest,omitempty"` // 建议内容
+	Cite            []*Cite `json:"cite,omitempty" bson:"cite,omitempty"`       // 引用
+	ContentWithCite *string // 模型用到的引用, 会替换模型域的消息
+}
+
+type Cite struct {
+	Index         int32  `json:"index" bson:"index"`
+	Name          string `json:"name" bson:"name"`
+	URL           string `json:"url" bson:"url"`
+	Snippet       string `json:"snippet" bson:"snippet"`
+	SiteName      string `json:"siteName" bson:"siteName"`
+	SiteIcon      string `json:"siteIcon" bson:"siteIcon"`
+	DatePublished string `json:"datePublished" bson:"datePublished"`
 }

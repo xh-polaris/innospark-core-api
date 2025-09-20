@@ -1,27 +1,24 @@
 package graph
 
 import (
-	"encoding/json"
 	"errors"
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
-	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
+	info "github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
 
 type Transformer struct {
-	relay                *RelayContext
-	index                int
+	relay                *info.RelayContext
 	text, think, suggest *strings.Builder
 }
 
-func NewTransformer(relay *RelayContext) (t *Transformer) {
-	t = &Transformer{relay: relay, index: 0, text: &strings.Builder{}, think: &strings.Builder{}, suggest: &strings.Builder{}}
+func NewTransformer(relay *info.RelayContext) (t *Transformer) {
+	t = &Transformer{relay: relay, text: &strings.Builder{}, think: &strings.Builder{}, suggest: &strings.Builder{}}
 	return
 }
 
@@ -61,6 +58,7 @@ func (t *Transformer) chat(msg *schema.Message) (*sse.Event, error) {
 		}
 		content = msg.Extra[cst.RawMessage].(string)
 	}
+	// 收集信息
 	switch typ {
 	case cst.EventMessageContentTypeText:
 		t.text.WriteString(content)
@@ -70,54 +68,19 @@ func (t *Transformer) chat(msg *schema.Message) (*sse.Event, error) {
 		t.suggest.WriteString(content)
 	}
 
-	chat := &adaptor.EventChat{
-		Message:          &adaptor.ChatMessage{Content: msg.Content, ContentType: typ},
-		ConversationId:   t.relay.ConversationId.Hex(),
-		SectionId:        t.relay.SectionId.Hex(),
-		ReplyId:          t.relay.ReplyId,
-		IsDelta:          true,
-		Status:           cst.MessageStatus,
-		InputContentType: cst.InputContentTypeText,
-		MessageIndex:     int(t.relay.MessageInfo.AssistantMessage.Index),
-		BotId:            t.relay.ModelInfo.BotId,
-	}
-	return event(t.id(), chat, cst.EventChat), nil
+	return t.relay.ChatEvent(msg, typ), nil
 }
 
 func (t *Transformer) meta() (*sse.Event, error) {
-	meta := &adaptor.EventMeta{
-		MessageId:        t.relay.MessageInfo.AssistantMessage.MessageId.Hex(),
-		ConversationId:   t.relay.ConversationId.Hex(),
-		SectionId:        t.relay.SectionId.Hex(),
-		MessageIndex:     int(t.relay.MessageInfo.AssistantMessage.Index),
-		ConversationType: cst.ConversationTypeText,
-		ReplyId:          t.relay.ReplyId,
-	}
-	return event(t.id(), meta, cst.EventMeta), nil
+	return t.relay.MetaEvent(), nil
 }
 
 func (t *Transformer) model() (*sse.Event, error) {
-	m := &adaptor.EventModel{Model: t.relay.ModelInfo.Model, BotId: t.relay.ModelInfo.BotId, BotName: t.relay.ModelInfo.BotName}
-	return event(t.id(), m, cst.EventModel), nil
+	return t.relay.ModelEvent(), nil
 }
 
 func (t *Transformer) end(err error) (*sse.Event, error) {
-	return &sse.Event{Type: cst.EventEnd, Data: []byte(cst.EventEndValue)}, err
-}
-
-func (t *Transformer) id() string {
-	i := strconv.Itoa(t.index)
-	t.index++
-	return i
-}
-
-func event(index string, obj any, typ string) *sse.Event {
-	var err error
-	var data []byte
-	if data, err = json.Marshal(obj); err != nil {
-		logx.Error("[graph sse] event marshal error: %v", err)
-	}
-	return &sse.Event{ID: index, Type: typ, Data: data}
+	return t.relay.EndEvent(), err
 }
 
 func (t *Transformer) collect() {
@@ -126,7 +89,7 @@ func (t *Transformer) collect() {
 	t.relay.MessageInfo.Suggest = t.suggest.String()
 }
 
-func SSE(relay *RelayContext, input *schema.StreamReader[*sse.Event]) (_ *RelayContext, err error) {
+func SSE(relay *info.RelayContext, input *schema.StreamReader[*sse.Event]) (_ *info.RelayContext, err error) {
 	var et *sse.Event
 	sw := sse.NewWriter(relay.RequestContext)
 	for {

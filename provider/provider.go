@@ -4,7 +4,6 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
@@ -27,8 +26,6 @@ type Provider struct {
 	CompletionsService  service.ICompletionsService
 	ConversationService service.IConversationService
 	FeedbackService     service.IFeedbackService
-	MessageDomain       *model.MessageDomain
-	CompletionDomain    *model.CompletionDomain
 	CompletionGraph     *graph.CompletionGraph
 }
 
@@ -45,8 +42,6 @@ var ApplicationSet = wire.NewSet(
 )
 
 var DomainSet = wire.NewSet(
-	model.MessageDomainSet,
-	model.CompletionDomainSet,
 	graph.HistoryDomainSet,
 	graph.DrawCompletionGraph,
 )

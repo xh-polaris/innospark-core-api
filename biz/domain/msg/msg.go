@@ -1,16 +1,17 @@
-package graph
+package msg
 
 import (
 	"time"
 
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func UserMMsg(relay *RelayContext, index int) *mmsg.Message {
+func UserMMsg(relay *info.RelayContext, index int) *mmsg.Message {
 	now := time.Now()
 	return &mmsg.Message{
 		MessageId:      primitive.NewObjectID(),
@@ -29,7 +30,7 @@ func UserMMsg(relay *RelayContext, index int) *mmsg.Message {
 	}
 }
 
-func NewModelMsg(relay *RelayContext, index int) *mmsg.Message {
+func NewModelMsg(relay *info.RelayContext, index int) *mmsg.Message {
 	var err error
 	var replayId primitive.ObjectID
 	if relay.ReplyId != "" {
@@ -66,11 +67,15 @@ func MMsgToEMsgList(messages []*mmsg.Message) (msgs []*schema.Message) {
 
 // MMsgToEMsg 将单个 core_api.Message 转换为 eino/schema.Message
 func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
-	return &schema.Message{
+	m := &schema.Message{
 		Role:    schema.RoleType(mmsg.RoleItoS[msg.Role]),
 		Content: msg.Content,
 		Name:    msg.MessageId.Hex(),
 	}
+	if msg.Ext.ContentWithCite != nil {
+		m.Content = *msg.Ext.ContentWithCite
+	}
+	return m
 }
 
 func MMsgToFMsgList(messages []*mmsg.Message) (msgs []*core_api.FullMessage) {

@@ -19,6 +19,11 @@ var (
 	once   sync.Once
 )
 
+const (
+	GET  = "GET"
+	POST = "POST"
+)
+
 // HttpClient 是一个简单的 HTTP 客户端
 type HttpClient struct {
 	Client *http.Client
@@ -59,6 +64,28 @@ func (c *HttpClient) do(method, url string, headers http.Header, body any) (resp
 }
 
 func (c *HttpClient) ReqWithHeader(method, url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
+	// 读取响应体
+	var _resp []byte
+	if header, _resp, err = c.getResp(method, url, headers, body); err != nil {
+		return
+	}
+	// 反序列化响应体
+	if err = json.Unmarshal(_resp, &resp); err != nil {
+		return header, nil, fmt.Errorf("反序列化响应失败: %w", err)
+	}
+	return header, resp, nil
+}
+
+func checkStatusCode(resp *http.Response) error {
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		_resp, _ := io.ReadAll(resp.Body)
+		errMsg := fmt.Sprintf("unexpected status code: %d, response body: %s", resp.StatusCode, _resp)
+		return fmt.Errorf(errMsg)
+	}
+	return nil
+}
+
+func (c *HttpClient) getResp(method, url string, headers http.Header, body any) (header http.Header, resp []byte, err error) {
 	var response *http.Response
 	if response, err = c.do(method, url, headers, body); err != nil {
 		return nil, nil, fmt.Errorf("[httpx] 发送请求失败: %w", err)
@@ -69,21 +96,15 @@ func (c *HttpClient) ReqWithHeader(method, url string, headers http.Header, body
 		}
 	}()
 	// 检查响应状态码
-	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		_resp, _ := io.ReadAll(response.Body)
-		errMsg := fmt.Sprintf("unexpected status code: %d, response body: %s", response.StatusCode, _resp)
-		return response.Header, nil, fmt.Errorf(errMsg)
+	if err = checkStatusCode(response); err != nil {
+		return response.Header, nil, err
 	}
 	// 读取响应体
 	var _resp []byte
 	if _resp, err = io.ReadAll(response.Body); err != nil {
 		return response.Header, nil, fmt.Errorf("读取响应失败: %w", err)
 	}
-	// 反序列化响应体
-	if err = json.Unmarshal(_resp, &resp); err != nil {
-		return response.Header, nil, fmt.Errorf("反序列化响应失败: %w", err)
-	}
-	return response.Header, resp, nil
+	return response.Header, _resp, nil
 }
 
 // Req 非流式HTTP请求
@@ -94,22 +115,22 @@ func (c *HttpClient) Req(method, url string, headers http.Header, body any) (res
 
 // GetWithHeader 非流式Get, 返回请求头
 func (c *HttpClient) GetWithHeader(url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
-	return c.ReqWithHeader("GET", url, headers, body)
+	return c.ReqWithHeader(GET, url, headers, body)
 }
 
 // Get 非流式Get
 func (c *HttpClient) Get(url string, headers http.Header, body any) (resp map[string]any, err error) {
-	return c.Req("GET", url, headers, body)
+	return c.Req(GET, url, headers, body)
 }
 
 // PostWithHeader 非流式Post, 返回请求头
 func (c *HttpClient) PostWithHeader(url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
-	return c.ReqWithHeader("POST", url, headers, body)
+	return c.ReqWithHeader(POST, url, headers, body)
 }
 
 // Post 非流式Post
 func (c *HttpClient) Post(url string, headers http.Header, body any) (resp map[string]any, err error) {
-	return c.Req("POST", url, headers, body)
+	return c.Req(POST, url, headers, body)
 }
 
 // StreamWithHeader 流式HTTP请求. 返回请求头
@@ -140,22 +161,50 @@ func (c *HttpClient) Stream(method, url string, headers http.Header, body interf
 
 // StreamGetWithHeader 流式Get请求, 返回请求头
 func (c *HttpClient) StreamGetWithHeader(url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
-	return c.StreamWithHeader("GET", url, headers, body)
+	return c.StreamWithHeader(GET, url, headers, body)
 }
 
 // StreamGet 流式Get请求
 func (c *HttpClient) StreamGet(url string, headers http.Header, body any) (*StreamReader, error) {
-	return c.Stream("GET", url, headers, body)
+	return c.Stream(GET, url, headers, body)
 }
 
 // StreamPostWithHeader 流式Post请求, 返回请求头
 func (c *HttpClient) StreamPostWithHeader(url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
-	return c.StreamWithHeader("POST", url, headers, body)
+	return c.StreamWithHeader(POST, url, headers, body)
 }
 
 // StreamPost 流式Post请求
 func (c *HttpClient) StreamPost(url string, headers http.Header, body any) (*StreamReader, error) {
-	return c.Stream("POST", url, headers, body)
+	return c.Stream(POST, url, headers, body)
+}
+
+func ReqWithHeader[T any](method, url string, headers http.Header, body any) (header http.Header, resp T, err error) {
+	// 读取响应体
+	var _resp []byte
+	if header, _resp, err = GetHttpClient().getResp(method, url, headers, body); err != nil {
+		return
+	}
+	// 反序列化响应体
+	if err = json.Unmarshal(_resp, &resp); err != nil {
+		return header, resp, fmt.Errorf("反序列化响应失败: %w", err)
+	}
+	return header, resp, nil
+}
+
+func Req[T any](method, url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](method, url, headers, body)
+	return resp, err
+}
+
+func Get[T any](url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](GET, url, headers, body)
+	return resp, err
+}
+
+func Post[T any](url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](POST, url, headers, body)
+	return resp, err
 }
 
 // StreamReader 流式请求Reader, 封装是为了避免只返回reader时无法关闭resp.Body
