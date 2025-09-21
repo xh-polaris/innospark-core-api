@@ -38,6 +38,7 @@ type Ext struct {
 	Think           string  `json:"think,omitempty" bson:"think,omitempty"`     // 深度思考内容
 	Suggest         string  `json:"suggest,omitempty" bson:"suggest,omitempty"` // 建议内容
 	Cite            []*Cite `json:"cite,omitempty" bson:"cite,omitempty"`       // 引用
+	Code            []*Code `json:"code,omitempty" bson:"code,omitempty"`       // 代码
 	ContentWithCite *string // 模型用到的引用, 会替换模型域的消息
 }
 
@@ -46,7 +47,13 @@ type Cite struct {
 	Name          string `json:"name" bson:"name"`
 	URL           string `json:"url" bson:"url"`
 	Snippet       string `json:"snippet" bson:"snippet"`
-	SiteName      string `json:"siteName" bson:"siteName"`
-	SiteIcon      string `json:"siteIcon" bson:"siteIcon"`
-	DatePublished string `json:"datePublished" bson:"datePublished"`
+	SiteName      string `json:"siteName" bson:"site_name"`
+	SiteIcon      string `json:"siteIcon" bson:"site_icon"`
+	DatePublished string `json:"datePublished" bson:"date_published"`
+}
+
+type Code struct {
+	Index    int32  `json:"index" bson:"index"`
+	CodeType string `json:"codeType" bson:"code_type"`
+	Code     string `json:"code" bson:"code"`
 }

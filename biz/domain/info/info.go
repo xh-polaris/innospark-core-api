@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
@@ -40,9 +39,9 @@ func (r *RelayContext) id() string {
 	return i
 }
 
-func (r *RelayContext) ChatEvent(msg *schema.Message, typ int) *sse.Event {
+func (r *RelayContext) ChatEvent(content string, typ int) *sse.Event {
 	chat := &adaptor.EventChat{
-		Message:          &adaptor.ChatMessage{Content: msg.Content, ContentType: typ},
+		Message:          &adaptor.ChatMessage{Content: content, ContentType: typ},
 		ConversationId:   r.ConversationId.Hex(),
 		SectionId:        r.SectionId.Hex(),
 		ReplyId:          r.ReplyId,
@@ -139,9 +138,10 @@ type ModelInfo struct {
 
 type MessageInfo struct {
 	AssistantMessage *mmsg.Message
-	Text             string // 对话内容
-	Think            string // 思考内容
-	Suggest          string // 建议内容
+	Text             string       // 对话内容
+	Think            string       // 思考内容
+	Suggest          string       // 建议内容
+	Code             []*mmsg.Code // 代码内容
 }
 
 type ReqMessage struct {
@@ -158,7 +158,50 @@ type SearchInfo struct {
 }
 
 type RefineContent struct {
-	Think   string `json:"think,omitempty"`
-	Text    string `json:"text,omitempty"`
-	Suggest string `json:"suggest,omitempty"`
+	Typ      int
+	Think    string `json:"think,omitempty"`
+	Text     string `json:"text,omitempty"`
+	Suggest  string `json:"suggest,omitempty"`
+	Code     string `json:"code,omitempty"`
+	CodeType string `json:"codeType,omitempty"`
+}
+
+func (r *RefineContent) GetContent() string {
+	switch r.Typ {
+	case cst.EventMessageContentTypeThink:
+		return r.Think
+	case cst.EventMessageContentTypeSuggest:
+		return r.Suggest
+	case cst.EventMessageContentTypeCode:
+		return r.Code
+	case cst.EventMessageContentTypeCodeType:
+		return r.CodeType
+	case cst.EventMessageContentTypeText:
+		fallthrough
+	default:
+		return r.Text
+	}
+}
+
+func (r *RefineContent) SetContent(s string) string {
+	switch r.Typ {
+	case cst.EventMessageContentTypeThink:
+		r.Think = s
+	case cst.EventMessageContentTypeSuggest:
+		r.Suggest = s
+	case cst.EventMessageContentTypeCode:
+		r.Code = s
+	case cst.EventMessageContentTypeCodeType:
+		r.CodeType = s
+	case cst.EventMessageContentTypeText:
+		fallthrough
+	default:
+		r.Text = s
+	}
+	return s
+}
+func (r *RefineContent) SetContentWithTyp(s string, t int) (string, int) {
+	r.Typ = t
+	r.SetContent(s)
+	return s, t
 }

@@ -2,13 +2,11 @@ package model
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
@@ -19,13 +17,13 @@ func init() {
 	RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
 }
 
-var (
+const (
 	DefaultModel   = "InnoSpark"
 	DeepThinkModel = "InnoSpark-R"
 	APIVersion     = "v1"
 )
 
-type ChatModel struct {
+type InnosparkChatModel struct {
 	cli   *openai.ChatModel
 	model string
 }
@@ -44,7 +42,7 @@ func NewDefaultChatModel(ctx context.Context, uid string) (_ model.ToolCallingCh
 		return nil, err
 	}
 
-	return &ChatModel{cli: cli, model: DefaultModel}, nil
+	return &InnosparkChatModel{cli: cli, model: DefaultModel}, nil
 }
 
 func NewDeepThinkChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
@@ -60,10 +58,10 @@ func NewDeepThinkChatModel(ctx context.Context, uid string) (_ model.ToolCalling
 	if err != nil {
 		return nil, err
 	}
-	return &ChatModel{cli: cli, model: DeepThinkModel}, nil
+	return &InnosparkChatModel{cli: cli, model: DeepThinkModel}, nil
 }
 
-func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
+func (c *InnosparkChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
 	// messages翻转顺序, 调用模型时消息应该正序
 	var reverse []*schema.Message
 	for i := len(in) - 1; i >= 0; i-- {
@@ -74,7 +72,7 @@ func (c *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...
 	return c.cli.Generate(ctx, reverse, opts...)
 }
 
-func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
+func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
 	var raw *schema.StreamReader[*schema.Message]
 	// messages翻转顺序, 调用模型时消息应该正序
 	var reverse []*schema.Message
@@ -89,21 +87,20 @@ func (c *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...mo
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
 	if c.model == DefaultModel {
-		go process(ctx, raw, processWriter)
+		go c.process(ctx, raw, processWriter)
 	} else if c.model == DeepThinkModel {
-		go deepThinkProcess(ctx, raw, processWriter)
+		go c.deepThinkProcess(ctx, raw, processWriter)
 	} else {
 		raw.Close()
 	}
 	return processReader, nil
 }
 
-func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+func (c *InnosparkChatModel) process(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
 	defer reader.Close()
 	defer writer.Close()
 
 	var err error
-	var data []byte
 	var msg *schema.Message
 
 	var status = cst.EventMessageContentTypeText
@@ -116,7 +113,6 @@ func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], 
 				writer.Send(nil, err)
 				return
 			}
-			refine := &info.RefineContent{}
 			// 处理消息
 			switch msg.Content {
 			case cst.SuggestStart: // 建议内容开始
@@ -126,27 +122,17 @@ func process(ctx context.Context, reader *schema.StreamReader[*schema.Message], 
 				status = cst.EventMessageContentTypeText
 				continue
 			}
-			switch status {
-			case cst.EventMessageContentTypeText:
-				refine.Text = msg.Content
-			case cst.EventMessageContentTypeSuggest:
-				refine.Suggest = msg.Content // optimize 建议内容处理
-			}
-			if data, err = json.Marshal(&refine); err != nil {
-				continue
-			}
-			msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status, cst.RawMessage: msg.Content}
+			util.AddExtra(msg, cst.EventMessageContentType, status)
 			writer.Send(msg, nil)
 		}
 	}
 }
 
-func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+func (c *InnosparkChatModel) deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
 	defer reader.Close()
 	defer writer.Close()
 
 	var err error
-	var data []byte
 	var msg *schema.Message
 
 	var pass int       // 跳过次数
@@ -166,7 +152,6 @@ func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.M
 				continue
 			}
 
-			refine := &info.RefineContent{}
 			// 深度思考需要处理 Think标签
 			if len(msg.Content) > 0 && msg.Content[0] == '<' { // 如果是 < 开头, 可能为深度思考<think>标签, 考虑到都是三个, 所以收集三个
 				pass, collect = 2, msg.Content
@@ -181,24 +166,15 @@ func deepThinkProcess(ctx context.Context, reader *schema.StreamReader[*schema.M
 				status = cst.EventMessageContentTypeText
 			default: // 都不是, 保持原状态
 			}
-			content := collect + msg.Content
-			switch status {
-			case cst.EventMessageContentTypeText:
-				refine.Text = content
-			case cst.EventMessageContentTypeSuggest: // optimize 需要处理建议
-				refine.Suggest = content
-			case cst.EventMessageContentTypeThink:
-				refine.Think = content
+			if collect != "" {
+				msg.Content = collect + msg.Content
 			}
-			if data, err = json.Marshal(&refine); err != nil {
-				continue
-			}
-			msg.Content, msg.Extra = string(data), map[string]any{cst.EventMessageContentType: status, cst.RawMessage: msg.Content}
+			util.AddExtra(msg, cst.EventMessageContentType, status)
 			writer.Send(msg, nil)
 		}
 	}
 }
 
-func (c *ChatModel) WithTools(tools []*schema.ToolInfo) (model.ToolCallingChatModel, error) {
+func (c *InnosparkChatModel) WithTools(tools []*schema.ToolInfo) (model.ToolCallingChatModel, error) {
 	return c.cli.WithTools(tools)
 }

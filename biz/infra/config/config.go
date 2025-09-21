@@ -38,6 +38,10 @@ type Bocha struct {
 	Template string
 }
 
+type ARK struct {
+	APIKey string
+}
+
 type Config struct {
 	service.ServiceConf
 	ListenOn  string
@@ -48,6 +52,7 @@ type Config struct {
 	Redis     redis.RedisConf
 	Mongo     *Mongo
 	Bocha     *Bocha
+	ARK       *ARK
 }
 
 func NewConfig() (*Config, error) {

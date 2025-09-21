@@ -59,4 +59,5 @@ func completeAssistantMsg(relay *info.RelayContext) {
 		Suggest:  relay.MessageInfo.Suggest,
 		Cite:     relay.SearchInfo.Cite,
 	}
+	am.Ext.Code = relay.MessageInfo.Code
 }

@@ -101,6 +101,7 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 			Brief:    msg.Ext.Brief,
 			Think:    msg.Ext.Think,
 			Suggest:  msg.Ext.Suggest,
+			Cite:     MCiteToFCiteList(msg.Ext.Cite),
 		},
 		Feedback: msg.Feedback,
 		UserType: msg.Role,
@@ -110,4 +111,23 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 		fm.ReplyId = &reply
 	}
 	return fm
+}
+
+func MCiteToFCiteList(cites []*mmsg.Cite) (cs []*core_api.Cite) {
+	for _, c := range cites {
+		cs = append(cs, MCiteToFCite(c))
+	}
+	return
+}
+
+func MCiteToFCite(cite *mmsg.Cite) *core_api.Cite {
+	return &core_api.Cite{
+		Index:         cite.Index,
+		Name:          cite.Name,
+		Url:           cite.URL,
+		Snippet:       cite.Snippet,
+		SiteName:      cite.SiteName,
+		SiteIcon:      cite.SiteIcon,
+		DatePublished: cite.DatePublished,
+	}
 }

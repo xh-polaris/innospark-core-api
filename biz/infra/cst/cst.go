@@ -39,10 +39,12 @@ const (
 
 // Event中各种类型枚举值
 const (
-	EventMessageContentTypeText    = 0
-	EventMessageContentTypeThink   = 1
-	EventMessageContentTypeSuggest = 2
-	MessageStatus                  = 0
+	EventMessageContentTypeText     = 0
+	EventMessageContentTypeThink    = 1
+	EventMessageContentTypeSuggest  = 2
+	EventMessageContentTypeCode     = 3 // 代码
+	EventMessageContentTypeCodeType = 4 // 代码
+	MessageStatus                   = 0
 )
 
 // 消息相关枚举值
@@ -67,6 +69,7 @@ const (
 	ThinkEnd     = "</think>"
 	SuggestStart = "<suggest>"
 	SuggestEnd   = "</suggest>"
+	CodeBound    = "```"
 )
 
 // mapper层字段枚举
