@@ -62,6 +62,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 	completionOpt := compose.InvokableLambda(func(ctx context.Context, input []*mmsg.Message) (output []*mmsg.Message, err error) {
 		err = compose.ProcessState(ctx, func(ctx context.Context, s Context) (err error) {
 			output, err = DoCompletionOption(s, input)
+
 			return
 		})
 		return

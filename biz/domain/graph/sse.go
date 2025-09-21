@@ -33,9 +33,6 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 	defer mr.Close() // 关闭模型读
 	defer sw.Close() // 关闭sse写
 
-	sw.Send(t.meta())  // 元数据事件
-	sw.Send(t.model()) // 模型信息事件
-
 	var err error
 	var msg *schema.Message
 	defer t.collect() // 收集各类型消息

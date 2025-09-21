@@ -64,5 +64,11 @@ func DoCompletionOption(relay *info.RelayContext, his []*mmsg.Message) ([]*mmsg.
 		relay.ReplyId = um.MessageId.Hex()
 	}
 	relay.MessageInfo.AssistantMessage = msg.NewModelMsg(relay, len(his))
+	if err := relay.SSEEvent(relay.MetaEvent()); err != nil { // 元数据事件
+		return nil, err
+	}
+	if err := relay.SSEEvent(relay.ModelEvent()); err != nil { // 模型信息事件
+		return nil, err
+	}
 	return his, nil
 }

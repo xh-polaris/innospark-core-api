@@ -128,6 +128,9 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 			return "", err
 		}
 	}
+	if err = r.SSEEvent(r.SearchEndEvent()); err != nil {
+		return "", err
+	}
 	r.SearchInfo = &info.SearchInfo{Find: find, Choose: choose, Cite: cite}
 	return sb.String(), nil
 }
