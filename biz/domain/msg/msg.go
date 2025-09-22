@@ -102,6 +102,7 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 			Think:    msg.Ext.Think,
 			Suggest:  msg.Ext.Suggest,
 			Cite:     MCiteToFCiteList(msg.Ext.Cite),
+			Code:     MCodeToFCodeList(msg.Ext.Code),
 		},
 		Feedback: msg.Feedback,
 		UserType: msg.Role,
@@ -129,5 +130,19 @@ func MCiteToFCite(cite *mmsg.Cite) *core_api.Cite {
 		SiteName:      cite.SiteName,
 		SiteIcon:      cite.SiteIcon,
 		DatePublished: cite.DatePublished,
+	}
+}
+
+func MCodeToFCodeList(codes []*mmsg.Code) (cs []*core_api.Code) {
+	for _, c := range codes {
+		cs = append(cs, MCodeToFCode(c))
+	}
+	return
+}
+func MCodeToFCode(code *mmsg.Code) *core_api.Code {
+	return &core_api.Code{
+		Index:    code.Index,
+		CodeType: code.CodeType,
+		Code:     code.Code,
 	}
 }

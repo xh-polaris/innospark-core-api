@@ -57,7 +57,9 @@ func completeAssistantMsg(relay *info.RelayContext) {
 		Brief:    relay.MessageInfo.Text,
 		Think:    relay.MessageInfo.Think,
 		Suggest:  relay.MessageInfo.Suggest,
-		Cite:     relay.SearchInfo.Cite,
+	}
+	if relay.SearchInfo != nil { // 搜索信息
+		am.Ext.Cite = relay.SearchInfo.Cite
 	}
 	am.Ext.Code = relay.MessageInfo.Code
 }

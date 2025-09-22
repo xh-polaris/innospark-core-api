@@ -3,6 +3,7 @@ package graph
 import (
 	"context"
 
+	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
@@ -12,6 +13,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
 	tool "github.com/xh-polaris/innospark-core-api/biz/domain/tool"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
@@ -98,8 +100,27 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 
 	// to optimize 根据模型配置, 路由到不同的分支
 	// 调用模型
+	modelOpt := compose.WithStatePreHandler(func(ctx context.Context, in []*schema.Message, state Context) ([]*schema.Message, error) {
+		if state.ModelInfo.BotId == "code-gen" {
+			state.ModelInfo.Model = model.Doubao15Pro32K
+			// 填充模板
+			format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: cst.User, Content: config.GetConfig().ARK.CodeGenTemplate}).Format(ctx,
+				map[string]any{"userQuery": state.OriginMessage.Content})
+			if err != nil {
+				return nil, err
+			}
+			// 找到最近一条有效的用户消息, 主要是为了适配regen的情况
+			for _, m := range in {
+				if m.Role == cst.User && m.Content != "" {
+					m.Content = format[0].Content
+					break
+				}
+			}
+		}
+		return in, nil
+	})
 	cm := &model.ModelFactory{}
-	util.MustAddChatModelNode(cg, ChatModel, cm)
+	util.MustAddChatModelNode(cg, ChatModel, cm, modelOpt)
 
 	// 构建事件
 	transformToEvent := compose.TransformableLambda(func(ctx context.Context, input *schema.StreamReader[*schema.Message]) (_ *schema.StreamReader[*sse.Event], err error) {

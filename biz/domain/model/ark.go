@@ -65,7 +65,7 @@ func (c *ARKChatModel) Stream(ctx context.Context, in []*schema.Message, opts ..
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
 	switch c.model {
 	case Doubao15Pro32K:
-		c.process(ctx, raw, processWriter)
+		go c.process(ctx, raw, processWriter)
 	default:
 		raw.Close()
 	}
@@ -95,6 +95,9 @@ func (c *ARKChatModel) process(ctx context.Context, reader *schema.StreamReader[
 				status = cst.EventMessageContentTypeCodeType // 代码类型
 				pass = !pass
 			} else {
+				if isCode {
+					status = cst.EventMessageContentTypeCode
+				}
 				// 处理消息
 				switch msg.Content {
 				case cst.CodeBound: // 代码内容边界, 需要在text中写入一个[code:x]来标注代码出现位置

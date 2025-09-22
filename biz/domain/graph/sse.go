@@ -103,11 +103,9 @@ func SSE(relay *info.RelayContext, input *schema.StreamReader[*sse.Event]) (_ *i
 	sw := sse.NewWriter(relay.RequestContext)
 	for {
 		et, err = input.Recv()
-		if err != nil { // sse 提前结束
-			logx.CondError(!errors.Is(err, io.EOF), "[sse] recv err: %v", err)
-			break
+		if et != nil {
+			err = sw.Write(et) // 写入事件
 		}
-		err = sw.Write(et) // 写入事件
 		if err != nil {
 			logx.CondError(!errors.Is(err, io.EOF), "[sse] write err: %v", err)
 			break

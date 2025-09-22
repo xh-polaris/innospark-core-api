@@ -158,7 +158,7 @@ type SearchInfo struct {
 }
 
 type RefineContent struct {
-	Typ      int
+	Typ      int    `json:"-"`
 	Think    string `json:"think,omitempty"`
 	Text     string `json:"text,omitempty"`
 	Suggest  string `json:"suggest,omitempty"`

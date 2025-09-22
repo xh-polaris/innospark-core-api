@@ -39,7 +39,7 @@ type Ext struct {
 	Suggest         string  `json:"suggest,omitempty" bson:"suggest,omitempty"` // 建议内容
 	Cite            []*Cite `json:"cite,omitempty" bson:"cite,omitempty"`       // 引用
 	Code            []*Code `json:"code,omitempty" bson:"code,omitempty"`       // 代码
-	ContentWithCite *string // 模型用到的引用, 会替换模型域的消息
+	ContentWithCite *string `json:"-" bson:"-"`                                 // 模型用到的引用, 会替换模型域的消息
 }
 
 type Cite struct {

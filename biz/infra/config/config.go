@@ -39,7 +39,8 @@ type Bocha struct {
 }
 
 type ARK struct {
-	APIKey string
+	APIKey          string
+	CodeGenTemplate string
 }
 
 type Config struct {
