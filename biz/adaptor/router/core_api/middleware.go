@@ -90,3 +90,8 @@ func _searchconversationMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _generateMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

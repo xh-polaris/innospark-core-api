@@ -42,6 +42,21 @@ func CreateConversation(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// Generate .
+// @router /conversation/brief [POST]
+func Generate(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.GenerateBriefReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ConversationService.GenerateBrief(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // RenameConversation .
 // @router /conversation/rename [POST]
 func RenameConversation(ctx context.Context, c *app.RequestContext) {

@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 
+	"github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/cloudwego/eino/schema"
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	dm "github.com/xh-polaris/innospark-core-api/biz/domain/msg"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
@@ -16,6 +19,7 @@ import (
 
 type IConversationService interface {
 	CreateConversation(ctx context.Context, req *core_api.CreateConversationReq) (*core_api.CreateConversationResp, error)
+	GenerateBrief(ctx context.Context, req *core_api.GenerateBriefReq) (*core_api.GenerateBriefResp, error)
 	RenameConversation(ctx context.Context, req *core_api.RenameConversationReq) (*core_api.RenameConversationResp, error)
 	ListConversation(ctx context.Context, req *core_api.ListConversationReq) (*core_api.ListConversationResp, error)
 	GetConversation(ctx context.Context, req *core_api.GetConversationReq) (*core_api.GetConversationResp, error)
@@ -50,6 +54,40 @@ func (s *ConversationService) CreateConversation(ctx context.Context, req *core_
 
 	// 返回conversationID
 	return &core_api.CreateConversationResp{Resp: util.Success(), ConversationId: newConversation.ConversationId.Hex()}, nil
+}
+
+func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.GenerateBriefReq) (*core_api.GenerateBriefResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logx.Error("extract user id error: %v", err)
+		return nil, cst.UnAuthErr
+	}
+	// 生成标题
+	m, err := openai.NewChatModel(context.Background(), &openai.ChatModelConfig{
+		BaseURL: config.GetConfig().InnoSpark.DefaultBaseURL,
+		APIKey:  config.GetConfig().InnoSpark.DefaultAPIKey,
+		Model:   "InnoSpark",
+	})
+	//m, err := ark.NewChatModel(ctx, &ark.ChatModelConfig{
+	//	BaseURL: "https://ark.cn-beijing.volces.com/api/v3",
+	//	Region:  "cn-beijing",
+	//	APIKey:  config.GetConfig().ARK.APIKey,
+	//	Model:   "doubao-1-5-pro-32k-250115",
+	//})
+	if err != nil {
+		return nil, err
+	}
+	in := []*schema.Message{schema.UserMessage("你是标题生成器, 不要回答, 而是根据用户输入概括[" + req.Messages[0].Content + "],不超过10个字, 简洁正式, 无额外内容")}
+	out, err := m.Generate(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	// 更新标题
+	if err = s.ConversationMapper.UpdateConversationBrief(ctx, uid, req.ConversationId, out.Content); err != nil {
+		return nil, err
+	}
+	return &core_api.GenerateBriefResp{Resp: util.Success(), Brief: out.Content}, nil
 }
 
 func (s *ConversationService) RenameConversation(ctx context.Context, req *core_api.RenameConversationReq) (*core_api.RenameConversationResp, error) {
