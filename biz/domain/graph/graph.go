@@ -102,7 +102,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 	// 调用模型
 	modelOpt := compose.WithStatePreHandler(func(ctx context.Context, in []*schema.Message, state Context) ([]*schema.Message, error) {
 		if state.ModelInfo.BotId == "code-gen" {
-			state.ModelInfo.Model = model.Doubao15Pro32K
+			state.ModelInfo.Model = model.Claude4Sonnet
 			// 填充模板
 			format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: cst.User, Content: config.GetConfig().ARK.CodeGenTemplate}).Format(ctx,
 				map[string]any{"userQuery": state.OriginMessage.Content})

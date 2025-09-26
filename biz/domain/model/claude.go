@@ -1,0 +1,174 @@
+package model
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/cloudwego/eino/components/model"
+	"github.com/cloudwego/eino/schema"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+)
+
+func init() {
+	RegisterModel(Claude4Sonnet, NewClaudeChatModel)
+}
+
+const (
+	Claude4Sonnet = "claude-4-sonnet"
+)
+
+type ClaudeChatModel struct {
+	cli   *openai.ChatModel
+	model string
+}
+
+func NewClaudeChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
+	var cli *openai.ChatModel
+	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		APIKey:     config.GetConfig().Claude.APIKey,
+		BaseURL:    config.GetConfig().Claude.BaseURL,
+		Model:      Claude4Sonnet,
+		User:       &uid,
+		HTTPClient: util.NewDebugClient(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClaudeChatModel{cli: cli, model: Claude4Sonnet}, nil
+}
+
+func (c *ClaudeChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		if in[i].Content != "" {
+			reverse = append(reverse, in[i])
+		}
+	}
+	return c.cli.Generate(ctx, reverse, opts...)
+}
+
+func (c *ClaudeChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
+	var raw *schema.StreamReader[*schema.Message]
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		if in[i].Content != "" {
+			in[i].Name = ""
+			reverse = append(reverse, in[i])
+		}
+	}
+	if raw, err = c.cli.Stream(ctx, reverse, opts...); err != nil {
+		return nil, err
+	}
+	processReader, processWriter := schema.Pipe[*schema.Message](5)
+	switch c.model {
+	case Claude4Sonnet:
+		go c.process(ctx, raw, processWriter)
+	default:
+		raw.Close()
+	}
+	return processReader, nil
+}
+
+func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamReader[*schema.Message], writer *schema.StreamWriter[*schema.Message]) {
+	defer reader.Close()
+	defer writer.Close()
+
+	var err error
+	var msg *schema.Message
+	var segment int       // 段落数
+	var isCode, pass bool // 是否为代码内容以及记录代码类型
+
+	var status = cst.EventMessageContentTypeText
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if msg, err = reader.Recv(); err != nil {
+				writer.Send(nil, err)
+				return
+			}
+			if pass { // 记录代码类型
+				var find bool
+				for i := 0; i < len(msg.Content)-1; i++ {
+					if msg.Content[i] == '<' { // 有代码内容
+						find = true
+						codeType := schema.AssistantMessage(msg.Content[:i], nil)
+						util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+						writer.Send(codeType, nil)
+						msg.Content = msg.Content[i:]
+						break
+					}
+				}
+				if !find { // 没有代码内容, 整个都是代码类型
+					msg.Content = strings.TrimRight(msg.Content, "\n")
+					util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+					writer.Send(msg, nil)
+					continue
+				}
+				pass = !pass
+			} else {
+				// 处理消息
+				switch {
+				case strings.Contains(msg.Content, cst.CodeBound): // 包含代码内容边界, 若是开始需要在text中写入一个[code:x]来标注代码出现位置
+					if !isCode {
+						ss := strings.Split(msg.Content, cst.CodeBound)
+						// 左侧文本内容
+						textMsg := schema.AssistantMessage(ss[0], nil)
+						util.AddExtra(textMsg, cst.EventMessageContentType, cst.EventMessageContentTypeText)
+						writer.Send(textMsg, nil)
+						msg.Content = fmt.Sprintf("[code:%d]", segment)
+						util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeText)
+						writer.Send(msg, nil)
+						// 右侧可能是代码类型, 也可能有代码, 也可能什么都没有
+						pass = true
+						if len(ss) > 1 && len(strings.Trim(ss[1], "\n")) > 0 {
+							for i := 0; i < len(ss[1])-1; i++ {
+								if ss[1][i] == '<' { // 有代码内容
+									codeType := schema.AssistantMessage(ss[1][:i], nil)
+									util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+									writer.Send(codeType, nil)
+									msg.Content = ss[1][i:]
+									util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+									writer.Send(msg, nil)
+									pass = false // 有了代码类型
+									break
+								}
+							}
+						}
+						status = cst.EventMessageContentTypeCode
+					} else {
+						segment++
+						ss := strings.Split(msg.Content, cst.CodeBound)
+						// 左侧代码内容
+						codeMsg := schema.AssistantMessage(ss[0], nil)
+						util.AddExtra(codeMsg, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+						writer.Send(codeMsg, nil)
+						// 右侧可能是文本内容也可能没有了
+						if len(ss) > 1 && len(strings.Trim(ss[1], "\n")) > 0 {
+							textMsg := schema.AssistantMessage(ss[1], nil)
+							util.AddExtra(textMsg, cst.EventMessageContentType, cst.EventMessageContentTypeText)
+							writer.Send(textMsg, nil)
+						}
+						status = cst.EventMessageContentTypeText
+
+					}
+					isCode = !isCode
+					continue
+				}
+			}
+			util.AddExtra(msg, cst.EventMessageContentType, status)
+			writer.Send(msg, nil)
+		}
+	}
+}
+
+func (c *ClaudeChatModel) WithTools(tools []*schema.ToolInfo) (model.ToolCallingChatModel, error) {
+	return c.cli.WithTools(tools)
+}

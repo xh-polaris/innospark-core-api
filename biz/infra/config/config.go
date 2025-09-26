@@ -43,6 +43,11 @@ type ARK struct {
 	CodeGenTemplate string
 }
 
+type Claude struct {
+	BaseURL string
+	APIKey  string
+}
+
 type Config struct {
 	service.ServiceConf
 	ListenOn  string
@@ -54,6 +59,7 @@ type Config struct {
 	Mongo     *Mongo
 	Bocha     *Bocha
 	ARK       *ARK
+	Claude    *Claude
 }
 
 func NewConfig() (*Config, error) {
