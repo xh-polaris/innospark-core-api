@@ -95,3 +95,28 @@ func _generateMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _basic_userMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _basicuserloginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _basicuserregisterMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _systemMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _sendverifycodeMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

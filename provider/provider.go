@@ -26,6 +26,7 @@ type Provider struct {
 	CompletionsService  service.ICompletionsService
 	ConversationService service.IConversationService
 	FeedbackService     service.IFeedbackService
+	UserService         service.IUserService
 	CompletionGraph     *graph.CompletionGraph
 }
 
@@ -39,6 +40,7 @@ var ApplicationSet = wire.NewSet(
 	service.CompletionsServiceSet,
 	service.ConversationServiceSet,
 	service.FeedbackServiceSet,
+	service.UserServiceSet,
 )
 
 var DomainSet = wire.NewSet(

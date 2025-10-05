@@ -23,6 +23,11 @@ func Register(r *server.Hertz) {
 		_agents.POST("/list", append(_listagentsMw(), core_api.ListAgents)...)
 	}
 	{
+		_basic_user := root.Group("/basic_user", _basic_userMw()...)
+		_basic_user.POST("/login", append(_basicuserloginMw(), core_api.BasicUserLogin)...)
+		_basic_user.POST("/register", append(_basicuserregisterMw(), core_api.BasicUserRegister)...)
+	}
+	{
 		_conversation := root.Group("/conversation", _conversationMw()...)
 		_conversation.POST("/brief", append(_generateMw(), core_api.Generate)...)
 		_conversation.POST("/create", append(_createconversationMw(), core_api.CreateConversation)...)
@@ -31,6 +36,10 @@ func Register(r *server.Hertz) {
 		_conversation.POST("/list", append(_listconversationMw(), core_api.ListConversation)...)
 		_conversation.POST("/rename", append(_renameconversationMw(), core_api.RenameConversation)...)
 		_conversation.POST("/search", append(_searchconversationMw(), core_api.SearchConversation)...)
+	}
+	{
+		_system := root.Group("/system", _systemMw()...)
+		_system.POST("/send_verify_code", append(_sendverifycodeMw(), core_api.SendVerifyCode)...)
 	}
 	{
 		_v1 := root.Group("/v1", _v1Mw()...)

@@ -40,11 +40,13 @@ func NewProvider() (*Provider, error) {
 		MessageMapper:  mongoMapper,
 		FeedbackMapper: feedbackMongoMapper,
 	}
+	userService := &service.UserService{}
 	providerProvider := &Provider{
 		Config:              configConfig,
 		CompletionsService:  completionsService,
 		ConversationService: conversationService,
 		FeedbackService:     feedbackService,
+		UserService:         userService,
 		CompletionGraph:     completionGraph,
 	}
 	return providerProvider, nil

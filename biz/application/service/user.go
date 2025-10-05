@@ -1,0 +1,120 @@
+package service
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/google/wire"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+)
+
+type IUserService interface {
+	SendVerifyCode(ctx context.Context, req *core_api.SendVerifyCodeReq) (*core_api.SendVerifyCodeResp, error)
+	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
+	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
+}
+
+type UserService struct {
+}
+
+var UserServiceSet = wire.NewSet(
+	wire.Struct(new(UserService), "*"),
+	wire.Bind(new(IUserService), new(*UserService)),
+)
+
+func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVerifyCodeReq) (*core_api.SendVerifyCodeResp, error) {
+	c := config.GetConfig()
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+	body := map[string]any{
+		"authType": req.AuthType,
+		"authId":   req.AuthId,
+		"expire":   300,
+		"cause":    "passport",
+		"app":      map[string]any{"name": "InnoSpark"},
+	}
+	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/system/send_verify_code", header, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.SendVerifyCodeResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.SendVerifyCodeResp{
+		Resp: util.Success(),
+	}, nil
+}
+
+func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error) {
+	c := config.GetConfig()
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+	body := map[string]any{
+		"authType": req.AuthType,
+		"authId":   req.AuthId,
+		"verify":   req.Verify,
+		"password": req.Password,
+		"app":      map[string]any{"name": "InnoSpark"},
+	}
+	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/register", header, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.BasicUserRegisterResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.BasicUserRegisterResp{
+		Resp:  util.Success(),
+		Token: resp["token"].(string),
+	}, nil
+}
+
+func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error) {
+	c := config.GetConfig()
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+	body := map[string]any{
+		"authType": req.AuthType,
+		"authId":   req.AuthId,
+		"verify":   req.Verify,
+		"app":      map[string]any{"name": "InnoSpark"},
+	}
+	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/login", header, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.BasicUserLoginResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.BasicUserLoginResp{
+		Resp:  util.Success(),
+		Token: resp["token"].(string),
+	}, nil
+}

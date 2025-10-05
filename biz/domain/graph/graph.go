@@ -151,7 +151,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 	})
 	util.MustAddLambdaNode(cg, StoreHis, storeHis)
 
-	// 链式连接
+	// 链式连接 optimize 满足Cond执行的节点
 	util.MustChain(cg, compose.START, GenLocalState, LoadHistory, ProcessCompletionOpt)
 	util.MustChain(cg, WebSearch, MsgMToE)
 	util.MustChain(cg, MsgMToE, ChatModel, TransformToSSEEvent, SSEStream, StoreHis, compose.END)

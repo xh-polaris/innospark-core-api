@@ -162,3 +162,48 @@ func Feedback(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().FeedbackService.Feedback(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// SendVerifyCode .
+// @router /system/send_verify_code [POST]
+func SendVerifyCode(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.SendVerifyCodeReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.SendVerifyCode(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// BasicUserRegister .
+// @router /basic_user/register [POST]
+func BasicUserRegister(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.BasicUserRegisterReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.Register(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// BasicUserLogin .
+// @router /basic_user/login [POST]
+func BasicUserLogin(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.BasicUserLoginReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.Login(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}

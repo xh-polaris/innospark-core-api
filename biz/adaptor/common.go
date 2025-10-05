@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -48,8 +49,11 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	if string(tokenString) == "xh-polaris" {
 		return "67aac4d14e8825731a1503d8", nil
 	}
-	token, err := jwt.Parse(string(tokenString), func(_ *jwt.Token) (interface{}, error) {
-		return jwt.ParseECPublicKeyFromPEM([]byte(config.GetConfig().Auth.PublicKey))
+	token, err := jwt.Parse(string(tokenString), func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwt.ParseRSAPublicKeyFromPEM([]byte(config.GetConfig().Auth.PublicKey))
 	})
 	if err != nil {
 		return
@@ -67,7 +71,7 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	if err != nil {
 		return
 	}
-	return claims["userId"].(string), err
+	return claims["basic_user_id"].(string), err
 }
 
 // PostProcess 处理http响应, resp要求指针或接口类型

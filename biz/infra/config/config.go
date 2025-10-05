@@ -50,16 +50,17 @@ type Claude struct {
 
 type Config struct {
 	service.ServiceConf
-	ListenOn  string
-	State     string
-	Auth      *Auth
-	InnoSpark *InnoSpark
-	Cache     cache.CacheConf
-	Redis     redis.RedisConf
-	Mongo     *Mongo
-	Bocha     *Bocha
-	ARK       *ARK
-	Claude    *Claude
+	ListenOn   string
+	State      string
+	SynapseURL string
+	Auth       *Auth
+	InnoSpark  *InnoSpark
+	Cache      cache.CacheConf
+	Redis      redis.RedisConf
+	Mongo      *Mongo
+	Bocha      *Bocha
+	ARK        *ARK
+	Claude     *Claude
 }
 
 func NewConfig() (*Config, error) {
