@@ -120,3 +120,8 @@ func _sendverifycodeMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _basicuserresetpasswordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

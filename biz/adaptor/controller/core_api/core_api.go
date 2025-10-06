@@ -207,3 +207,18 @@ func BasicUserLogin(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().UserService.Login(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// BasicUserResetPassword .
+// @router /basic_user/reset_password [POST]
+func BasicUserResetPassword(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.BasicUserResetPasswordReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.ResetPassword(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}

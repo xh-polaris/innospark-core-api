@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/wire"
+	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
@@ -15,6 +16,7 @@ type IUserService interface {
 	SendVerifyCode(ctx context.Context, req *core_api.SendVerifyCodeReq) (*core_api.SendVerifyCodeResp, error)
 	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
+	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
 }
 
 type UserService struct {
@@ -116,5 +118,39 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 	return &core_api.BasicUserLoginResp{
 		Resp:  util.Success(),
 		Token: resp["token"].(string),
+		New:   resp["new"].(bool),
+	}, nil
+}
+
+func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error) {
+	c := config.GetConfig()
+	rc, err := adaptor.ExtractContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	header.Set("Authorization", string(rc.GetHeader("Authorization")))
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+	body := map[string]any{
+		"newPassword": req.NewPassword,
+		"app":         map[string]any{"name": "InnoSpark"},
+	}
+	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/reset_password", header, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.BasicUserResetPasswordResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.BasicUserResetPasswordResp{
+		Resp: util.Success(),
 	}, nil
 }

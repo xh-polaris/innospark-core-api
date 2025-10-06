@@ -27,7 +27,7 @@ var file_core_api_proto_rawDesc = []byte{
 	0x12, 0x08, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x1a, 0x15, 0x63, 0x6f, 0x72, 0x65,
 	0x5f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x1a, 0x10, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2f, 0x68, 0x74, 0x74, 0x70, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x32, 0xb5, 0x0a, 0x0a, 0x07, 0x43, 0x6f, 0x72, 0x65, 0x41, 0x70, 0x69, 0x12,
+	0x6f, 0x74, 0x6f, 0x32, 0xb5, 0x0b, 0x0a, 0x07, 0x43, 0x6f, 0x72, 0x65, 0x41, 0x70, 0x69, 0x12,
 	0x52, 0x0a, 0x0b, 0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x18,
 	0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x65,
 	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x12, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f,
@@ -110,7 +110,15 @@ var file_core_api_proto_rawDesc = []byte{
 	0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70,
 	0x69, 0x2e, 0x42, 0x61, 0x73, 0x69, 0x63, 0x55, 0x73, 0x65, 0x72, 0x4c, 0x6f, 0x67, 0x69, 0x6e,
 	0x52, 0x65, 0x73, 0x70, 0x22, 0x15, 0xd2, 0xc1, 0x18, 0x11, 0x2f, 0x62, 0x61, 0x73, 0x69, 0x63,
-	0x5f, 0x75, 0x73, 0x65, 0x72, 0x2f, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x42, 0x47, 0x5a, 0x45, 0x67,
+	0x5f, 0x75, 0x73, 0x65, 0x72, 0x2f, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x7e, 0x0a, 0x16, 0x42,
+	0x61, 0x73, 0x69, 0x63, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x65, 0x74, 0x50, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x23, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69,
+	0x2e, 0x42, 0x61, 0x73, 0x69, 0x63, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x65, 0x74, 0x50,
+	0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x1f, 0x2e, 0x63, 0x6f, 0x72,
+	0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x42, 0x61, 0x73, 0x69, 0x63, 0x55, 0x73, 0x65, 0x72, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x22, 0x1e, 0xd2, 0xc1, 0x18,
+	0x1a, 0x2f, 0x62, 0x61, 0x73, 0x69, 0x63, 0x5f, 0x75, 0x73, 0x65, 0x72, 0x2f, 0x72, 0x65, 0x73,
+	0x65, 0x74, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x42, 0x47, 0x5a, 0x45, 0x67,
 	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c,
 	0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63,
 	0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c,
@@ -119,32 +127,33 @@ var file_core_api_proto_rawDesc = []byte{
 }
 
 var file_core_api_proto_goTypes = []interface{}{
-	(*CompletionsReq)(nil),         // 0: core_api.CompletionsReq
-	(*CreateConversationReq)(nil),  // 1: core_api.CreateConversationReq
-	(*ListConversationReq)(nil),    // 2: core_api.ListConversationReq
-	(*GetConversationReq)(nil),     // 3: core_api.GetConversationReq
-	(*GenerateBriefReq)(nil),       // 4: core_api.GenerateBriefReq
-	(*RenameConversationReq)(nil),  // 5: core_api.RenameConversationReq
-	(*DeleteConversationReq)(nil),  // 6: core_api.DeleteConversationReq
-	(*SearchConversationReq)(nil),  // 7: core_api.SearchConversationReq
-	(*ListAgentsReq)(nil),          // 8: core_api.ListAgentsReq
-	(*FeedbackReq)(nil),            // 9: core_api.FeedbackReq
-	(*SendVerifyCodeReq)(nil),      // 10: core_api.SendVerifyCodeReq
-	(*BasicUserRegisterReq)(nil),   // 11: core_api.BasicUserRegisterReq
-	(*BasicUserLoginReq)(nil),      // 12: core_api.BasicUserLoginReq
-	(*SSEEvent)(nil),               // 13: core_api.SSEEvent
-	(*CreateConversationResp)(nil), // 14: core_api.CreateConversationResp
-	(*ListConversationResp)(nil),   // 15: core_api.ListConversationResp
-	(*GetConversationResp)(nil),    // 16: core_api.GetConversationResp
-	(*GenerateBriefResp)(nil),      // 17: core_api.GenerateBriefResp
-	(*RenameConversationResp)(nil), // 18: core_api.RenameConversationResp
-	(*DeleteConversationResp)(nil), // 19: core_api.DeleteConversationResp
-	(*SearchConversationResp)(nil), // 20: core_api.SearchConversationResp
-	(*ListAgentsResp)(nil),         // 21: core_api.ListAgentsResp
-	(*FeedbackResp)(nil),           // 22: core_api.FeedbackResp
-	(*SendVerifyCodeResp)(nil),     // 23: core_api.SendVerifyCodeResp
-	(*BasicUserRegisterResp)(nil),  // 24: core_api.BasicUserRegisterResp
-	(*BasicUserLoginResp)(nil),     // 25: core_api.BasicUserLoginResp
+	(*CompletionsReq)(nil),            // 0: core_api.CompletionsReq
+	(*CreateConversationReq)(nil),     // 1: core_api.CreateConversationReq
+	(*ListConversationReq)(nil),       // 2: core_api.ListConversationReq
+	(*GetConversationReq)(nil),        // 3: core_api.GetConversationReq
+	(*GenerateBriefReq)(nil),          // 4: core_api.GenerateBriefReq
+	(*RenameConversationReq)(nil),     // 5: core_api.RenameConversationReq
+	(*DeleteConversationReq)(nil),     // 6: core_api.DeleteConversationReq
+	(*SearchConversationReq)(nil),     // 7: core_api.SearchConversationReq
+	(*ListAgentsReq)(nil),             // 8: core_api.ListAgentsReq
+	(*FeedbackReq)(nil),               // 9: core_api.FeedbackReq
+	(*SendVerifyCodeReq)(nil),         // 10: core_api.SendVerifyCodeReq
+	(*BasicUserRegisterReq)(nil),      // 11: core_api.BasicUserRegisterReq
+	(*BasicUserLoginReq)(nil),         // 12: core_api.BasicUserLoginReq
+	(*BasicUserResetPasswordReq)(nil), // 13: core_api.BasicUserResetPasswordReq
+	(*SSEEvent)(nil),                  // 14: core_api.SSEEvent
+	(*CreateConversationResp)(nil),    // 15: core_api.CreateConversationResp
+	(*ListConversationResp)(nil),      // 16: core_api.ListConversationResp
+	(*GetConversationResp)(nil),       // 17: core_api.GetConversationResp
+	(*GenerateBriefResp)(nil),         // 18: core_api.GenerateBriefResp
+	(*RenameConversationResp)(nil),    // 19: core_api.RenameConversationResp
+	(*DeleteConversationResp)(nil),    // 20: core_api.DeleteConversationResp
+	(*SearchConversationResp)(nil),    // 21: core_api.SearchConversationResp
+	(*ListAgentsResp)(nil),            // 22: core_api.ListAgentsResp
+	(*FeedbackResp)(nil),              // 23: core_api.FeedbackResp
+	(*SendVerifyCodeResp)(nil),        // 24: core_api.SendVerifyCodeResp
+	(*BasicUserRegisterResp)(nil),     // 25: core_api.BasicUserRegisterResp
+	(*BasicUserLoginResp)(nil),        // 26: core_api.BasicUserLoginResp
 }
 var file_core_api_proto_depIdxs = []int32{
 	0,  // 0: core_api.CoreApi.Completions:input_type -> core_api.CompletionsReq
@@ -160,21 +169,23 @@ var file_core_api_proto_depIdxs = []int32{
 	10, // 10: core_api.CoreApi.SendVerifyCode:input_type -> core_api.SendVerifyCodeReq
 	11, // 11: core_api.CoreApi.BasicUserRegister:input_type -> core_api.BasicUserRegisterReq
 	12, // 12: core_api.CoreApi.BasicUserLogin:input_type -> core_api.BasicUserLoginReq
-	13, // 13: core_api.CoreApi.Completions:output_type -> core_api.SSEEvent
-	14, // 14: core_api.CoreApi.CreateConversation:output_type -> core_api.CreateConversationResp
-	15, // 15: core_api.CoreApi.ListConversation:output_type -> core_api.ListConversationResp
-	16, // 16: core_api.CoreApi.GetConversation:output_type -> core_api.GetConversationResp
-	17, // 17: core_api.CoreApi.Generate:output_type -> core_api.GenerateBriefResp
-	18, // 18: core_api.CoreApi.RenameConversation:output_type -> core_api.RenameConversationResp
-	19, // 19: core_api.CoreApi.DeleteConversation:output_type -> core_api.DeleteConversationResp
-	20, // 20: core_api.CoreApi.SearchConversation:output_type -> core_api.SearchConversationResp
-	21, // 21: core_api.CoreApi.ListAgents:output_type -> core_api.ListAgentsResp
-	22, // 22: core_api.CoreApi.Feedback:output_type -> core_api.FeedbackResp
-	23, // 23: core_api.CoreApi.SendVerifyCode:output_type -> core_api.SendVerifyCodeResp
-	24, // 24: core_api.CoreApi.BasicUserRegister:output_type -> core_api.BasicUserRegisterResp
-	25, // 25: core_api.CoreApi.BasicUserLogin:output_type -> core_api.BasicUserLoginResp
-	13, // [13:26] is the sub-list for method output_type
-	0,  // [0:13] is the sub-list for method input_type
+	13, // 13: core_api.CoreApi.BasicUserResetPassword:input_type -> core_api.BasicUserResetPasswordReq
+	14, // 14: core_api.CoreApi.Completions:output_type -> core_api.SSEEvent
+	15, // 15: core_api.CoreApi.CreateConversation:output_type -> core_api.CreateConversationResp
+	16, // 16: core_api.CoreApi.ListConversation:output_type -> core_api.ListConversationResp
+	17, // 17: core_api.CoreApi.GetConversation:output_type -> core_api.GetConversationResp
+	18, // 18: core_api.CoreApi.Generate:output_type -> core_api.GenerateBriefResp
+	19, // 19: core_api.CoreApi.RenameConversation:output_type -> core_api.RenameConversationResp
+	20, // 20: core_api.CoreApi.DeleteConversation:output_type -> core_api.DeleteConversationResp
+	21, // 21: core_api.CoreApi.SearchConversation:output_type -> core_api.SearchConversationResp
+	22, // 22: core_api.CoreApi.ListAgents:output_type -> core_api.ListAgentsResp
+	23, // 23: core_api.CoreApi.Feedback:output_type -> core_api.FeedbackResp
+	24, // 24: core_api.CoreApi.SendVerifyCode:output_type -> core_api.SendVerifyCodeResp
+	25, // 25: core_api.CoreApi.BasicUserRegister:output_type -> core_api.BasicUserRegisterResp
+	26, // 26: core_api.CoreApi.BasicUserLogin:output_type -> core_api.BasicUserLoginResp
+	25, // 27: core_api.CoreApi.BasicUserResetPassword:output_type -> core_api.BasicUserRegisterResp
+	14, // [14:28] is the sub-list for method output_type
+	0,  // [0:14] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
