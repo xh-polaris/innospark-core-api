@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
@@ -21,6 +22,17 @@ func Success() *basic.Response {
 		Code: 0,
 		Msg:  "success",
 	}
+}
+
+func ToCDN(u, host string) string {
+	// 解析 URL
+	parsedURL, err := url.Parse(u)
+	if err != nil {
+		return ""
+	}
+	parsedURL.Host = host
+	parsedURL.RawQuery = ""
+	return parsedURL.String()
 }
 
 func NewDebugClient() *http.Client {

@@ -12,7 +12,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 )
 
 const webAPIEndPoint = "https://api.bochaai.com/v1/web-search"
@@ -92,7 +92,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 	header.Add("Content-Type", "application/json")
 	header.Add("Authorization", "Bearer "+t.apiKey)
 	body := &webAPIReq{Query: args["query"].(string), Freshness: "noLimit", Summary: true}
-	if resp, err = util.Post[*webAPIResp](webAPIEndPoint, header, body); err != nil {
+	if resp, err = httpx.Post[*webAPIResp](webAPIEndPoint, header, body); err != nil {
 		return "", err
 	}
 

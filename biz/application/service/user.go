@@ -10,6 +10,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 )
 
 type IUserService interface {
@@ -41,7 +42,7 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 		"cause":    "passport",
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/system/send_verify_code", header, body)
+	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/system/send_verify_code", header, body)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +73,7 @@ func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegis
 		"password": req.Password,
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/register", header, body)
+	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/register", header, body)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 		"verify":   req.Verify,
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/login", header, body)
+	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/login", header, body)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 		"newPassword": req.NewPassword,
 		"app":         map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := util.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/reset_password", header, body)
+	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/reset_password", header, body)
 	if err != nil {
 		return nil, err
 	}

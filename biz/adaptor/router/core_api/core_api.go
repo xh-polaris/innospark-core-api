@@ -39,6 +39,11 @@ func Register(r *server.Hertz) {
 		_conversation.POST("/search", append(_searchconversationMw(), core_api.SearchConversation)...)
 	}
 	{
+		_intelligence := root.Group("/intelligence", _intelligenceMw()...)
+		_intelligence.POST("/get", append(_getintelligenceMw(), core_api.GetIntelligence)...)
+		_intelligence.POST("/list", append(_listintelligenceMw(), core_api.ListIntelligence)...)
+	}
+	{
 		_system := root.Group("/system", _systemMw()...)
 		_system.POST("/send_verify_code", append(_sendverifycodeMw(), core_api.SendVerifyCode)...)
 	}

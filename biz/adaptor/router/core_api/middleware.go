@@ -125,3 +125,18 @@ func _basicuserresetpasswordMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _intelligenceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listintelligenceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getintelligenceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

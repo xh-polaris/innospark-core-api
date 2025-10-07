@@ -61,6 +61,7 @@ type Config struct {
 	Bocha      *Bocha
 	ARK        *ARK
 	Claude     *Claude
+	Coze       *Coze
 }
 
 func NewConfig() (*Config, error) {
