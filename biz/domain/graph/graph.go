@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"strings"
 
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
@@ -116,6 +117,8 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 					break
 				}
 			}
+		} else if strings.HasPrefix(state.ModelInfo.BotId, "intelligence-") {
+			state.ModelInfo.Model, state.ModelInfo.BotId = model.SelfCoze, state.ModelInfo.BotId[13:]
 		}
 		return in, nil
 	})

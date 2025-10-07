@@ -28,7 +28,7 @@ type InnosparkChatModel struct {
 	model string
 }
 
-func NewDefaultChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
+func NewDefaultChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
@@ -45,7 +45,7 @@ func NewDefaultChatModel(ctx context.Context, uid string) (_ model.ToolCallingCh
 	return &InnosparkChatModel{cli: cli, model: DefaultModel}, nil
 }
 
-func NewDeepThinkChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
+func NewDeepThinkChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,

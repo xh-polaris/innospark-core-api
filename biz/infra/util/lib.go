@@ -41,7 +41,7 @@ func NewDebugClient() *http.Client {
 			Transport: NewLoggingTransport(),
 		}
 	}
-	return nil
+	return http.DefaultClient
 }
 
 // LoggingTransport 是一个自定义 Transport，用于打印 HTTP 请求和响应

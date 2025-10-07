@@ -37,7 +37,7 @@ func loginCoze(account, password string) string {
 	header := http.Header{}
 	header.Set("Content-Type", "application/json")
 	body := map[string]string{"email": account, "password": password}
-	header, _, err := httpx.GetHttpClient().PostWithHeader("https://coze.aiecnu.net/api/api/passport/web/email/login/", header, body)
+	header, _, err := httpx.GetHttpClient().PostWithHeader("https://coze.aiecnu.net/api/passport/web/email/login/", header, body)
 	if err != nil {
 		logx.Error("loginCoze err: %v", err)
 		return ""

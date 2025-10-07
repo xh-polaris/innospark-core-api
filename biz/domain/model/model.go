@@ -10,7 +10,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
-type getModelFunc func(ctx context.Context, uid string) (model.ToolCallingChatModel, error)
+type getModelFunc func(ctx context.Context, uid, botId string) (model.ToolCallingChatModel, error)
 
 var models = map[string]getModelFunc{}
 
@@ -19,8 +19,8 @@ func RegisterModel(name string, f getModelFunc) {
 }
 
 // getModel 获取模型
-func getModel(ctx context.Context, model, uid string) (model.ToolCallingChatModel, error) {
-	return models[model](ctx, uid)
+func getModel(ctx context.Context, model, uid, botId string) (model.ToolCallingChatModel, error) {
+	return models[model](ctx, uid, botId)
 }
 
 type ModelFactory struct{}
@@ -56,7 +56,7 @@ func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ..
 
 func (m *ModelFactory) get(ctx context.Context) (cm model.ToolCallingChatModel, err error) {
 	err = compose.ProcessState(ctx, func(ctx context.Context, s *info.RelayContext) (err error) {
-		cm, err = getModel(ctx, s.ModelInfo.Model, s.UserId.Hex())
+		cm, err = getModel(ctx, s.ModelInfo.Model, s.UserId.Hex(), s.ModelInfo.BotId)
 		return
 	})
 	return cm, err

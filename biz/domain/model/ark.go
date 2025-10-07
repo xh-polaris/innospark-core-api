@@ -26,7 +26,7 @@ type ARKChatModel struct {
 	model string
 }
 
-func NewDoubao15Pro32KChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
+func NewDoubao15Pro32KChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *ark.ChatModel
 	cli, err = ark.NewChatModel(ctx, &ark.ChatModelConfig{
 		BaseURL:    ARKBeijing,

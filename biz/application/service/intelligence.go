@@ -50,7 +50,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	if req.Page != nil && req.Page.Cursor == nil {
 		listBody["cursor_id"] = req.Page.Cursor
 	}
-	resp, err := httpx.GetHttpClient().Post("https://coze.aiecnu.net/api/api/intelligence_api/search/get_draft_intelligence_list", header, listBody)
+	resp, err := httpx.GetHttpClient().Post("https://coze.aiecnu.net/api/intelligence_api/search/get_draft_intelligence_list", header, listBody)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	}
 	if resp["code"].(float64) == 700012006 {
 		header.Set("Cookie", config.GetConfig().Coze.RefreshCookie())
-		resp, err = httpx.GetHttpClient().Post("https://coze.aiecnu.net/api/api/intelligence_api/search/get_draft_intelligence_list", header, listBody)
+		resp, err = httpx.GetHttpClient().Post("https://coze.aiecnu.net/api/intelligence_api/search/get_draft_intelligence_list", header, listBody)
 		if err != nil {
 			return nil, err
 		}
@@ -99,9 +99,9 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 
 func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core_api.GetIntelligenceReq) (*core_api.GetIntelligenceResp, error) {
 	header := http.Header{}
-	header.Set("Authorization", config.GetConfig().Coze.PAT)
+	header.Set("Authorization", "Bearer"+config.GetConfig().Coze.PAT)
 	header.Set("Content-Type", "application/json")
-	resp, err := httpx.GetHttpClient().Get(fmt.Sprintf("https://coze.aiecnu.net/api/v1/bots/%s", req.GetId()), header, nil)
+	resp, err := httpx.GetHttpClient().Get(fmt.Sprintf("https://coze.aiecnu.net/v1/bots/%s", req.GetId()), header, nil)
 	if err != nil {
 		return nil, err
 	}

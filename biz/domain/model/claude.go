@@ -28,7 +28,7 @@ type ClaudeChatModel struct {
 	model string
 }
 
-func NewClaudeChatModel(ctx context.Context, uid string) (_ model.ToolCallingChatModel, err error) {
+func NewClaudeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     config.GetConfig().Claude.APIKey,
