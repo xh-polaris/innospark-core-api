@@ -108,6 +108,7 @@ func SSE(relay *info.RelayContext, input *schema.StreamReader[*sse.Event]) (_ *i
 		}
 		if err != nil {
 			logx.CondError(!errors.Is(err, io.EOF), "[sse] write err: %v", err)
+			err = nil // 为了能进入后续的存储历史记录节点
 			break
 		}
 	}
