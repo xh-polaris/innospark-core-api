@@ -81,8 +81,8 @@ func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamRead
 
 	var err error
 	var msg *schema.Message
-	var segment int       // 段落数
-	var isCode, pass bool // 是否为代码内容以及记录代码类型
+	var segment int             // 段落数
+	var isCode, noCodeType bool // 是否为代码内容以及记录代码类型
 
 	var status = cst.EventMessageContentTypeText
 	for {
@@ -94,25 +94,34 @@ func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamRead
 				writer.Send(nil, err)
 				return
 			}
-			if pass { // 记录代码类型
-				var find bool
-				for i := 0; i < len(msg.Content)-1; i++ {
-					if msg.Content[i] == '<' { // 有代码内容
-						find = true
-						codeType := schema.AssistantMessage(msg.Content[:i], nil)
-						util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
-						writer.Send(codeType, nil)
-						msg.Content = msg.Content[i:]
-						break
-					}
+			if noCodeType { // 记录代码类型
+				//var find bool
+				//for i := 0; i < len(msg.Content)-1; i++ {
+				//	if msg.Content[i] == '<' { // 有代码内容
+				//		find = true
+				//		codeType := schema.AssistantMessage(strings.Trim(msg.Content[:i], "\n"), nil)
+				//		util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+				//		writer.Send(codeType, nil)
+				//		msg.Content = msg.Content[i:]
+				//		break
+				//	}
+				//}
+				//if !find { // 没有代码内容, 整个都是代码类型
+				//	msg.Content = strings.Trim(msg.Content, "\n")
+				//	util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+				//	writer.Send(msg, nil)
+				//	continue
+				//}
+				right := strings.Split(msg.Content, "html")
+				codeType := schema.AssistantMessage("html", nil)
+				util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+				writer.Send(codeType, nil)
+				if len(right) > 1 {
+					code := schema.AssistantMessage(strings.TrimLeft(right[1], "\n"), nil)
+					util.AddExtra(code, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+					writer.Send(code, nil)
 				}
-				if !find { // 没有代码内容, 整个都是代码类型
-					msg.Content = strings.TrimRight(msg.Content, "\n")
-					util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
-					writer.Send(msg, nil)
-					continue
-				}
-				pass = !pass
+				noCodeType = !noCodeType
 			} else {
 				// 处理消息
 				switch {
@@ -127,20 +136,30 @@ func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamRead
 						util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeText)
 						writer.Send(msg, nil)
 						// 右侧可能是代码类型, 也可能有代码, 也可能什么都没有
-						pass = true
+						noCodeType = true
 						if len(ss) > 1 && len(strings.Trim(ss[1], "\n")) > 0 {
-							for i := 0; i < len(ss[1])-1; i++ {
-								if ss[1][i] == '<' { // 有代码内容
-									codeType := schema.AssistantMessage(ss[1][:i], nil)
-									util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
-									writer.Send(codeType, nil)
-									msg.Content = ss[1][i:]
-									util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
-									writer.Send(msg, nil)
-									pass = false // 有了代码类型
-									break
-								}
+							right := strings.Split(ss[1], "html")
+							codeType := schema.AssistantMessage("html", nil)
+							util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+							writer.Send(codeType, nil)
+							if len(right) > 1 {
+								code := schema.AssistantMessage(strings.TrimLeft(right[1], "\n"), nil)
+								util.AddExtra(code, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+								writer.Send(code, nil)
 							}
+							noCodeType = false // 有了代码类型
+							//for i := 0; i < len(ss[1])-1; i++ {
+							//	if ss[1][i] == '<' || ss[1][i] == '\n' { // 有代码内容
+							//		codeType := schema.AssistantMessage(strings.Trim(ss[1][:i], "\n"), nil)
+							//		util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+							//		writer.Send(codeType, nil)
+							//		msg.Content = strings.TrimLeft(ss[1][i:], "\n")
+							//		util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+							//		writer.Send(msg, nil)
+							//		noCodeType = false // 有了代码类型
+							//		break
+							//	}
+							//}
 						}
 						status = cst.EventMessageContentTypeCode
 					} else {

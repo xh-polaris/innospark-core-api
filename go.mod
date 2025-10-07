@@ -9,6 +9,7 @@ require (
 	github.com/cloudwego/hertz v0.10.2
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/wire v0.7.0
+	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/monitor-prometheus v0.1.3
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.4.1
 	github.com/xh-polaris/gopkg v0.0.0-20250312141711-7327267f4ea6
@@ -93,7 +94,6 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/xh-polaris/synapse-idl v0.0.0-20251005064742-6f617896f316 // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect

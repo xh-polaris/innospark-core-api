@@ -10,6 +10,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/hertz-contrib/cors"
 	prometheus "github.com/hertz-contrib/monitor-prometheus"
 	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/xh-polaris/gopkg/hertz/middleware"
@@ -48,6 +49,12 @@ func main() {
 
 	h.NoHijackConnPool = true
 
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"*"}
+	corsHandler := cors.New(config)
+
+	h.Use(corsHandler)
 	// 增加全局中间件链
 	h.Use(tracing.ServerMiddleware(cfg), middleware.EnvironmentMiddleware, recovery.Recovery(), func(ctx context.Context, c *app.RequestContext) {
 		ctx = adaptor.InjectContext(ctx, c)
