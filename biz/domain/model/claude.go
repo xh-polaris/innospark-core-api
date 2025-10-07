@@ -21,6 +21,8 @@ const (
 	Claude4Sonnet = "claude-4-sonnet"
 )
 
+var MaxToken = 65535
+
 type ClaudeChatModel struct {
 	cli   *openai.ChatModel
 	model string
@@ -32,6 +34,7 @@ func NewClaudeChatModel(ctx context.Context, uid string) (_ model.ToolCallingCha
 		APIKey:     config.GetConfig().Claude.APIKey,
 		BaseURL:    config.GetConfig().Claude.BaseURL,
 		Model:      Claude4Sonnet,
+		MaxTokens:  &MaxToken,
 		User:       &uid,
 		HTTPClient: util.NewDebugClient(),
 	})

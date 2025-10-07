@@ -85,8 +85,6 @@ func NewConfig() (*Config, error) {
 }
 
 func GetConfig() *Config {
-	once.Do(func() {
-		_, _ = NewConfig()
-	})
+	_, _ = NewConfig()
 	return config
 }
