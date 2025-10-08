@@ -117,6 +117,10 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 	} else {
 		typ, name = s[0], s[1]
 	}
+	var questions []string
+	for _, q := range data["onboarding_info"].(map[string]interface{})["suggested_questions"].([]interface{}) {
+		questions = append(questions, q.(string))
+	}
 	info := &core_api.IntelligenceInfo{
 		BotId:       data["bot_id"].(string),
 		Name:        name,
@@ -129,7 +133,7 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 		OnboardingInfo: &core_api.OnboardingInfo{
 			Prologue:                   data["onboarding_info"].(map[string]interface{})["prologue"].(string),
 			SuggestedQuestionsShowMode: int32(data["onboarding_info"].(map[string]interface{})["suggested_questions_show_mode"].(float64)),
-			SuggestedQuestions:         data["onboarding_info"].(map[string]interface{})["suggested_questions"].([]string),
+			SuggestedQuestions:         questions,
 		},
 		BotMode: int32(data["bot_mode"].(float64)),
 		ModelInfo: &core_api.ModelInfo{
