@@ -129,6 +129,7 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 		OnboardingInfo: &core_api.OnboardingInfo{
 			Prologue:                   data["onboarding_info"].(map[string]interface{})["prologue"].(string),
 			SuggestedQuestionsShowMode: int32(data["onboarding_info"].(map[string]interface{})["suggested_questions_show_mode"].(float64)),
+			SuggestedQuestions:         data["onboarding_info"].(map[string]interface{})["suggested_questions"].([]string),
 		},
 		BotMode: int32(data["bot_mode"].(float64)),
 		ModelInfo: &core_api.ModelInfo{
