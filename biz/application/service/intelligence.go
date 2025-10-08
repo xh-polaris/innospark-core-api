@@ -86,15 +86,18 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 			PublishTime: intelligence["publish_time"].(string),
 		})
 	}
-	return &core_api.ListIntelligenceResp{
+	liResp := &core_api.ListIntelligenceResp{
 		Resp: &basic.Response{
 			Code: int32(int(resp["code"].(float64))),
 			Msg:  resp["msg"].(string),
 		},
 		Intelligences: intelligences,
 		HasMore:       data["has_more"].(bool),
-	}, nil
-
+	}
+	if ncid, ok := data["next_cursor_id"]; ok {
+		liResp.NextCursor = ncid.(string)
+	}
+	return liResp, nil
 }
 
 func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core_api.GetIntelligenceReq) (*core_api.GetIntelligenceResp, error) {
