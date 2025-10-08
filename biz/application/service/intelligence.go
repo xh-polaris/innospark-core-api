@@ -47,7 +47,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	} else {
 		listBody["size"] = 100
 	}
-	if req.Page != nil && req.Page.Cursor == nil {
+	if req.Page != nil && req.Page.Cursor != nil {
 		listBody["cursor_id"] = req.Page.Cursor
 	}
 	resp, err := httpx.GetHttpClient().Post("https://coze.aiecnu.net/api/intelligence_api/search/get_draft_intelligence_list", header, listBody)
