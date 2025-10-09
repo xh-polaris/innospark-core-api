@@ -46,7 +46,7 @@ func (s *ConversationService) CreateConversation(ctx context.Context, req *core_
 	}
 
 	// 调用mapper创建对话
-	newConversation, err := s.ConversationMapper.CreateNewConversation(ctx, uid)
+	newConversation, err := s.ConversationMapper.CreateNewConversation(ctx, uid, req.BotId)
 	if err != nil {
 		logx.Error("create conversation error: %v", err)
 		return nil, cst.ConversationCreationErr
@@ -127,6 +127,7 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 		items[i] = &core_api.Conversation{
 			ConversationId: conv.ConversationId.Hex(),
 			Brief:          conv.Brief,
+			BotId:          conv.BotId,
 			CreateTime:     conv.CreateTime.Unix(),
 			UpdateTime:     conv.UpdateTime.Unix(),
 		}

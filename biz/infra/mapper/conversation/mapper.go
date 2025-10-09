@@ -23,7 +23,7 @@ const (
 )
 
 type MongoMapper interface {
-	CreateNewConversation(ctx context.Context, uid string) (c *Conversation, err error)
+	CreateNewConversation(ctx context.Context, uid, botId string) (c *Conversation, err error)
 	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, hasMore bool, err error)
 	UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error)
 	DeleteConversation(ctx context.Context, uid, cid string) (err error)
@@ -40,7 +40,7 @@ func NewConversationMongoMapper(config *config.Config) MongoMapper {
 }
 
 // CreateNewConversation 创建并缓存一个新的对话
-func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid string) (c *Conversation, err error) {
+func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid, botId string) (c *Conversation, err error) {
 	// 转换成ObjectID
 	oid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
@@ -53,6 +53,7 @@ func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid string) (c 
 	c = &Conversation{
 		ConversationId: primitive.NewObjectID(),
 		UserId:         oid,
+		BotId:          botId,
 		CreateTime:     now,
 		UpdateTime:     now,
 		Brief:          "未命名对话",
