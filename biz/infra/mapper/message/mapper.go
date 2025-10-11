@@ -101,8 +101,8 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 	if err != nil {
 		return nil, err
 	}
-	if err = m.conn.Find(ctx, msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
-		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil {
+	if err = m.conn.Find(ctx, &msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
+		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 		logx.Error("[message mapper] find err:%v", err)
 		return nil, err
 	}
