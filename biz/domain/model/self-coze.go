@@ -88,6 +88,11 @@ func process(ctx context.Context, reader coze.Stream[coze.ChatEvent], writer *sc
 				return
 			}
 			if event.Message == nil || event.Event != coze.ChatEventConversationMessageDelta {
+				if event.Message != nil && event.Message.Type == coze.MessageTypeFollowUp {
+					msg = ce2e(event)
+					util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeSuggest)
+					writer.Send(msg, nil)
+				}
 				continue
 			}
 			msg = ce2e(event)

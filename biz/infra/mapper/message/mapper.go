@@ -3,6 +3,7 @@ package message
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"time"
 
@@ -169,6 +170,9 @@ func (m *mongoMapper) listAllMsg(ctx context.Context, key string) ([]*Message, e
 	result, err := m.rs.HgetallCtx(ctx, key)
 	if err != nil {
 		return nil, err
+	}
+	if len(result) == 0 {
+		return nil, errors.New("the key is not found")
 	}
 	msgs := make([]*Message, len(result), len(result))
 	for _, data := range result {
