@@ -102,9 +102,15 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 		return nil, err
 	}
 	if err = m.conn.Find(ctx, &msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
-		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		logx.Error("[message mapper] find err:%v", err)
-		return nil, err
+		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil {
+		if !errors.Is(err, mongo.ErrNoDocuments) {
+			logx.Error("[message mapper] find err:%v", err)
+			return nil, err
+		}
+		return msgs, nil
+	}
+	if len(msgs) == 0 {
+		return msgs, nil
 	}
 	// 删除原缓存
 	if _, err = m.rs.DelCtx(ctx, genCacheKey(msgs[0])); err != nil {
