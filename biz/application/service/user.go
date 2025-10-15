@@ -18,6 +18,7 @@ type IUserService interface {
 	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
 	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
+	ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error)
 }
 
 type UserService struct {
@@ -153,5 +154,35 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 	}
 	return &core_api.BasicUserResetPasswordResp{
 		Resp: util.Success(),
+	}, nil
+}
+
+func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error) {
+	c := config.GetConfig()
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+	body := map[string]any{
+		"thirdparty": req.Thirdparty,
+		"ticket":     req.Ticket,
+	}
+	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/thirdparty/login", header, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.ThirdPartyLoginResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.ThirdPartyLoginResp{
+		Resp:  util.Success(),
+		Token: resp["token"].(string),
+		New:   false,
 	}, nil
 }

@@ -2580,6 +2580,124 @@ func (x *BasicUserResetPasswordResp) GetResp() *basic.Response {
 	return nil
 }
 
+type ThirdPartyLoginReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Thirdparty string `protobuf:"bytes,1,opt,name=thirdparty,proto3" form:"thirdparty" json:"thirdparty" query:"thirdparty"`
+	Ticket     string `protobuf:"bytes,2,opt,name=ticket,proto3" form:"ticket" json:"ticket" query:"ticket"`
+}
+
+func (x *ThirdPartyLoginReq) Reset() {
+	*x = ThirdPartyLoginReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_common_proto_msgTypes[39]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ThirdPartyLoginReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ThirdPartyLoginReq) ProtoMessage() {}
+
+func (x *ThirdPartyLoginReq) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_common_proto_msgTypes[39]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ThirdPartyLoginReq.ProtoReflect.Descriptor instead.
+func (*ThirdPartyLoginReq) Descriptor() ([]byte, []int) {
+	return file_core_api_common_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *ThirdPartyLoginReq) GetThirdparty() string {
+	if x != nil {
+		return x.Thirdparty
+	}
+	return ""
+}
+
+func (x *ThirdPartyLoginReq) GetTicket() string {
+	if x != nil {
+		return x.Ticket
+	}
+	return ""
+}
+
+type ThirdPartyLoginResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Resp  *basic.Response `protobuf:"bytes,1,opt,name=resp,proto3" form:"resp" json:"resp" query:"resp"`
+	Token string          `protobuf:"bytes,2,opt,name=token,proto3" form:"token" json:"token" query:"token"`
+	New   bool            `protobuf:"varint,3,opt,name=new,proto3" form:"new" json:"new" query:"new"`
+}
+
+func (x *ThirdPartyLoginResp) Reset() {
+	*x = ThirdPartyLoginResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_common_proto_msgTypes[40]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ThirdPartyLoginResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ThirdPartyLoginResp) ProtoMessage() {}
+
+func (x *ThirdPartyLoginResp) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_common_proto_msgTypes[40]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ThirdPartyLoginResp.ProtoReflect.Descriptor instead.
+func (*ThirdPartyLoginResp) Descriptor() ([]byte, []int) {
+	return file_core_api_common_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *ThirdPartyLoginResp) GetResp() *basic.Response {
+	if x != nil {
+		return x.Resp
+	}
+	return nil
+}
+
+func (x *ThirdPartyLoginResp) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *ThirdPartyLoginResp) GetNew() bool {
+	if x != nil {
+		return x.New
+	}
+	return false
+}
+
 type EventChat_Message struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2592,7 +2710,7 @@ type EventChat_Message struct {
 func (x *EventChat_Message) Reset() {
 	*x = EventChat_Message{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[39]
+		mi := &file_core_api_common_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2605,7 +2723,7 @@ func (x *EventChat_Message) String() string {
 func (*EventChat_Message) ProtoMessage() {}
 
 func (x *EventChat_Message) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[39]
+	mi := &file_core_api_common_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2649,7 +2767,7 @@ type ListAgentsResp_Agent struct {
 func (x *ListAgentsResp_Agent) Reset() {
 	*x = ListAgentsResp_Agent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[40]
+		mi := &file_core_api_common_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2662,7 +2780,7 @@ func (x *ListAgentsResp_Agent) String() string {
 func (*ListAgentsResp_Agent) ProtoMessage() {}
 
 func (x *ListAgentsResp_Agent) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[40]
+	mi := &file_core_api_common_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2718,7 +2836,7 @@ type FeedbackReq_Feedback struct {
 func (x *FeedbackReq_Feedback) Reset() {
 	*x = FeedbackReq_Feedback{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[41]
+		mi := &file_core_api_common_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2731,7 +2849,7 @@ func (x *FeedbackReq_Feedback) String() string {
 func (*FeedbackReq_Feedback) ProtoMessage() {}
 
 func (x *FeedbackReq_Feedback) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[41]
+	mi := &file_core_api_common_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3093,12 +3211,23 @@ var file_core_api_common_proto_rawDesc = []byte{
 	0x65, 0x73, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70,
 	0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f,
 	0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52,
-	0x04, 0x72, 0x65, 0x73, 0x70, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69,
-	0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70,
-	0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x04, 0x72, 0x65, 0x73, 0x70, 0x22, 0x4c, 0x0a, 0x12, 0x54, 0x68, 0x69, 0x72, 0x64, 0x50, 0x61,
+	0x72, 0x74, 0x79, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x12, 0x1e, 0x0a, 0x0a, 0x74,
+	0x68, 0x69, 0x72, 0x64, 0x70, 0x61, 0x72, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x74, 0x68, 0x69, 0x72, 0x64, 0x70, 0x61, 0x72, 0x74, 0x79, 0x12, 0x16, 0x0a, 0x06, 0x74,
+	0x69, 0x63, 0x6b, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x69, 0x63,
+	0x6b, 0x65, 0x74, 0x22, 0x62, 0x0a, 0x13, 0x54, 0x68, 0x69, 0x72, 0x64, 0x50, 0x61, 0x72, 0x74,
+	0x79, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x12, 0x23, 0x0a, 0x04, 0x72, 0x65,
+	0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x73, 0x69, 0x63,
+	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70, 0x12,
+	0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6e, 0x65, 0x77, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x03, 0x6e, 0x65, 0x77, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73,
+	0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d,
+	0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3113,7 +3242,7 @@ func file_core_api_common_proto_rawDescGZIP() []byte {
 	return file_core_api_common_proto_rawDescData
 }
 
-var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
 var file_core_api_common_proto_goTypes = []interface{}{
 	(*Message)(nil),                    // 0: core_api.Message
 	(*CompletionsOption)(nil),          // 1: core_api.CompletionsOption
@@ -3154,48 +3283,51 @@ var file_core_api_common_proto_goTypes = []interface{}{
 	(*BasicUserLoginResp)(nil),         // 36: core_api.BasicUserLoginResp
 	(*BasicUserResetPasswordReq)(nil),  // 37: core_api.BasicUserResetPasswordReq
 	(*BasicUserResetPasswordResp)(nil), // 38: core_api.BasicUserResetPasswordResp
-	(*EventChat_Message)(nil),          // 39: core_api.EventChat.Message
-	(*ListAgentsResp_Agent)(nil),       // 40: core_api.ListAgentsResp.Agent
-	(*FeedbackReq_Feedback)(nil),       // 41: core_api.FeedbackReq.Feedback
-	(*basic.Response)(nil),             // 42: basic.Response
-	(*basic.Page)(nil),                 // 43: basic.Page
+	(*ThirdPartyLoginReq)(nil),         // 39: core_api.ThirdPartyLoginReq
+	(*ThirdPartyLoginResp)(nil),        // 40: core_api.ThirdPartyLoginResp
+	(*EventChat_Message)(nil),          // 41: core_api.EventChat.Message
+	(*ListAgentsResp_Agent)(nil),       // 42: core_api.ListAgentsResp.Agent
+	(*FeedbackReq_Feedback)(nil),       // 43: core_api.FeedbackReq.Feedback
+	(*basic.Response)(nil),             // 44: basic.Response
+	(*basic.Page)(nil),                 // 45: basic.Page
 }
 var file_core_api_common_proto_depIdxs = []int32{
 	3,  // 0: core_api.Ext.cite:type_name -> core_api.Cite
 	4,  // 1: core_api.Ext.code:type_name -> core_api.Code
 	2,  // 2: core_api.FullMessage.ext:type_name -> core_api.Ext
-	39, // 3: core_api.EventChat.message:type_name -> core_api.EventChat.Message
+	41, // 3: core_api.EventChat.message:type_name -> core_api.EventChat.Message
 	0,  // 4: core_api.CompletionsReq.messages:type_name -> core_api.Message
 	1,  // 5: core_api.CompletionsReq.completionsOption:type_name -> core_api.CompletionsOption
-	42, // 6: core_api.CreateConversationResp.resp:type_name -> basic.Response
-	43, // 7: core_api.ListConversationReq.page:type_name -> basic.Page
-	42, // 8: core_api.ListConversationResp.resp:type_name -> basic.Response
+	44, // 6: core_api.CreateConversationResp.resp:type_name -> basic.Response
+	45, // 7: core_api.ListConversationReq.page:type_name -> basic.Page
+	44, // 8: core_api.ListConversationResp.resp:type_name -> basic.Response
 	11, // 9: core_api.ListConversationResp.conversations:type_name -> core_api.Conversation
-	43, // 10: core_api.GetConversationReq.page:type_name -> basic.Page
-	42, // 11: core_api.GetConversationResp.resp:type_name -> basic.Response
+	45, // 10: core_api.GetConversationReq.page:type_name -> basic.Page
+	44, // 11: core_api.GetConversationResp.resp:type_name -> basic.Response
 	5,  // 12: core_api.GetConversationResp.messageList:type_name -> core_api.FullMessage
 	5,  // 13: core_api.GetConversationResp.regenList:type_name -> core_api.FullMessage
 	0,  // 14: core_api.GenerateBriefReq.messages:type_name -> core_api.Message
-	42, // 15: core_api.GenerateBriefResp.resp:type_name -> basic.Response
-	42, // 16: core_api.RenameConversationResp.resp:type_name -> basic.Response
-	42, // 17: core_api.DeleteConversationResp.resp:type_name -> basic.Response
-	43, // 18: core_api.SearchConversationReq.page:type_name -> basic.Page
-	42, // 19: core_api.SearchConversationResp.resp:type_name -> basic.Response
+	44, // 15: core_api.GenerateBriefResp.resp:type_name -> basic.Response
+	44, // 16: core_api.RenameConversationResp.resp:type_name -> basic.Response
+	44, // 17: core_api.DeleteConversationResp.resp:type_name -> basic.Response
+	45, // 18: core_api.SearchConversationReq.page:type_name -> basic.Page
+	44, // 19: core_api.SearchConversationResp.resp:type_name -> basic.Response
 	11, // 20: core_api.SearchConversationResp.conversations:type_name -> core_api.Conversation
-	43, // 21: core_api.ListAgentsReq.page:type_name -> basic.Page
-	42, // 22: core_api.ListAgentsResp.resp:type_name -> basic.Response
-	40, // 23: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
-	41, // 24: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
-	42, // 25: core_api.FeedbackResp.resp:type_name -> basic.Response
-	42, // 26: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
-	42, // 27: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
-	42, // 28: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
-	42, // 29: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
-	30, // [30:30] is the sub-list for method output_type
-	30, // [30:30] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	45, // 21: core_api.ListAgentsReq.page:type_name -> basic.Page
+	44, // 22: core_api.ListAgentsResp.resp:type_name -> basic.Response
+	42, // 23: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
+	43, // 24: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
+	44, // 25: core_api.FeedbackResp.resp:type_name -> basic.Response
+	44, // 26: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
+	44, // 27: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
+	44, // 28: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
+	44, // 29: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
+	44, // 30: core_api.ThirdPartyLoginResp.resp:type_name -> basic.Response
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func file_core_api_common_proto_init() {
@@ -3672,7 +3804,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventChat_Message); i {
+			switch v := v.(*ThirdPartyLoginReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3684,7 +3816,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListAgentsResp_Agent); i {
+			switch v := v.(*ThirdPartyLoginResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3696,6 +3828,30 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*EventChat_Message); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_common_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListAgentsResp_Agent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_common_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FeedbackReq_Feedback); i {
 			case 0:
 				return &v.state
@@ -3718,7 +3874,7 @@ func file_core_api_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_core_api_common_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   42,
+			NumMessages:   44,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

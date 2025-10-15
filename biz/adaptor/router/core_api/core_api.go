@@ -48,6 +48,10 @@ func Register(r *server.Hertz) {
 		_system.POST("/send_verify_code", append(_sendverifycodeMw(), core_api.SendVerifyCode)...)
 	}
 	{
+		_thirdparty := root.Group("/thirdparty", _thirdpartyMw()...)
+		_thirdparty.POST("/login", append(_thirdpartyloginMw(), core_api.ThirdPartyLogin)...)
+	}
+	{
 		_v1 := root.Group("/v1", _v1Mw()...)
 		_v1.POST("/completions", append(_completionsMw(), core_api.Completions)...)
 	}

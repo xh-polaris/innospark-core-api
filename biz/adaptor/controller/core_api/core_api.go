@@ -222,3 +222,18 @@ func BasicUserResetPassword(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().UserService.ResetPassword(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// ThirdPartyLogin .
+// @router /thirdparty/login [POST]
+func ThirdPartyLogin(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.ThirdPartyLoginReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.ThirdPartyLogin(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
