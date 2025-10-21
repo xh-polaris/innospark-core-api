@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
 
@@ -38,7 +39,7 @@ func makeSSE(c *app.RequestContext, stream *SSEStream) {
 	defer func(w *sse.Writer) {
 		close(stream.Done) // 关闭结束channel
 		if closeErr := w.Close(); err != nil && closeErr != nil {
-			logx.Error("close sse writer fail, err=%v", err)
+			logx.Error("close sse writer fail, err=%s", errorx.ErrorWithoutStack(err))
 		}
 	}(w)
 
@@ -50,7 +51,7 @@ func makeSSE(c *app.RequestContext, stream *SSEStream) {
 		}
 		if err = w.Write(event); err != nil {
 			stream.Done <- struct{}{} // 给这个流写入提前终止信号
-			logx.Error("write sse-event error, err=%s", err.Error())
+			logx.Error("write sse-event error, err=%s", errorx.ErrorWithoutStack(err))
 			return
 		}
 	}

@@ -9,7 +9,9 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 )
 
@@ -43,9 +45,11 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 		"cause":    "passport",
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/system/send_verify_code", header, body)
+
+	url := config.GetConfig().SynapseURL + "/system/send_verify_code"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.SendVerifyCodeResp{
@@ -74,9 +78,11 @@ func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegis
 		"password": req.Password,
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/register", header, body)
+
+	url := config.GetConfig().SynapseURL + "/basic_user/register"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.BasicUserRegisterResp{
@@ -105,9 +111,11 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 		"verify":   req.Verify,
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/login", header, body)
+
+	url := config.GetConfig().SynapseURL + "/basic_user/login"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.BasicUserLoginResp{
@@ -128,7 +136,7 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 	c := config.GetConfig()
 	rc, err := adaptor.ExtractContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 	header := http.Header{}
 	header.Set("content-type", "application/json")
@@ -140,9 +148,11 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 		"newPassword": req.NewPassword,
 		"app":         map[string]any{"name": "InnoSpark"},
 	}
-	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/basic_user/reset_password", header, body)
+
+	url := config.GetConfig().SynapseURL + "/basic_user/reset_password"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.BasicUserResetPasswordResp{
@@ -168,9 +178,11 @@ func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPa
 		"thirdparty": req.Thirdparty,
 		"ticket":     req.Ticket,
 	}
-	resp, err := httpx.GetHttpClient().Post(config.GetConfig().SynapseURL+"/thirdparty/login", header, body)
+
+	url := config.GetConfig().SynapseURL + "/thirdparty/login"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.ThirdPartyLoginResp{

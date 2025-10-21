@@ -8,6 +8,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,7 +45,7 @@ func (m *mongoMapper) CreateNewConversation(ctx context.Context, uid, botId stri
 	// 转换成ObjectID
 	oid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [CreateNewConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [CreateNewConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return nil, err
 	}
 
@@ -69,7 +70,7 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 	// 转换为ObjectID
 	oid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return nil, false, err
 	}
 
@@ -93,12 +94,12 @@ func (m *mongoMapper) ListConversations(ctx context.Context, uid string, page *b
 func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (err error) {
 	ouid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [DeleteConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [DeleteConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 	ocid, err := primitive.ObjectIDFromHex(cid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [DeleteConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [DeleteConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 
@@ -113,7 +114,7 @@ func (m *mongoMapper) DeleteConversation(ctx context.Context, uid, cid string) (
 func (m *mongoMapper) UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error) {
 	oids, err := util.ObjectIDsFromHex(uid, cid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [UpdateConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [UpdateConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 	ouid, ocid := oids[0], oids[1]
@@ -127,7 +128,7 @@ func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, 
 	// 转换为ObjectID
 	oid, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%v", err)
+		logx.Error("[mapper] [conversation] [ListConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
 		return nil, false, err
 	}
 

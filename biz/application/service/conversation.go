@@ -14,6 +14,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
 )
 
@@ -41,15 +42,15 @@ func (s *ConversationService) CreateConversation(ctx context.Context, req *core_
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 
 	// 调用mapper创建对话
 	newConversation, err := s.ConversationMapper.CreateNewConversation(ctx, uid, req.BotId)
 	if err != nil {
-		logx.Error("create conversation error: %v", err)
-		return nil, cst.ConversationCreationErr
+		logx.Error("create conversation error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationCreateErrCode)
 	}
 
 	// 返回conversationID
@@ -60,8 +61,8 @@ func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.G
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 	// 生成标题
 	m, err := openai.NewChatModel(context.Background(), &openai.ChatModelConfig{
@@ -76,16 +77,16 @@ func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.G
 	//	Model:   "doubao-1-5-pro-32k-250115",
 	//})
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.ConversationGenerateBriefErrCode)
 	}
 	in := []*schema.Message{schema.UserMessage("你是标题生成器, 不要回答, 而是根据用户输入概括[" + req.Messages[0].Content + "],不超过10个字, 简洁正式, 无额外内容")}
 	out, err := m.Generate(ctx, in)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.ConversationGenerateBriefErrCode)
 	}
 	// 更新标题
 	if err = s.ConversationMapper.UpdateConversationBrief(ctx, uid, req.ConversationId, out.Content); err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, cst.ConversationGenerateBriefErrCode)
 	}
 	return &core_api.GenerateBriefResp{Resp: util.Success(), Brief: out.Content}, nil
 }
@@ -94,14 +95,14 @@ func (s *ConversationService) RenameConversation(ctx context.Context, req *core_
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 
 	// 更新对话描述
 	if err = s.ConversationMapper.UpdateConversationBrief(ctx, uid, req.GetConversationId(), req.GetBrief()); err != nil {
-		logx.Error("update conversation brief error: %v", err)
-		return nil, cst.ConversationRenameErr
+		logx.Error("update conversation brief error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationRenameErrCode)
 	}
 
 	// 返回响应
@@ -112,15 +113,15 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 
 	// 分页获取Conversation列表，并转化为ListConversationResp_ConversationItem
 	conversations, hasMore, err := s.ConversationMapper.ListConversations(ctx, uid, req.GetPage())
 	if err != nil {
-		logx.Error("list conversation error: %v", err)
-		return nil, cst.ConversationListErr
+		logx.Error("list conversation error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationListErrCode)
 	}
 	items := make([]*core_api.Conversation, len(conversations))
 	for i, conv := range conversations {
@@ -145,14 +146,14 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 	// 鉴权 optimize
 	_, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 
 	msgs, hasMore, err := s.MessageMapper.ListMessage(ctx, req.GetConversationId(), req.GetPage())
 	if err != nil {
-		logx.Error("get conversation messages error: %v", err)
-		return nil, cst.ConversationGetErr
+		logx.Error("get conversation messages error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationGetErrCode)
 	}
 	// 判断是否有regen
 	var regen []*mmsg.Message
@@ -182,12 +183,12 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 func (s *ConversationService) DeleteConversation(ctx context.Context, req *core_api.DeleteConversationReq) (*core_api.DeleteConversationResp, error) {
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 	if err = s.ConversationMapper.DeleteConversation(ctx, uid, req.ConversationId); err != nil {
-		logx.Error("delete conversation error: %v", err)
-		return nil, cst.ConversationDeleteErr
+		logx.Error("delete conversation error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationDeleteErrCode)
 	}
 	return &core_api.DeleteConversationResp{Resp: util.Success()}, nil
 }
@@ -196,15 +197,15 @@ func (s *ConversationService) SearchConversation(ctx context.Context, req *core_
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logx.Error("extract user id error: %v", err)
-		return nil, cst.UnAuthErr
+		logx.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
 	}
 
 	// 分页获取存储域Conversation列表，并转化为交互域中Conversation
 	conversations, hasMore, err := s.ConversationMapper.SearchConversations(ctx, uid, req.GetKey(), req.GetPage())
 	if err != nil {
-		logx.Error("list conversation error: %v", err)
-		return nil, cst.ConversationSearchErr
+		logx.Error("list conversation error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, cst.ConversationSearchErrCode)
 	}
 	items := make([]*core_api.Conversation, len(conversations))
 	for i, conv := range conversations {

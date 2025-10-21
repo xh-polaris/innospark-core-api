@@ -10,6 +10,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 )
 
 func init() {
@@ -39,7 +40,7 @@ func NewSelfCozeModel(ctx context.Context, uid, botId string) (_ model.ToolCalli
 }
 
 func (c *SelfCozeModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
-	return nil, cst.UnImplementErr
+	return nil, errorx.New(cst.UnImplementErrCode)
 }
 
 func (c *SelfCozeModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (sr *schema.StreamReader[*schema.Message], err error) {

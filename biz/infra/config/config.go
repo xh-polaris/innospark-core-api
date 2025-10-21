@@ -4,6 +4,8 @@ import (
 	"os"
 	"sync"
 
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
@@ -13,6 +15,7 @@ import (
 var (
 	config *Config
 	once   sync.Once
+	loadConfigError error
 )
 
 type Auth struct {
@@ -74,15 +77,21 @@ func NewConfig() (*Config, error) {
 		}
 		err := conf.Load(path, c)
 		if err != nil {
-			panic(err)
+			loadConfigError = errorx.WrapByCode(err, cst.ConfigLoadErrCode, errorx.KV("path", path))
+			return
 		}
 		err = c.SetUp()
 		if err != nil {
-			panic(err)
+			loadConfigError = errorx.WrapByCode(err, cst.ConfigSetupErrCode)
+			return
 		}
 		config = c
 	})
 
+	if loadConfigError != nil {
+		return nil, loadConfigError
+	}
+	
 	return config, nil
 }
 
