@@ -62,6 +62,7 @@ type Config struct {
 	ARK        *ARK
 	Claude     *Claude
 	Coze       *Coze
+	ASR        *ASR
 }
 
 func NewConfig() (*Config, error) {
