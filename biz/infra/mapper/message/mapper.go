@@ -11,7 +11,8 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -52,7 +53,7 @@ func (m *mongoMapper) CreateNewMessage(ctx context.Context, message *Message) (e
 		return
 	}
 	if _, err = m.conn.InsertOneNoCache(ctx, message); err != nil {
-		logx.Error("[message mapper] insert one err:%+v", err)
+		logs.Errorf("[message mapper] insert one err:%s", errorx.ErrorWithoutStack(err))
 		return
 	}
 	_ = m.addOneMsg(ctx, message)
@@ -81,12 +82,12 @@ func (m *mongoMapper) UpdateMany(ctx context.Context, msgs []*Message) (err erro
 		_, err = m.conn.BulkWrite(ctx, operations)
 		return nil, err
 	}); err != nil {
-		logx.Error("[message mapper] update many: bulk write err:%v", err)
+		logs.Errorf("[message mapper] update many: bulk write err:%s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 
 	if err = m.buildCache(ctx, msgs); err != nil {
-		logx.Error("[message mapper] update many: build cache err:%v", err)
+		logs.Errorf("[message mapper] update many: build cache err:%s", errorx.ErrorWithoutStack(err))
 		return nil
 	}
 	return err
@@ -104,7 +105,7 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 	if err = m.conn.Find(ctx, &msgs, bson.M{cst.ConversationId: ocid, cst.Status: bson.M{cst.NE: cst.DeletedStatus}},
 		options.Find().SetSort(bson.M{cst.CreateTime: -1})); err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
-			logx.Error("[message mapper] find err:%v", err)
+			logs.Errorf("[message mapper] find err:%s", errorx.ErrorWithoutStack(err))
 			return nil, err
 		}
 		return msgs, nil
@@ -114,12 +115,12 @@ func (m *mongoMapper) AllMessage(ctx context.Context, conversation string) (msgs
 	}
 	// 删除原缓存
 	if _, err = m.rs.DelCtx(ctx, genCacheKey(msgs[0])); err != nil {
-		logx.Error("[message mapper] delete cache err:%v", err)
+		logs.Errorf("[message mapper] delete cache err:%s", errorx.ErrorWithoutStack(err))
 		return msgs, nil // 缓存不应该影响正常使用
 	}
 	// 构建新缓存
 	if err = m.buildCache(ctx, msgs); err != nil {
-		logx.Error("[message mapper] build cache err:%v", err)
+		logs.Errorf("[message mapper] build cache err:%s", errorx.ErrorWithoutStack(err))
 		return msgs, nil
 	}
 	return msgs, nil
@@ -140,7 +141,7 @@ func (m *mongoMapper) ListMessage(ctx context.Context, conversation string, page
 		filter[cst.Id] = bson.M{cst.LT: cursor}
 	}
 	if err = m.conn.Find(ctx, &msgs, filter, opts); err != nil {
-		logx.Error("[message mapper] find err:%v", err)
+		logs.Errorf("[message mapper] find err:%s", errorx.ErrorWithoutStack(err))
 		return nil, false, err
 	}
 	msgs, hasMore = util.SplitAndHasMore(msgs, page)
@@ -154,16 +155,16 @@ func (m *mongoMapper) addOneMsg(ctx context.Context, msg *Message) error {
 	// 序列化消息
 	data, err := json.Marshal(msg)
 	if err != nil {
-		logx.Error("[message mapper] addOneMsg: json.Marshal err:%v", err)
+		logs.Errorf("[message mapper] addOneMsg: json.Marshal err:%s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 	err = m.rs.PipelinedCtx(ctx, func(pipeliner redis.Pipeliner) error {
 		if err := pipeliner.HSet(ctx, key, field, string(data)).Err(); err != nil {
-			logx.Error("[message mapper] addOneMsg: HSet err:%v", err)
+			logs.Errorf("[message mapper] addOneMsg: HSet err:%s", errorx.ErrorWithoutStack(err))
 			return err
 		}
 		if err := pipeliner.Expire(ctx, key, 6*time.Hour).Err(); err != nil {
-			logx.Error("[message mapper] addOneMsg: Expire err:%v", err)
+			logs.Errorf("[message mapper] addOneMsg: Expire err:%s", errorx.ErrorWithoutStack(err))
 			return err
 		}
 		return nil
@@ -184,7 +185,7 @@ func (m *mongoMapper) listAllMsg(ctx context.Context, key string) ([]*Message, e
 	for _, data := range result {
 		var msg Message
 		if err = json.Unmarshal([]byte(data), &msg); err != nil {
-			logx.Error("[message mapper] listAllMsg: json.Unmarshal err:%v", err)
+			logs.Errorf("[message mapper] listAllMsg: json.Unmarshal err:%s", errorx.ErrorWithoutStack(err))
 			return nil, err
 		}
 		msgs[len(result)-1-int(msg.Index)] = &msg // 倒序
@@ -203,7 +204,7 @@ func (m *mongoMapper) buildCache(ctx context.Context, msgs []*Message) (err erro
 		var data []byte
 		field := key + strconv.Itoa(int(msg.Index))
 		if data, err = json.Marshal(msg); err != nil {
-			logx.Error("[message mapper] buildCache: json.Marshal err:%v", err)
+			logs.Errorf("[message mapper] buildCache: json.Marshal err:%s", errorx.ErrorWithoutStack(err))
 			return err
 		}
 		fields[field] = string(data)
@@ -211,11 +212,11 @@ func (m *mongoMapper) buildCache(ctx context.Context, msgs []*Message) (err erro
 	// 构建缓存并设置过期时间
 	err = m.rs.PipelinedCtx(ctx, func(pipeliner redis.Pipeliner) error {
 		if err := pipeliner.HMSet(ctx, key, fields).Err(); err != nil {
-			logx.Error("[message mapper] buildCache: HMSET err:%v", err)
+			logs.Errorf("[message mapper] buildCache: HMSET err:%s", errorx.ErrorWithoutStack(err))
 			return err
 		}
 		if err := pipeliner.Expire(ctx, key, time.Hour*6).Err(); err != nil {
-			logx.Error("[message mapper] buildCache: Expire err:%v", err)
+			logs.Errorf("[message mapper] buildCache: Expire err:%s", errorx.ErrorWithoutStack(err))
 			return err
 		}
 		return nil

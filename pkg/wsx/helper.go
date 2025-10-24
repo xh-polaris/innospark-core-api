@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
@@ -56,7 +57,7 @@ func (ws *WSClient) classifyErr(err error) error {
 		return NormalCloseErr
 	case websocket.IsUnexpectedCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway, websocket.CloseNoStatusReceived):
 		// 为了避免内部错误被隐藏, 此处日志记录错误原因
-		logs.Error("[WSClient] close error%s", err)
+		logs.Errorf("[WSClient] close error: %s", errorx.ErrorWithoutStack(err))
 		ws.closed = true
 		return AbnormalCloseErr
 	default:
@@ -72,7 +73,7 @@ func Classify(err error) error {
 		return NormalCloseErr
 	case websocket.IsUnexpectedCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway, websocket.CloseNoStatusReceived):
 		// 为了避免内部错误被隐藏, 此处日志记录错误原因
-		logs.Error("[WSClient] close error%s", err)
+		logs.Errorf("[WSClient] close error: %s", errorx.ErrorWithoutStack(err))
 		return AbnormalCloseErr
 	default:
 		return err
@@ -111,7 +112,7 @@ func NewWSClientWithDial(ctx context.Context, url string, header http.Header) (*
 	// 连接失败若有响应, 打印错误日志
 	if r != nil {
 		if body, parseErr := io.ReadAll(r.Body); parseErr == nil {
-			logs.Error("[WSClient] parse conn resp body:%s", string(body))
+			logs.Errorf("[WSClient] parse conn resp body: %s", string(body))
 		}
 	}
 	return nil, err
@@ -176,7 +177,7 @@ func (ws *WSClient) WritePing() error {
 func (ws *WSClient) Close() error {
 	if !ws.closed {
 		if err := ws.conn.WriteControl(websocket.CloseMessage, NormalCLoseMsg, time.Now().Add(DefaultTimeout)); err != nil {
-			logs.Error("[WSClient] send close msg error", err)
+			logs.Errorf("[WSClient] send close msg error: %s", errorx.ErrorWithoutStack(err))
 		}
 		ws.closed = true
 		return ws.conn.Close()

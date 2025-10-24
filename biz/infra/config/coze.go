@@ -5,7 +5,8 @@ import (
 	"sync"
 
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 type Coze struct {
@@ -39,7 +40,7 @@ func loginCoze(account, password string) string {
 	body := map[string]string{"email": account, "password": password}
 	header, _, err := httpx.GetHttpClient().PostWithHeader("https://coze.aiecnu.net/api/passport/web/email/login/", header, body)
 	if err != nil {
-		logx.Error("loginCoze err: %v", err)
+		logs.Errorf("loginCoze err: %s", errorx.ErrorWithoutStack(err))
 		return ""
 	}
 	return header.Get("Set-Cookie")
