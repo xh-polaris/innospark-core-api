@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx/internal"
+	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx/internal"
 )
 
 // StatusError 是一个包含状态码的error接口, 可以使用New或WrapByCode创建

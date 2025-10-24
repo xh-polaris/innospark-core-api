@@ -7,11 +7,11 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mf "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
+	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 )
 
 type IFeedbackService interface {
@@ -32,11 +32,11 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, cst.UnAuthErrCode)
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
 	}
 	ids, err := util.ObjectIDsFromHex(uid, req.MessageId)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, cst.OIDErrCode)
+		return nil, errorx.WrapByCode(err, errno.OIDErrCode)
 	}
 
 	feedback := &mf.FeedBack{MessageId: ids[1], UserId: ids[0], Action: req.Action, UpdateTime: time.Now()}
@@ -45,11 +45,11 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	}
 	// 更新反馈状态
 	if err = f.FeedbackMapper.UpdateFeedback(ctx, feedback); err != nil {
-		return nil, errorx.WrapByCode(err, cst.FeedbackErrCode)
+		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
 	}
 	// 更新消息状态
 	if err = f.MessageMapper.Feedback(ctx, ids[1], req.Action); err != nil {
-		return nil, errorx.WrapByCode(err, cst.FeedbackErrCode)
+		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
 	}
 	return &core_api.FeedbackResp{Resp: util.Success()}, nil
 }

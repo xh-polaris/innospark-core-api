@@ -12,8 +12,9 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/errorx"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
+	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 )
 
 type IIntelligenceService interface {
@@ -55,7 +56,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	url := "https://coze.aiecnu.net/api/intelligence_api/search/get_draft_intelligence_list"
 	resp, err := httpx.GetHttpClient().Post(url, header, listBody)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
+		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
 
 	if resp["code"].(float64) != 0 && resp["code"].(float64) != 700012006 {
@@ -65,7 +66,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 		header.Set("Cookie", config.GetConfig().Coze.RefreshCookie())
 		resp, err = httpx.GetHttpClient().Post(url, header, listBody)
 		if err != nil {
-			return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
+			return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 		}
 		if resp["code"].(float64) != 0 {
 			return nil, cst.New(999, resp["msg"].(string))
@@ -110,7 +111,7 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 	url := fmt.Sprintf("https://coze.aiecnu.net/api/intelligence_api/intelligence/%s", req.GetId())
 	resp, err := httpx.GetHttpClient().Get(url, header, nil)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, cst.SynapseErrCode, errorx.KV("url", url))
+		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
 		return nil, cst.New(999, resp["msg"].(string))
