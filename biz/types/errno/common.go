@@ -17,11 +17,6 @@ func init() {
 		code.WithAffectStability(false),
 	)
 	code.Register(
-		OIDErrCode,
-		"id错误",
-		code.WithAffectStability(false),
-	)
-	code.Register(
 		UnImplementErrCode,
 		"功能暂未实现",
 		code.WithAffectStability(true),

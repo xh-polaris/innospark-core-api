@@ -36,7 +36,7 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	}
 	ids, err := util.ObjectIDsFromHex(uid, req.MessageId)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, errno.OIDErrCode)
+		return nil, err
 	}
 
 	feedback := &mf.FeedBack{MessageId: ids[1], UserId: ids[0], Action: req.Action, UpdateTime: time.Now()}
