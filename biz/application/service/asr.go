@@ -102,7 +102,7 @@ func (m *funASRManager) handleTextMessage() error {
 	if m.ini {
 		return nil // 已经初始化，忽略后续文本消息
 	}
-	uid, err := adaptor.ExtractUserId(m.ctx)
+	uid, err := adaptor.WebSocketExtractUserId(m.ctx)
 	if err != nil {
 		return fmt.Errorf("extract user id failed: %s", err)
 	}
