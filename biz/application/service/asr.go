@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/bytedance/sonic"
 	"github.com/hertz-contrib/websocket"
@@ -72,9 +71,6 @@ func (m *funASRManager) run() error {
 		case <-m.ctx.Done():
 			return m.ctx.Err()
 		default:
-			if err := m.conn.SetReadDeadline(time.Now().Add(3 * time.Second)); err != nil {
-				return err
-			}
 			mt, data, err := m.conn.ReadMessage()
 			if err != nil {
 				m.sendError(err)
