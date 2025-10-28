@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
@@ -10,6 +11,8 @@ import (
 	"github.com/hertz-contrib/websocket"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/pkg/wsx"
 )
@@ -87,7 +90,7 @@ func (m *funASRManager) run() error {
 func (m *funASRManager) handleMessage(mt int, data []byte) error {
 	switch mt {
 	case websocket.TextMessage:
-		return m.handleTextMessage()
+		return m.handleTextMessage(data)
 	case websocket.BinaryMessage:
 		return m.handleBinaryMessage(data)
 	case websocket.CloseMessage:
@@ -98,11 +101,23 @@ func (m *funASRManager) handleMessage(mt int, data []byte) error {
 	}
 }
 
-func (m *funASRManager) handleTextMessage() error {
+func (m *funASRManager) handleTextMessage(data []byte) error {
 	if m.ini {
 		return nil // 已经初始化，忽略后续文本消息
 	}
-	uid, err := adaptor.WebSocketExtractUserId(m.ctx)
+	info := map[string]any{}
+	if err := json.Unmarshal(data, &info); err != nil {
+		return err
+	}
+	jwt, ok := info["Authorization"]
+	if !ok {
+		return errorx.New(errno.UnAuthErrCode)
+	}
+	token, ok := jwt.(string)
+	if !ok {
+		return errorx.New(errno.UnAuthErrCode)
+	}
+	uid, err := adaptor.ExtractUserIdFromJWT(token)
 	if err != nil {
 		return fmt.Errorf("extract user id failed: %s", err)
 	}
