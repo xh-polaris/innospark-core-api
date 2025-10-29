@@ -46,7 +46,10 @@ func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, login boo
 		cst.Id:         oid,
 		cst.CreateTime: time.Now(),
 		cst.UpdateTime: time.Now(),
-	}, "$set": bson.M{cst.LoginTime: time.Now()}}
+	}}
+	if login {
+		update["$set"] = bson.M{cst.LoginTime: time.Now()}
+	}
 	var u User
 	err = m.conn.FindOneAndUpdate(ctx, key, &u, filter, update, options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After))
 	return &u, err
