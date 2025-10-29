@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-var _ MongoMapper = (*mongoMapper)(nil)
+var Mapper MongoMapper = (*mongoMapper)(nil)
 
 const (
 	collection     = "user"
@@ -23,6 +23,7 @@ const (
 type MongoMapper interface {
 	FindOrCreateUser(ctx context.Context, id string, login bool) (*User, error) // 查找或创建一个用户
 	CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error)
+	Warn(ctx context.Context, id string) error
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
 }
@@ -35,7 +36,9 @@ type mongoMapper struct {
 func NewUserMongoMapper(config *config.Config) MongoMapper {
 	conn := monc.MustNewModel(config.Mongo.URL, config.Mongo.DB, collection, config.Cache)
 	rs := redis.MustNewRedis(config.Redis)
-	return &mongoMapper{conn: conn, rs: rs}
+	m := &mongoMapper{conn: conn, rs: rs}
+	Mapper = m // 这里依赖的provider的初始化来创建一个全局变量, 不是很好
+	return m
 }
 
 func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, login bool) (*User, error) {
@@ -78,6 +81,18 @@ func (m *mongoMapper) CheckForbidden(ctx context.Context, id string) (int, bool,
 		}
 	}
 	return u.Status, u.Status == StatusForbidden, u.Expire, nil
+}
+
+func (m *mongoMapper) Warn(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	key := cacheKeyPrefix + id
+	filter := bson.M{cst.Id: oid}
+	update := bson.M{"$inc": bson.M{"warnings": 1}}
+	_, err = m.conn.UpdateOne(ctx, key, filter, update)
+	return err
 }
 
 func (m *mongoMapper) Forbidden(ctx context.Context, id string, expire time.Time) error {

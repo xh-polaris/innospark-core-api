@@ -33,11 +33,17 @@ func (m *ModelFactory) Generate(ctx context.Context, in []*schema.Message, opts 
 	ctx, cancel := context.WithCancel(ctx)
 	r.ModelCancel = cancel
 
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		in[i].Name = ""
+		reverse = append(reverse, in[i])
+	}
 	var cm model.ToolCallingChatModel
 	if cm, err = m.get(ctx); err != nil {
 		return nil, err
 	}
-	return cm.Generate(ctx, in, opts...)
+	return cm.Generate(ctx, reverse, opts...)
 }
 func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (_ *schema.StreamReader[*schema.Message], err error) {
 	var r *info.RelayContext
@@ -47,11 +53,19 @@ func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ..
 	ctx, cancel := context.WithCancel(ctx)
 	r.ModelCancel = cancel
 
+	// messages翻转顺序, 调用模型时消息应该正序
+	var reverse []*schema.Message
+	for i := len(in) - 1; i >= 0; i-- {
+		if in[i].Content != "" {
+			in[i].Name = ""
+			reverse = append(reverse, in[i])
+		}
+	}
 	var cm model.ToolCallingChatModel
 	if cm, err = m.get(ctx); err != nil {
 		return nil, err
 	}
-	return cm.Stream(ctx, in, opts...)
+	return cm.Stream(ctx, reverse, opts...)
 }
 
 func (m *ModelFactory) get(ctx context.Context) (cm model.ToolCallingChatModel, err error) {

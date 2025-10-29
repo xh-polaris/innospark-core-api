@@ -35,6 +35,7 @@ const (
 	EventSearchFind   = "searchFind"
 	EventSearchChoose = "searchChoice"
 	EventSearchCite   = "searchCite"
+	EventError        = "error"
 )
 
 // Event中各种类型枚举值

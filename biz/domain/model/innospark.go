@@ -62,27 +62,12 @@ func NewDeepThinkChatModel(ctx context.Context, uid, _ string) (_ model.ToolCall
 }
 
 func (c *InnosparkChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
-	// messages翻转顺序, 调用模型时消息应该正序
-	var reverse []*schema.Message
-	for i := len(in) - 1; i >= 0; i-- {
-		if in[i].Content != "" {
-			reverse = append(reverse, in[i])
-		}
-	}
-	return c.cli.Generate(ctx, reverse, opts...)
+	return c.cli.Generate(ctx, in, opts...)
 }
 
 func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
 	var raw *schema.StreamReader[*schema.Message]
-	// messages翻转顺序, 调用模型时消息应该正序
-	var reverse []*schema.Message
-	for i := len(in) - 1; i >= 0; i-- {
-		if in[i].Content != "" {
-			in[i].Name = ""
-			reverse = append(reverse, in[i])
-		}
-	}
-	if raw, err = c.cli.Stream(ctx, reverse, opts...); err != nil {
+	if raw, err = c.cli.Stream(ctx, in, opts...); err != nil {
 		return nil, err
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)

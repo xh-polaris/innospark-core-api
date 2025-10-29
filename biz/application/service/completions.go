@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -12,6 +13,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/pkg/ac"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/types/errno"
@@ -49,6 +51,15 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 		return nil, errorx.New(errno.UnImplementErrCode)
 	}
 
+	// 检查用户输入是否有违禁词
+	sensitive, hits := ac.AcSearch(req.Messages[0].Content, true)
+	if sensitive {
+		if err = s.UserMapper.Warn(ctx, uid); err != nil {
+			logs.Errorf("warn err: %v", err)
+		}
+		return nil, errorx.New(errno.ErrSensitive, errorx.KV("text", strings.Join(hits, ",")))
+	}
+
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
@@ -70,6 +81,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 			Content: req.Messages[0].Content, ContentType: req.Messages[0].ContentType,
 			Attaches: req.Messages[0].Attaches, References: req.Messages[0].References,
 		},
+		Sensitive: &info.Sensitive{},
 	}
 
 	_, err = s.CompletionGraph.CompileAndStream(ctx, state)

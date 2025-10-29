@@ -3,6 +3,7 @@ package info
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -32,6 +33,7 @@ type RelayContext struct {
 	SSEIndex          int                // SSE事件索引
 	ModelCancel       context.CancelFunc // 中断模型输出
 	SearchInfo        *SearchInfo        // 搜素信息
+	Sensitive         *Sensitive
 }
 
 func (r *RelayContext) id() string {
@@ -74,6 +76,10 @@ func (r *RelayContext) ModelEvent() *sse.Event {
 
 func (r *RelayContext) EndEvent() *sse.Event {
 	return EventWithoutMarshal(r.id(), cst.EventEnd, []byte(cst.EventNotifyValue))
+}
+
+func (r *RelayContext) ErrorEvent(code int, msg string) *sse.Event {
+	return EventWithoutMarshal(r.id(), cst.EventError, []byte(fmt.Sprintf("{\"code\":%d,\"msg\":\"%s\"}", code, msg)))
 }
 
 func (r *RelayContext) SearchStartEvent() *sse.Event {
@@ -205,4 +211,8 @@ func (r *RefineContent) SetContentWithTyp(s string, t int) (string, int) {
 	r.Typ = t
 	r.SetContent(s)
 	return s, t
+}
+
+type Sensitive struct {
+	Hits []string
 }

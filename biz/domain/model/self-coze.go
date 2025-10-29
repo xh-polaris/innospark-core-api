@@ -45,17 +45,11 @@ func (c *SelfCozeModel) Generate(ctx context.Context, in []*schema.Message, opts
 }
 
 func (c *SelfCozeModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (sr *schema.StreamReader[*schema.Message], err error) {
-	// messages翻转顺序, 调用模型时消息应该正序
-	var reverse []*schema.Message
-	for i := len(in) - 1; i >= 0; i-- {
-		in[i].Name = ""
-		reverse = append(reverse, in[i])
-	}
 	sr, sw := schema.Pipe[*schema.Message](5)
 	request := &coze.CreateChatsReq{
 		BotID:           c.botId,
 		UserID:          c.uid,
-		Messages:        e2c(reverse),
+		Messages:        e2c(in),
 		AutoSaveHistory: &autoSaveHistory,
 		Stream:          &isStream,
 		ConnectorID:     "1024",

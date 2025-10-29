@@ -62,5 +62,9 @@ func completeAssistantMsg(relay *info.RelayContext) {
 	if relay.SearchInfo != nil { // 搜索信息
 		am.Ext.Cite = relay.SearchInfo.Cite
 	}
+	if relay.Sensitive.Hits != nil && len(relay.Sensitive.Hits) > 0 {
+		am.Content = ""
+		am.Ext.Sensitive = true
+	}
 	am.Ext.Code = relay.MessageInfo.Code
 }

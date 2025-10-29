@@ -28,8 +28,10 @@ func NewProvider() (*Provider, error) {
 		MsgMapper: mongoMapper,
 	}
 	completionGraph := graph.DrawCompletionGraph(historyDomain)
+	userMongoMapper := user.NewUserMongoMapper(configConfig)
 	completionsService := &service.CompletionsService{
 		CompletionGraph: completionGraph,
+		UserMapper:      userMongoMapper,
 	}
 	conversationMongoMapper := conversation.NewConversationMongoMapper(configConfig)
 	conversationService := &service.ConversationService{
@@ -41,7 +43,6 @@ func NewProvider() (*Provider, error) {
 		MessageMapper:  mongoMapper,
 		FeedbackMapper: feedbackMongoMapper,
 	}
-	userMongoMapper := user.NewUserMongoMapper(configConfig)
 	userService := &service.UserService{
 		UserMapper: userMongoMapper,
 	}
