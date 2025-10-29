@@ -27,6 +27,7 @@ func Register(r *server.Hertz) {
 		_basic_user.POST("/login", append(_basicuserloginMw(), core_api.BasicUserLogin)...)
 		_basic_user.POST("/register", append(_basicuserregisterMw(), core_api.BasicUserRegister)...)
 		_basic_user.POST("/reset_password", append(_basicuserresetpasswordMw(), core_api.BasicUserResetPassword)...)
+		_basic_user.PATCH("/update_profile", append(_basicuserupdateprofileMw(), core_api.BasicUserUpdateProfile)...)
 	}
 	{
 		_conversation := root.Group("/conversation", _conversationMw()...)

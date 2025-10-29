@@ -9,10 +9,13 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/types/errno"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type IUserService interface {
@@ -20,10 +23,12 @@ type IUserService interface {
 	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
 	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
+	UpdateProfile(ctx context.Context, req *core_api.BasicUserUpdateProfileReq) (*core_api.BasicUserUpdateProfileResp, error)
 	ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error)
 }
 
 type UserService struct {
+	UserMapper user.MongoMapper
 }
 
 var UserServiceSet = wire.NewSet(
@@ -165,6 +170,46 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 	return &core_api.BasicUserResetPasswordResp{
 		Resp: util.Success(),
 	}, nil
+}
+
+func (u *UserService) UpdateProfile(ctx context.Context, req *core_api.BasicUserUpdateProfileReq) (*core_api.BasicUserUpdateProfileResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+
+	objUid, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		return nil, errorx.WrapByCode(err, errno.OIDErrCode)
+	}
+
+	if req.Username != nil {
+		// 检查是否存在用户名字
+		if exist, err := u.UserMapper.ExistUsername(ctx, *req.Username); err != nil {
+			logs.Errorf("check username exist error: %s", errorx.ErrorWithoutStack(err))
+			return nil, errorx.WrapByCode(err, errno.UpdateUsernameErrCode)
+		} else if exist {
+			return nil, errorx.New(errno.UsernameExistedErrCode, errorx.KV("username", *req.Username))
+		}
+
+		// 更新用户名
+		if err := u.UserMapper.UpdateUsername(ctx, objUid, *req.Username); err != nil {
+			logs.Errorf("update username error: %s", errorx.ErrorWithoutStack(err))
+			return nil, errorx.WrapByCode(err, errno.UpdateUsernameErrCode)
+		}
+	}
+
+	if req.Avatar != nil {
+		// 更新头像
+		if err := u.UserMapper.UpdateAvatar(ctx, objUid, *req.Avatar); err != nil {
+			logs.Errorf("update avatar error: %s", errorx.ErrorWithoutStack(err))
+			return nil, errorx.WrapByCode(err, errno.UpdateAvatarErrCode)
+		}
+	}
+
+	return &core_api.BasicUserUpdateProfileResp{Resp: util.Success()}, nil
 }
 
 func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error) {

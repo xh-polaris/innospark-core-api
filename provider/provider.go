@@ -8,6 +8,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 )
 
 var provider *Provider
@@ -56,6 +57,7 @@ var InfraSet = wire.NewSet(
 	conversation.NewConversationMongoMapper,
 	message.NewMessageMongoMapper,
 	feedback.NewFeedbackMongoMapper,
+	user.NewUserMongoMapper,
 )
 
 var AllProvider = wire.NewSet(
