@@ -10,9 +10,9 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
+	"github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 type ICompletionsService interface {

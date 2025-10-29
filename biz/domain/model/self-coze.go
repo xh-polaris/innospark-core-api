@@ -10,8 +10,8 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 func init() {

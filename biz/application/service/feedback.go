@@ -10,8 +10,8 @@ import (
 	mf "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
-	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 type IFeedbackService interface {
