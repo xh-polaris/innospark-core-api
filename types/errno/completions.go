@@ -1,6 +1,8 @@
 package errno
 
-import "github.com/xh-polaris/innospark-core-api/biz/pkg/errorx/code"
+import (
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx/code"
+)
 
 const (
 	CompletionsErrCode = 70001

@@ -11,8 +11,8 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
-	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx"
-	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	errno2 "github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 type ICompletionsService interface {
@@ -33,18 +33,18 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
 		logx.Error("extract user id error: %v", err)
-		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+		return nil, errorx.WrapByCode(err, errno2.UnAuthErrCode)
 	}
 
 	// 暂时只支持一个新增对话
 	if len(req.Messages) > 1 {
-		return nil, errorx.New(errno.UnImplementErrCode)
+		return nil, errorx.New(errno2.UnImplementErrCode)
 	}
 
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
-		return nil, errorx.New(errno.UnImplementErrCode)
+		return nil, errorx.New(errno2.UnImplementErrCode)
 	}
 	state := &info.RelayContext{
 		RequestContext: c,
@@ -65,5 +65,5 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	}
 
 	_, err = s.CompletionGraph.CompileAndStream(ctx, state)
-	return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
+	return nil, errorx.WrapByCode(err, errno2.CompletionsErrCode)
 }

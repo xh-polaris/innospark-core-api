@@ -11,10 +11,10 @@ import (
 	"github.com/hertz-contrib/websocket"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
-	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx"
-	"github.com/xh-polaris/innospark-core-api/biz/types/errno"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/pkg/wsx"
+	"github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 const (

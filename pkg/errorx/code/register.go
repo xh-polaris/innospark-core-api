@@ -1,7 +1,7 @@
 package code
 
 import (
-	"github.com/xh-polaris/innospark-core-api/biz/pkg/errorx/internal"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx/internal"
 )
 
 type RegisterOptionFn = internal.RegisterOption
