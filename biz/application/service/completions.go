@@ -63,7 +63,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+		return nil, err
 	}
 	state := &info.RelayContext{
 		RequestContext: c,

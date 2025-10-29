@@ -31,8 +31,8 @@ update:
 	hz --verbose update $(IDL_OPTIONS) --mod $(MODULE_NAME) $(EXTRA_OPTIONS)
 	@files=$$(find biz/application/dto -type f); \
 	for file in $$files; do \
-  	  sed -i  -e 's/func init\(\).*//' $$file; \
-  	done
+		sed -i '' 's/func init() .*//' "$$file" 2>/dev/null || sed -i 's/func init() .*//' "$$file"; \
+	done
 new:
 	hz new $(IDL_OPTIONS) $(OUTPUT_OPTIONS) --service $(SERVICE_NAME) --mod $(MODULE_NAME) $(EXTRA_OPTIONS)
 clean:

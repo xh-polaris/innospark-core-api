@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	core_api "github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/provider"
 )
 

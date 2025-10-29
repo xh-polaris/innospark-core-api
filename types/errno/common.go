@@ -7,7 +7,6 @@ import (
 const (
 	UnAuthErrCode      = 1000
 	UnImplementErrCode = 888
-	OIDErrCode         = 777
 	InterruptCode      = 666
 	unknowCode         = 999
 )
