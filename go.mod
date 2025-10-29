@@ -3,6 +3,8 @@ module github.com/xh-polaris/innospark-core-api
 go 1.24.6
 
 require (
+	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0
+	github.com/bytedance/sonic v1.14.0
 	github.com/cloudwego/eino v0.4.8
 	github.com/cloudwego/eino-ext/components/model/ark v0.1.28
 	github.com/cloudwego/eino-ext/components/model/openai v0.0.0-20250905035413-86dbae6351d5
@@ -27,11 +29,11 @@ require (
 )
 
 require (
+	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
-	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

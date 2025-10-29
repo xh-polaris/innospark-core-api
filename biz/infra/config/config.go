@@ -1,10 +1,12 @@
 package config
 
 import (
+	"io"
 	"os"
+	"strings"
 	"sync"
 
-	"github.com/zeromicro/go-zero/core/conf"
+	confx "github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -63,26 +65,35 @@ type Config struct {
 	Claude     *Claude
 	Coze       *Coze
 	ASR        *ASR
+	Sensitive  []string
 }
 
 func NewConfig() (*Config, error) {
 	once.Do(func() {
-		c := new(Config)
-		path := os.Getenv("CONFIG_PATH")
-		if path == "" {
-			path = "etc/config.yaml"
+		paths := []string{"etc/config.yaml", "etc/sensitive.yaml"}
+		var err error
+		var data []byte
+		var yamlDocs []string
+		for _, path := range paths {
+			var f *os.File
+			if f, err = os.Open(path); err != nil {
+				panic(err)
+			}
+			if data, err = io.ReadAll(f); err != nil {
+				panic(err)
+			}
+			yamlDocs = append(yamlDocs, string(data))
 		}
-		err := conf.Load(path, c)
-		if err != nil {
+		c, yaml := new(Config), []byte(strings.Join(yamlDocs, "\r\n"))
+		// 用 "---\n" 拼接多个 YAML 文档
+		if err = confx.LoadFromYamlBytes(yaml, c); err != nil {
 			panic(err)
 		}
-		err = c.SetUp()
-		if err != nil {
+		if err = c.SetUp(); err != nil {
 			panic(err)
 		}
 		config = c
 	})
-
 	return config, nil
 }
 
