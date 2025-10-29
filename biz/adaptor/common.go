@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/xh-polaris/gopkg/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -79,6 +79,11 @@ func ExtractUserIdFromJWT(tokenString string) (userId string, err error) {
 	return claims["basic_user_id"].(string), err
 }
 
+type data struct {
+	Code int32  `json:"code"`
+	Msg  string `json:"msg"`
+}
+
 // PostProcess 处理http响应, resp要求指针或接口类型
 // 在日志中记录本次调用详情, 同时向响应头中注入符合b3规范的链路信息, 主要是trace_id
 // 最佳实践:
@@ -98,12 +103,11 @@ func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err 
 		return
 	}
 
-	if ex, ok := err.(cst.IErrorx); ok { // errorx错误
-		StatusCode := hertz.StatusOK
-		c.JSON(StatusCode, &cst.Errorx{
-			Code: ex.GetCode(),
-			Msg:  ex.GetMsg(),
-		})
+	var customErr errorx.StatusError
+	if errors.As(err, &customErr) && customErr.Code() != 0 {
+		logs.CtxWarnf(ctx, "[ErrorX] error:  %v %v \n", customErr.Code(), err)
+		c.AbortWithStatusJSON(http.StatusOK, data{Code: customErr.Code(), Msg: customErr.Msg()})
+		return
 	} else { // 常规错误, 状态码500
 		logs.CtxErrorf(ctx, "internal error, err=%s", errorx.ErrorWithoutStack(err))
 		code := hertz.StatusInternalServerError

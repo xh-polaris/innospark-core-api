@@ -12,6 +12,6 @@ func init() {
 	code.Register(
 		FeedbackErrCode,
 		"处理反馈失败",
-		code.WithAffectStability(true),
+		code.WithAffectStability(false),
 	)
 }

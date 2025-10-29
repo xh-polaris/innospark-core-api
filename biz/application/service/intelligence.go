@@ -10,7 +10,6 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -60,7 +59,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	}
 
 	if resp["code"].(float64) != 0 && resp["code"].(float64) != 700012006 {
-		return nil, cst.New(999, resp["msg"].(string))
+		return nil, errorx.New(errno.ErrListIntelligence, errorx.KV("msg", resp["msg"].(string)))
 	}
 	if resp["code"].(float64) == 700012006 {
 		header.Set("Cookie", config.GetConfig().Coze.RefreshCookie())
@@ -69,7 +68,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 			return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 		}
 		if resp["code"].(float64) != 0 {
-			return nil, cst.New(999, resp["msg"].(string))
+			return nil, errorx.New(errno.ErrListIntelligence, errorx.KV("msg", resp["msg"].(string)))
 		}
 	}
 	data := resp["data"].(map[string]interface{})
@@ -114,7 +113,7 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
 	if resp["code"].(float64) != 0 {
-		return nil, cst.New(999, resp["msg"].(string))
+		return nil, errorx.New(errno.ErrGetIntelligence, errorx.KV("msg", resp["msg"].(string)))
 	}
 	data := resp["data"].(map[string]interface{})
 	modelInfo := data["model_info"].(map[string]interface{})

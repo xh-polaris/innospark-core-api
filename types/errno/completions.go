@@ -11,7 +11,7 @@ const (
 func init() {
 	code.Register(
 		CompletionsErrCode,
-		"处理AI文本生成请求失败",
-		code.WithAffectStability(true),
+		"对话生成失败",
+		code.WithAffectStability(false),
 	)
 }

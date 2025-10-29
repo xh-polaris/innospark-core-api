@@ -13,11 +13,11 @@ func init() {
 	code.Register(
 		SynapseErrCode,
 		"使用 Synapse 访问 {url} 错误",
-		code.WithAffectStability(true),
+		code.WithAffectStability(false),
 	)
 	code.Register(
 		CozeErrCode,
 		"使用 Coze 访问 {url} 错误",
-		code.WithAffectStability(true),
+		code.WithAffectStability(false),
 	)
 }
