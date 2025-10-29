@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/google/wire"
@@ -9,6 +10,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
@@ -21,6 +23,7 @@ type ICompletionsService interface {
 
 type CompletionsService struct {
 	CompletionGraph *graph.CompletionGraph
+	UserMapper      user.MongoMapper
 }
 
 var CompletionsServiceSet = wire.NewSet(
@@ -32,8 +35,13 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		logs.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
 		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+	if _, forbidden, expire, err := s.UserMapper.CheckForbidden(ctx, uid); err != nil {
+		return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
+	} else if forbidden { // 封禁中
+		return nil, errorx.New(errno.ErrForbidden, errorx.KV("time", expire.Local().Format(time.RFC3339)))
 	}
 
 	// 暂时只支持一个新增对话
@@ -44,7 +52,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
-		return nil, err
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
 	}
 	state := &info.RelayContext{
 		RequestContext: c,

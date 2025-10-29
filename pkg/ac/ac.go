@@ -32,12 +32,7 @@ func InitAc(dict []string) error {
 // AcSearch 使用Aho-Corasick算法进行多模式串搜索
 // 参数: findText: 待搜索的文本内容  dict: 关键词字典列表 stopImmediately: 是否找到第一个匹配就停止搜索
 // 返回值: bool: 是否找到匹配的关键词 []string: 匹配到的关键词列表
-func AcSearch(findText string, dict []string, stopImmediately bool) (bool, []string) {
-	// 空字典或空文本的边界情况处理
-	if len(dict) == 0 || len(findText) == 0 {
-		return false, nil
-	}
-
+func AcSearch(findText string, stopImmediately bool) (bool, []string) {
 	// 执行多模式串搜索
 	hits := m.MultiPatternSearch([]rune(findText), stopImmediately)
 	// 处理搜索结果

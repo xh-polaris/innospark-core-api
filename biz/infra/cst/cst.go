@@ -82,6 +82,7 @@ const (
 	UpdateTime     = "update_time"
 	DeleteTime     = "delete_time"
 	LoginTime      = "login_time"
+	Expire         = "expire"
 	Brief          = "brief"
 	Feedback       = "feedback"
 
