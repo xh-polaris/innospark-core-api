@@ -17,7 +17,7 @@ type User struct {
 	Avatar     string             `json:"avatar" bson:"avatar,omitempty"`           // 头像
 	Name       string             `json:"name" bson:"name,omitempty"`               // 用户名
 	Warnings   int32              `json:"warnings" bson:"warnings"`                 // 违规次数
-	Status     int                `json:"status" bson:"status"`                     // 状态
+	Status     int32              `json:"status" bson:"status"`                     // 状态
 	Expire     time.Time          `json:"expire,omitempty" bson:"expire,omitempty"` // 封禁到期时间
 	LoginTime  time.Time          `json:"login_time" bson:"login_time"`             // 最近登录时间
 	CreateTime time.Time          `json:"create_time" bson:"create_time"`
