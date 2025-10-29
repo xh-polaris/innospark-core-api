@@ -81,6 +81,7 @@ const (
 	CreateTime     = "create_time"
 	UpdateTime     = "update_time"
 	DeleteTime     = "delete_time"
+	LoginTime      = "login_time"
 	Brief          = "brief"
 	Feedback       = "feedback"
 

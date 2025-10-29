@@ -13,6 +13,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 )
 
 // Injectors from wire.go:
@@ -40,7 +41,10 @@ func NewProvider() (*Provider, error) {
 		MessageMapper:  mongoMapper,
 		FeedbackMapper: feedbackMongoMapper,
 	}
-	userService := &service.UserService{}
+	userMongoMapper := user.NewUserMongoMapper(configConfig)
+	userService := &service.UserService{
+		UserMapper: userMongoMapper,
+	}
 	intelligenceService := &service.IntelligenceService{}
 	providerProvider := &Provider{
 		Config:              configConfig,

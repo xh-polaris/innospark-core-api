@@ -9,6 +9,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -24,6 +25,7 @@ type IUserService interface {
 }
 
 type UserService struct {
+	UserMapper user.MongoMapper
 }
 
 var UserServiceSet = wire.NewSet(
@@ -82,7 +84,7 @@ func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegis
 	url := config.GetConfig().SynapseURL + "/basic_user/register"
 	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
+		return nil, errorx.WrapByCode(err, errno.ErrRegister)
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.BasicUserRegisterResp{
@@ -115,7 +117,7 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 	url := config.GetConfig().SynapseURL + "/basic_user/login"
 	resp, err := httpx.GetHttpClient().Post(url, header, body)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
+		return nil, errorx.WrapByCode(err, errno.ErrLogin)
 	}
 	if resp["code"].(float64) != 0 {
 		return &core_api.BasicUserLoginResp{
@@ -125,11 +127,20 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 			},
 		}, nil
 	}
-	return &core_api.BasicUserLoginResp{
-		Resp:  util.Success(),
-		Token: resp["token"].(string),
-		New:   resp["new"].(bool),
-	}, nil
+	var id string
+	if basicUser, ok := resp["basicUser"].(map[string]any); ok {
+		if id, ok = basicUser["basicUserId"].(string); ok && id != "" {
+			if _, err = u.UserMapper.FindOrCreateUser(ctx, id, true); err != nil {
+				return nil, errorx.WrapByCode(err, errno.ErrLogin)
+			}
+			return &core_api.BasicUserLoginResp{
+				Resp:  util.Success(),
+				Token: resp["token"].(string),
+				New:   resp["new"].(bool),
+			}, nil
+		}
+	}
+	return nil, errorx.New(errno.ErrLogin)
 }
 
 func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error) {
