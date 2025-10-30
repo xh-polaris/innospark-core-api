@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/schema"
@@ -79,7 +80,7 @@ func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.G
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ConversationGenerateBriefErrCode)
 	}
-	in := []*schema.Message{schema.UserMessage("你是标题生成器, 不要回答, 而是根据用户输入概括[" + req.Messages[0].Content + "],不超过10个字, 简洁正式, 无额外内容")}
+	in := []*schema.Message{schema.UserMessage(fmt.Sprintf(config.GetConfig().TitleGen, req.Messages[0].Content))}
 	out, err := m.Generate(ctx, in)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ConversationGenerateBriefErrCode)

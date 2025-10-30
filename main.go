@@ -16,6 +16,7 @@ import (
 	"github.com/xh-polaris/gopkg/hertz/middleware"
 	xhlog "github.com/xh-polaris/gopkg/util/log"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
+	application "github.com/xh-polaris/innospark-core-api/biz/application/service/base"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/provider"
@@ -44,6 +45,7 @@ func Init() {
 	// 设置openTelemetry的传播器，用于分布式追踪中传递上下文信息
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(b3.New(), propagation.Baggage{}, propagation.TraceContext{}))
 	http.DefaultTransport = otelhttp.NewTransport(http.DefaultTransport)
+	application.InitApp()
 }
 
 func main() {

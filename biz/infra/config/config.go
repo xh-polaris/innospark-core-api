@@ -68,6 +68,7 @@ type Config struct {
 	Sensitive          []string
 	SensitiveStreamGap int
 	Admin              *Admin
+	TitleGen           string
 }
 
 func NewConfig() (*Config, error) {
