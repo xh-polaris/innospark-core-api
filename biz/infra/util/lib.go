@@ -83,3 +83,10 @@ func (t *LoggingTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 
 	return resp, nil
 }
+
+func Str2URL(raw string) *url.URL {
+	if u, err := url.Parse(raw); err == nil {
+		return u
+	}
+	return nil
+}

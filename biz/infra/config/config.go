@@ -48,6 +48,12 @@ type Claude struct {
 	APIKey  string
 }
 
+type COS struct {
+	BucketURL string
+	SecretID  string // 永久密钥
+	SecretKey string
+}
+
 type Config struct {
 	service.ServiceConf
 	ListenOn   string
@@ -63,6 +69,7 @@ type Config struct {
 	Claude     *Claude
 	Coze       *Coze
 	ASR        *ASR
+	COS        *COS
 }
 
 func NewConfig() (*Config, error) {
