@@ -47,6 +47,9 @@ func NewProvider() (*Provider, error) {
 		UserMapper: userMongoMapper,
 	}
 	intelligenceService := &service.IntelligenceService{}
+	manageService := &service.ManageService{
+		UserMapper: userMongoMapper,
+	}
 	providerProvider := &Provider{
 		Config:              configConfig,
 		CompletionsService:  completionsService,
@@ -54,6 +57,7 @@ func NewProvider() (*Provider, error) {
 		FeedbackService:     feedbackService,
 		UserService:         userService,
 		IntelligenceService: intelligenceService,
+		ManageService:       manageService,
 		CompletionGraph:     completionGraph,
 	}
 	return providerProvider, nil

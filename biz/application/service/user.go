@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
@@ -127,10 +128,13 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 			},
 		}, nil
 	}
-	var id string
+	var id, phone string
 	if basicUser, ok := resp["basicUser"].(map[string]any); ok {
 		if id, ok = basicUser["basicUserId"].(string); ok && id != "" {
-			if _, err = u.UserMapper.FindOrCreateUser(ctx, id, true); err != nil {
+			if strings.HasPrefix(req.AuthType, "phone-") {
+				phone = req.AuthId
+			}
+			if _, err = u.UserMapper.FindOrCreateUser(ctx, id, phone, true); err != nil {
 				return nil, errorx.WrapByCode(err, errno.ErrLogin)
 			}
 			return &core_api.BasicUserLoginResp{
@@ -202,6 +206,19 @@ func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPa
 				Msg:  resp["msg"].(string),
 			},
 		}, nil
+	}
+	var id string
+	if basicUser, ok := resp["basicUser"].(map[string]any); ok {
+		if id, ok = basicUser["basicUserId"].(string); ok && id != "" {
+			if _, err = u.UserMapper.FindOrCreateUser(ctx, id, "第三方用户", true); err != nil {
+				return nil, errorx.WrapByCode(err, errno.ErrLogin)
+			}
+			return &core_api.ThirdPartyLoginResp{
+				Resp:  util.Success(),
+				Token: resp["token"].(string),
+				New:   false,
+			}, nil
+		}
 	}
 	return &core_api.ThirdPartyLoginResp{
 		Resp:  util.Success(),

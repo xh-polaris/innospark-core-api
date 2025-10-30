@@ -86,6 +86,7 @@ const (
 	Expire         = "expire"
 	Brief          = "brief"
 	Feedback       = "feedback"
+	Phone          = "phone"
 
 	Status        = "status"
 	DeletedStatus = -1

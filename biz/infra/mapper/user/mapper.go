@@ -4,8 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,11 +23,12 @@ const (
 )
 
 type MongoMapper interface {
-	FindOrCreateUser(ctx context.Context, id string, login bool) (*User, error) // 查找或创建一个用户
+	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) // 查找或创建一个用户
 	CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error)
 	Warn(ctx context.Context, id string) error
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
+	ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error)
 }
 
 type mongoMapper struct {
@@ -41,7 +44,7 @@ func NewUserMongoMapper(config *config.Config) MongoMapper {
 	return m
 }
 
-func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, login bool) (*User, error) {
+func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -52,6 +55,8 @@ func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, login boo
 		cst.Id:         oid,
 		cst.CreateTime: time.Now(),
 		cst.UpdateTime: time.Now(),
+		cst.Phone:      phone,
+		cst.Status:     0,
 	}}
 	if login {
 		update["$set"] = bson.M{cst.LoginTime: time.Now()}
@@ -117,4 +122,32 @@ func (m *mongoMapper) UnForbidden(ctx context.Context, id string) error {
 	update := bson.M{"$set": bson.M{cst.Status: StatusNormal, cst.Expire: time.Time{}}}
 	_, err = m.conn.UpdateOne(ctx, key, filter, update)
 	return err
+}
+
+const (
+	SortedByCreateTime = 0
+	SortedByUpdateTime = 1
+	SortedByLoginTime  = 2
+)
+
+func (m *mongoMapper) ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error) {
+	var users []*User
+	filter := bson.M{cst.Status: status}
+	var sort string
+	switch sortedBy {
+	case SortedByUpdateTime:
+		sort = cst.UpdateTime
+	case SortedByLoginTime:
+		sort = cst.LoginTime
+	case SortedByCreateTime:
+		sort = cst.CreateTime
+	default:
+		sort = cst.CreateTime
+	}
+	opts := util.BuildFindOption(page).SetSort(bson.M{sort: reverse})
+	if err := m.conn.Find(ctx, &users, filter, opts); err != nil {
+		return 0, nil, err
+	}
+	total, err := m.conn.CountDocuments(ctx, filter)
+	return total, users, err
 }

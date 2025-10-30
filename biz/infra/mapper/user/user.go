@@ -14,6 +14,7 @@ const (
 // User 用户
 type User struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id,omitempty"`                  // ID
+	Phone      string             `json:"phone" bson:"phone,omitempty"`             // 手机号
 	Avatar     string             `json:"avatar" bson:"avatar,omitempty"`           // 头像
 	Name       string             `json:"name" bson:"name,omitempty"`               // 用户名
 	Warnings   int32              `json:"warnings" bson:"warnings"`                 // 违规次数

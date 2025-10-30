@@ -150,3 +150,23 @@ func _thirdpartyloginMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _adminMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _forbiddenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listuserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _adminloginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

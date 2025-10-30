@@ -67,6 +67,7 @@ type Config struct {
 	ASR                *ASR
 	Sensitive          []string
 	SensitiveStreamGap int
+	Admin              *Admin
 }
 
 func NewConfig() (*Config, error) {
