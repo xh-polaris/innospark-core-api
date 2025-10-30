@@ -10,11 +10,15 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/types/errno"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type IUserService interface {
@@ -22,6 +26,7 @@ type IUserService interface {
 	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
 	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
+	UpdateProfile(ctx context.Context, req *core_api.BasicUserUpdateProfileReq) (*core_api.BasicUserUpdateProfileResp, error)
 	ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error)
 }
 
@@ -180,6 +185,39 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 	return &core_api.BasicUserResetPasswordResp{
 		Resp: util.Success(),
 	}, nil
+}
+
+func (u *UserService) UpdateProfile(ctx context.Context, req *core_api.BasicUserUpdateProfileReq) (*core_api.BasicUserUpdateProfileResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+
+	objUid, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构建更新字段
+	update := make(bson.M)
+	if req.Username != nil {
+		update[cst.Name] = *req.Username
+	}
+	if req.Avatar != nil {
+		update[cst.Avatar] = *req.Avatar
+	}
+
+	// 一次性更新所有字段
+	if len(update) > 0 {
+		if err = u.UserMapper.UpdateField(ctx, objUid, update); err != nil {
+			logs.Errorf("update user profile error: %s", errorx.ErrorWithoutStack(err))
+			return nil, errorx.WrapByCode(err, errno.ErrUpdateUserField)
+		}
+	}
+
+	return &core_api.BasicUserUpdateProfileResp{Resp: util.Success()}, nil
 }
 
 func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error) {

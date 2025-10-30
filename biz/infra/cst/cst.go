@@ -100,6 +100,9 @@ const (
 	Search        = "$search"
 	Regex         = "$regex"
 	Options       = "$options"
+
+	Name   = "name"
+	Avatar = "avatar"
 )
 
 const (

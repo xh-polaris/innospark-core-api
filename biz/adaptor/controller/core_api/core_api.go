@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	core_api "github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/provider"
 )
 
@@ -220,6 +220,21 @@ func BasicUserResetPassword(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp, err := provider.Get().UserService.ResetPassword(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// BasicUserUpdateProfile
+// @router /basic_user/update_profile [POST]
+func BasicUserUpdateProfile(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.BasicUserUpdateProfileReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.UpdateProfile(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 

@@ -8,6 +8,8 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -29,6 +31,10 @@ type MongoMapper interface {
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
 	ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error)
+	UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error
+
+	existField(ctx context.Context, field string, value interface{}) (bool, error)
+	ExistUsername(ctx context.Context, username string) (bool, error)
 }
 
 type mongoMapper struct {
@@ -150,4 +156,31 @@ func (m *mongoMapper) ListUser(ctx context.Context, page *basic.Page, status, so
 	}
 	total, err := m.conn.CountDocuments(ctx, filter)
 	return total, users, err
+}
+
+// UpdateField 更新字段
+func (m *mongoMapper) UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error {
+	if _, err := m.conn.UpdateByIDNoCache(ctx, uid, bson.M{"$set": update}); err != nil {
+		logs.CtxErrorf(ctx, "failed to update user %s: %s", uid.Hex(), errorx.ErrorWithoutStack(err))
+		return err
+	}
+
+	return nil
+}
+
+// existField 检查字段是否存在
+func (m *mongoMapper) existField(ctx context.Context, field string, value interface{}) (bool, error) {
+	var err error
+	var count int64
+	if count, err = m.conn.CountDocuments(ctx, bson.M{field: value}); err != nil {
+		logs.CtxErrorf(ctx, "failed to check existing %s: %s", field, errorx.ErrorWithoutStack(err))
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+// ExistUsername 检查用户名是否存在
+func (m *mongoMapper) ExistUsername(ctx context.Context, username string) (bool, error) {
+	return m.existField(ctx, cst.Name, username)
 }
