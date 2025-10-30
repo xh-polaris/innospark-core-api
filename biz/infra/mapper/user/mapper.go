@@ -80,7 +80,7 @@ func (m *mongoMapper) CheckForbidden(ctx context.Context, id string) (int, bool,
 			}
 		}
 	}
-	return u.Status, u.Status == StatusForbidden, u.Expire, nil
+	return int(u.Status), u.Status == StatusForbidden, u.Expire, nil
 }
 
 func (m *mongoMapper) Warn(ctx context.Context, id string) error {
