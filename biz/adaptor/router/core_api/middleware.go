@@ -176,6 +176,11 @@ func _adminloginMw() []app.HandlerFunc {
 	return nil
 }
 
+func _gensignedurlMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _feedback0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
