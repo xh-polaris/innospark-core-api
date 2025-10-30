@@ -11,7 +11,8 @@ import (
 	info "github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 type Transformer struct {
@@ -44,7 +45,7 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 		default:
 			msg, err = mr.Recv()
 			if err != nil {
-				logx.CondError(!errors.Is(err, io.EOF), "[graph transformer] recv err:", err)
+				logs.CondErrorf(!errors.Is(err, io.EOF), "[graph transformer] recv err: %s", errorx.ErrorWithoutStack(err))
 				sw.Send(t.end(err))
 				return
 			}
@@ -107,7 +108,7 @@ func SSE(relay *info.RelayContext, input *schema.StreamReader[*sse.Event]) (_ *i
 			err = sw.Write(et) // 写入事件
 		}
 		if err != nil {
-			logx.CondError(!errors.Is(err, io.EOF), "[sse] write err: %v", err)
+			logs.CondErrorf(!errors.Is(err, io.EOF), "[sse] write err: %s", errorx.ErrorWithoutStack(err))
 			err = nil // 为了能进入后续的存储历史记录节点
 			break
 		}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/xh-polaris/innospark-core-api/biz/application/service"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/pkg/wsx"
 )
@@ -13,6 +14,6 @@ import (
 // @router /asr [GET]
 func ASR(ctx context.Context, c *app.RequestContext) {
 	if err := wsx.UpgradeWs(ctx, c, service.ASR); err != nil {
-		logs.Error("[controller] [Chat] websocket upgrade error:", err)
+		logs.Errorf("[controller] [Chat] websocket upgrade error: %s", errorx.ErrorWithoutStack(err))
 	}
 }

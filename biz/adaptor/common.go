@@ -15,7 +15,8 @@ import (
 	"github.com/xh-polaris/gopkg/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel/propagation"
 )
@@ -38,7 +39,7 @@ func ExtractUserId(ctx context.Context) (userId string, err error) {
 	userId = ""
 	defer func() {
 		if err != nil {
-			logx.CtxInfo(ctx, "extract user meta fail, err=%v", err)
+			logs.CtxInfof(ctx, "extract user meta fail, err=%s", errorx.ErrorWithoutStack(err))
 		}
 	}()
 	c, err := ExtractContext(ctx)
@@ -84,7 +85,7 @@ func ExtractUserIdFromJWT(tokenString string) (userId string, err error) {
 // - 在controller中调用业务处理, 处理结束后调用PostProcess
 func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err error) {
 	b3.New().Inject(ctx, &headerProvider{headers: &c.Response.Header})
-	logx.CtxInfo(ctx, "[%s] req=%s, resp=%s, err=%v", c.Path(), util.JSONF(req), util.JSONF(resp), err)
+	logs.CtxInfof(ctx, "[%s] req=%s, resp=%s, err=%s", c.Path(), util.JSONF(req), util.JSONF(resp), errorx.ErrorWithoutStack(err))
 
 	// 无错, 正常响应
 	if err == nil {
@@ -104,7 +105,7 @@ func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err 
 			Msg:  ex.GetMsg(),
 		})
 	} else { // 常规错误, 状态码500
-		logx.CtxError(ctx, "internal error, err=%s", err.Error())
+		logs.CtxErrorf(ctx, "internal error, err=%s", errorx.ErrorWithoutStack(err))
 		code := hertz.StatusInternalServerError
 		c.String(code, err.Error())
 	}

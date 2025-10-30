@@ -10,7 +10,8 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -102,7 +103,7 @@ func Event(index string, typ string, obj any) *sse.Event {
 	var err error
 	var data []byte
 	if data, err = json.Marshal(obj); err != nil {
-		logx.Error("[graph sse] event marshal error: %v", err)
+		logs.Errorf("[graph sse] event marshal error: %s", errorx.ErrorWithoutStack(err))
 	}
 	return &sse.Event{ID: index, Type: typ, Data: data}
 }

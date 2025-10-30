@@ -8,7 +8,8 @@ import (
 	"sync"
 
 	"github.com/cloudwego/hertz/pkg/common/json"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 // httpx/client 是一个简单的http客户端
@@ -92,7 +93,7 @@ func (c *HttpClient) getResp(method, url string, headers http.Header, body any) 
 	}
 	defer func() {
 		if closeErr := response.Body.Close(); closeErr != nil {
-			logx.Error("[httpx] 关闭请求失败: ", closeErr)
+			logs.Errorf("[httpx] 关闭请求失败: %s", errorx.ErrorWithoutStack(closeErr))
 		}
 	}()
 	// 检查响应状态码

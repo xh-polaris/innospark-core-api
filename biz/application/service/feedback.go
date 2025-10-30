@@ -11,7 +11,7 @@ import (
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
-	errno2 "github.com/xh-polaris/innospark-core-api/types/errno"
+	"github.com/xh-polaris/innospark-core-api/types/errno"
 )
 
 type IFeedbackService interface {
@@ -32,7 +32,7 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	// 鉴权
 	uid, err := adaptor.ExtractUserId(ctx)
 	if err != nil {
-		return nil, errorx.WrapByCode(err, errno2.UnAuthErrCode)
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
 	}
 	ids, err := util.ObjectIDsFromHex(uid, req.MessageId)
 	if err != nil {
@@ -45,11 +45,11 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	}
 	// 更新反馈状态
 	if err = f.FeedbackMapper.UpdateFeedback(ctx, feedback); err != nil {
-		return nil, errorx.WrapByCode(err, errno2.FeedbackErrCode)
+		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
 	}
 	// 更新消息状态
 	if err = f.MessageMapper.Feedback(ctx, ids[1], req.Action); err != nil {
-		return nil, errorx.WrapByCode(err, errno2.FeedbackErrCode)
+		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
 	}
 	return &core_api.FeedbackResp{Resp: util.Success()}, nil
 }

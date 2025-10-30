@@ -7,7 +7,8 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 // HistoryDomain 是历史记录域, 负责维护对话的上下文
@@ -34,18 +35,18 @@ func (d *HistoryDomain) StoreHistory(ctx context.Context, relay *info.RelayConte
 		update = append(update, relay.CompletionOptions.SelectRegenList...)
 	}
 	if err = d.MsgMapper.UpdateMany(ctx, update); err != nil {
-		logx.Error("[domain message] process history option err: %v", err)
+		logs.Errorf("[domain message] process history option err: %s", errorx.ErrorWithoutStack(err))
 		return err
 	}
 
 	// 用户消息
 	if err = d.MsgMapper.CreateNewMessage(context.WithoutCancel(ctx), relay.UserMessage); err != nil {
-		logx.Error("[domain message] store user message err: %v", err)
+		logs.Errorf("[domain message] store user message err: %s", errorx.ErrorWithoutStack(err))
 	}
 	completeAssistantMsg(relay)
 	// 模型消息
 	if err = d.MsgMapper.CreateNewMessage(context.WithoutCancel(ctx), relay.MessageInfo.AssistantMessage); err != nil {
-		logx.Error("[domain message] store assistant message err: %v", err)
+		logs.Errorf("[domain message] store assistant message err: %s", errorx.ErrorWithoutStack(err))
 	}
 	return
 }

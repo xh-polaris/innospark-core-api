@@ -158,6 +158,20 @@ func CtxTracef(ctx context.Context, format string, v ...interface{}) {
 	logger.CtxTracef(ctx, format, v...)
 }
 
+// CondError calls the default logs's Errorf method conditionally.
+func CondError(cond bool, format string, v ...interface{}) {
+	if cond {
+		logger.Errorf(format, v...)
+	}
+}
+
+// CondErrorf calls the default logs's Errorf method conditionally.
+func CondErrorf(cond bool, format string, v ...interface{}) {
+	if cond {
+		logger.Errorf(format, v...)
+	}
+}
+
 type defaultLogger struct {
 	stdlog *log.Logger
 	level  Level
@@ -169,6 +183,18 @@ func (ll *defaultLogger) SetOutput(w io.Writer) {
 
 func (ll *defaultLogger) SetLevel(lv Level) {
 	ll.level = lv
+}
+
+func (ll *defaultLogger) CondError(cond bool, format string, v ...interface{}) {
+	if cond {
+		ll.logf(LevelError, &format, v...)
+	}
+}
+
+func (ll *defaultLogger) CondErrorf(cond bool, format string, v ...interface{}) {
+	if cond {
+		ll.logf(LevelError, &format, v...)
+	}
 }
 
 func (ll *defaultLogger) logf(lv Level, format *string, v ...interface{}) {

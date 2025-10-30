@@ -16,7 +16,8 @@ import (
 	"github.com/xh-polaris/gopkg/hertz/middleware"
 	xhlog "github.com/xh-polaris/gopkg/util/log"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/logx"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/xh-polaris/innospark-core-api/provider"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -29,6 +30,17 @@ func Init() {
 	provider.Init()
 	// 初始化自定义日志
 	hlog.SetLogger(xhlog.NewHlogLogger())
+
+	// 根据环境设置不同的日志级别
+	c := config.GetConfig()
+	if c.State == "debug" {
+		logs.SetLevel(logs.LevelDebug)
+	} else if c.State == "test" {
+		logs.SetLevel(logs.LevelInfo)
+	} else {
+		logs.SetLevel(logs.LevelWarn)
+	}
+
 	// 设置openTelemetry的传播器，用于分布式追踪中传递上下文信息
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(b3.New(), propagation.Baggage{}, propagation.TraceContext{}))
 	http.DefaultTransport = otelhttp.NewTransport(http.DefaultTransport)
@@ -63,7 +75,7 @@ func main() {
 
 	// 注册路由
 	register(h)
-	logx.Info("server start")
+	logs.Info("server start")
 
 	h.Spin()
 }

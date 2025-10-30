@@ -56,6 +56,12 @@ type CtxLogger interface {
 	CtxFatalf(ctx context.Context, format string, v ...interface{})
 }
 
+// CondLogger is a logs interface that provides conditional logging function.
+type CondLogger interface {
+	CondError(cond bool, format string, v ...interface{})
+	CondErrorf(cond bool, format string, v ...interface{})
+}
+
 // Control provides methods to config a logs.
 type Control interface {
 	SetLevel(Level)
@@ -67,6 +73,7 @@ type FullLogger interface {
 	Logger
 	FormatLogger
 	CtxLogger
+	CondLogger
 	Control
 }
 
