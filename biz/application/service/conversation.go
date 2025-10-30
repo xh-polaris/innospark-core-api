@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
@@ -86,7 +87,9 @@ func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.G
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ConversationGenerateBriefErrCode)
 	}
-	strings.Trim(out.Content, "\"")
+	out.Content = strings.Trim(out.Content, "\"")
+	re := regexp.MustCompile(`[\[(（][^]）)]*[]）)]`)
+	out.Content = re.ReplaceAllString(out.Content, "")
 	// 更新标题
 	if err = s.ConversationMapper.UpdateConversationBrief(ctx, uid, req.ConversationId, out.Content); err != nil {
 		return nil, errorx.WrapByCode(err, errno.ConversationGenerateBriefErrCode)

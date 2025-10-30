@@ -44,9 +44,9 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 	var msg *schema.Message
 	var sb strings.Builder
 	var cnt int
-	defer t.collect()         // 收集各类型消息
-	defer sw.Send(t.end(err)) // 发送结束消息
-	defer func(sb *strings.Builder) { // 最终校验是否有违禁词
+	defer t.collect()                      // 收集各类型消息
+	defer func() { sw.Send(t.end(err)) }() // 发送结束消息
+	defer func(sb *strings.Builder) {      // 最终校验是否有违禁词
 		if t.checkSensitive(sb) {
 			sw.Send(t.error(fmt.Sprintf("这个话题暂时还不能聊哦, 也请不要引导我聊敏感话题否则会被封禁哦")))
 		}
