@@ -185,3 +185,8 @@ func _feedbackcontentMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _basicuserupdateprofileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
