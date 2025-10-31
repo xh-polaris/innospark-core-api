@@ -175,3 +175,13 @@ func _adminloginMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _feedback0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _feedbackcontentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

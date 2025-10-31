@@ -16,6 +16,7 @@ import (
 
 type IFeedbackService interface {
 	Feedback(ctx context.Context, req *core_api.FeedbackReq) (*core_api.FeedbackResp, error)
+	Content(ctx context.Context, req *core_api.FeedbackReq) (*core_api.FeedbackResp, error)
 }
 
 type FeedbackService struct {
@@ -49,6 +50,19 @@ func (f *FeedbackService) Feedback(ctx context.Context, req *core_api.FeedbackRe
 	}
 	// 更新消息状态
 	if err = f.MessageMapper.Feedback(ctx, ids[1], req.Action); err != nil {
+		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
+	}
+	return &core_api.FeedbackResp{Resp: util.Success()}, nil
+}
+
+func (f *FeedbackService) Content(ctx context.Context, req *core_api.FeedbackReq) (*core_api.FeedbackResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+	err = f.FeedbackMapper.Insert(ctx, uid, req.Action, req.GetFeedback().GetType(), req.GetFeedback().GetContent())
+	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.FeedbackErrCode)
 	}
 	return &core_api.FeedbackResp{Resp: util.Success()}, nil

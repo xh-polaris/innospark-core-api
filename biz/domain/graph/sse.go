@@ -59,7 +59,7 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 		default:
 			msg, err = mr.Recv()
 			if err != nil {
-				logs.CondErrorf(!errors.Is(err, io.EOF), "[graph transformer] recv err:", errorx.ErrorWithoutStack(err))
+				logs.CondErrorf(!errors.Is(err, io.EOF), "[graph transformer] recv err:%s", errorx.ErrorWithoutStack(err))
 				return
 			}
 			refine := &info.RefineContent{}

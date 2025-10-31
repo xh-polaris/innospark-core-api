@@ -163,6 +163,21 @@ func Feedback(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// FeedbackContent .
+// @router /feedback/content [POST]
+func FeedbackContent(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.FeedbackReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().FeedbackService.Content(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // SendVerifyCode .
 // @router /system/send_verify_code [POST]
 func SendVerifyCode(ctx context.Context, c *app.RequestContext) {
