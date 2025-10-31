@@ -267,19 +267,3 @@ func ThirdPartyLogin(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().UserService.ThirdPartyLogin(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
-
-// BasicUserUpdateProfile .
-// @router /basic_user/update_profile [POST]
-func BasicUserUpdateProfile(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req core_api.BasicUserUpdateProfileReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	resp := new(core_api.BasicUserUpdateProfileResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
