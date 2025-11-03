@@ -4,8 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -22,6 +24,7 @@ const (
 type MongoMapper interface {
 	UpdateFeedback(ctx context.Context, feedback *FeedBack) error
 	Insert(ctx context.Context, uid string, action, typ int32, content string) error
+	ListFeedback(ctx context.Context, p *basic.Page, mid, uid *string, action, typ *int32) ([]*FeedBack, error)
 }
 
 type mongoMapper struct {
@@ -54,4 +57,31 @@ func (m *mongoMapper) Insert(ctx context.Context, uid string, action, typ int32,
 	}
 	_, err = m.conn.InsertOneNoCache(ctx, f)
 	return
+}
+
+func (m *mongoMapper) ListFeedback(ctx context.Context, p *basic.Page, message, user *string, action, typ *int32) (fbs []*FeedBack, err error) {
+	filter := bson.M{}
+	if message != nil { // 筛选消息
+		mid, err := primitive.ObjectIDFromHex(*message)
+		if err != nil {
+			return nil, err
+		}
+		filter[cst.Id] = mid
+	}
+	if user != nil { // 筛选用户
+		uid, err := primitive.ObjectIDFromHex(*user)
+		if err != nil {
+			return nil, err
+		}
+		filter[cst.UserId] = uid
+	}
+	if action != nil { // 删选action
+		filter[cst.Action] = *action
+	}
+	if typ != nil { // 筛选type
+		filter[cst.Type] = *typ
+	}
+	option := util.BuildFindOption(p).SetSort(bson.M{cst.UpdateTime: -1})
+	err = m.conn.Find(ctx, &fbs, filter, option)
+	return fbs, err
 }

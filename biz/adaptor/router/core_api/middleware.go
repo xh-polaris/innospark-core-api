@@ -185,3 +185,13 @@ func _feedbackcontentMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _feedback1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listfeedbackMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

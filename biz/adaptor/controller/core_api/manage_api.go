@@ -56,3 +56,18 @@ func Forbidden(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().ManageService.Forbidden(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// ListFeedback .
+// @router /admin/feedback/list [POST]
+func ListFeedback(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req manage.ListFeedBackReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().ManageService.ListFeedback(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}

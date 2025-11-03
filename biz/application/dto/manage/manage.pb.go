@@ -495,6 +495,227 @@ func (x *ForbiddenUserResp) GetResp() *basic.Response {
 	return nil
 }
 
+type ListFeedBackReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Page      *basic.Page `protobuf:"bytes,1,opt,name=page,proto3" form:"page" json:"page" query:"page"`
+	MessageId *string     `protobuf:"bytes,2,opt,name=messageId,proto3,oneof" form:"messageId" json:"messageId" query:"messageId"`
+	UserId    *string     `protobuf:"bytes,3,opt,name=userId,proto3,oneof" form:"userId" json:"userId" query:"userId"`
+	Action    *int32      `protobuf:"varint,4,opt,name=action,proto3,oneof" form:"action" json:"action" query:"action"`
+	Type      *int32      `protobuf:"varint,5,opt,name=type,proto3,oneof" form:"type" json:"type" query:"type"`
+}
+
+func (x *ListFeedBackReq) Reset() {
+	*x = ListFeedBackReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListFeedBackReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFeedBackReq) ProtoMessage() {}
+
+func (x *ListFeedBackReq) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListFeedBackReq.ProtoReflect.Descriptor instead.
+func (*ListFeedBackReq) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListFeedBackReq) GetPage() *basic.Page {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListFeedBackReq) GetMessageId() string {
+	if x != nil && x.MessageId != nil {
+		return *x.MessageId
+	}
+	return ""
+}
+
+func (x *ListFeedBackReq) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+func (x *ListFeedBackReq) GetAction() int32 {
+	if x != nil && x.Action != nil {
+		return *x.Action
+	}
+	return 0
+}
+
+func (x *ListFeedBackReq) GetType() int32 {
+	if x != nil && x.Type != nil {
+		return *x.Type
+	}
+	return 0
+}
+
+type ListFeedBackResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Resp      *basic.Response              `protobuf:"bytes,1,opt,name=resp,proto3" form:"resp" json:"resp" query:"resp"`
+	Feedbacks []*ListFeedBackResp_FeedBack `protobuf:"bytes,2,rep,name=feedbacks,proto3" form:"feedbacks" json:"feedbacks" query:"feedbacks"`
+}
+
+func (x *ListFeedBackResp) Reset() {
+	*x = ListFeedBackResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListFeedBackResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFeedBackResp) ProtoMessage() {}
+
+func (x *ListFeedBackResp) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListFeedBackResp.ProtoReflect.Descriptor instead.
+func (*ListFeedBackResp) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListFeedBackResp) GetResp() *basic.Response {
+	if x != nil {
+		return x.Resp
+	}
+	return nil
+}
+
+func (x *ListFeedBackResp) GetFeedbacks() []*ListFeedBackResp_FeedBack {
+	if x != nil {
+		return x.Feedbacks
+	}
+	return nil
+}
+
+type ListFeedBackResp_FeedBack struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	MessageId  string `protobuf:"bytes,1,opt,name=messageId,proto3" form:"messageId" json:"messageId" query:"messageId"`
+	UserId     string `protobuf:"bytes,2,opt,name=userId,proto3" form:"userId" json:"userId" query:"userId"`
+	Action     int32  `protobuf:"varint,3,opt,name=action,proto3" form:"action" json:"action" query:"action"`
+	Type       int32  `protobuf:"varint,4,opt,name=type,proto3" form:"type" json:"type" query:"type"`
+	Content    string `protobuf:"bytes,5,opt,name=content,proto3" form:"content" json:"content" query:"content"`
+	CreateTime int64  `protobuf:"varint,6,opt,name=createTime,proto3" form:"createTime" json:"createTime" query:"createTime"`
+}
+
+func (x *ListFeedBackResp_FeedBack) Reset() {
+	*x = ListFeedBackResp_FeedBack{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListFeedBackResp_FeedBack) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFeedBackResp_FeedBack) ProtoMessage() {}
+
+func (x *ListFeedBackResp_FeedBack) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListFeedBackResp_FeedBack.ProtoReflect.Descriptor instead.
+func (*ListFeedBackResp_FeedBack) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{8, 0}
+}
+
+func (x *ListFeedBackResp_FeedBack) GetMessageId() string {
+	if x != nil {
+		return x.MessageId
+	}
+	return ""
+}
+
+func (x *ListFeedBackResp_FeedBack) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ListFeedBackResp_FeedBack) GetAction() int32 {
+	if x != nil {
+		return x.Action
+	}
+	return 0
+}
+
+func (x *ListFeedBackResp_FeedBack) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *ListFeedBackResp_FeedBack) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *ListFeedBackResp_FeedBack) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
 var File_core_api_manage_proto protoreflect.FileDescriptor
 
 var file_core_api_manage_proto_rawDesc = []byte{
@@ -553,12 +774,43 @@ var file_core_api_manage_proto_rawDesc = []byte{
 	0x6f, 0x72, 0x62, 0x69, 0x64, 0x64, 0x65, 0x6e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70,
 	0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f,
 	0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52,
-	0x04, 0x72, 0x65, 0x73, 0x70, 0x42, 0x45, 0x5a, 0x43, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69,
-	0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70,
-	0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x04, 0x72, 0x65, 0x73, 0x70, 0x22, 0xd5, 0x01, 0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x65,
+	0x65, 0x64, 0x42, 0x61, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x04, 0x70, 0x61, 0x67,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x21, 0x0a, 0x09, 0x6d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
+	0x09, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x1b, 0x0a,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x1b, 0x0a, 0x06, 0x61, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x48, 0x02, 0x52, 0x06, 0x61, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x88, 0x01, 0x01, 0x12, 0x17, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x05, 0x48, 0x03, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x88, 0x01, 0x01,
+	0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x42, 0x09,
+	0x0a, 0x07, 0x5f, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x42, 0x09, 0x0a, 0x07, 0x5f, 0x61, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x42, 0x07, 0x0a, 0x05, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x22, 0xa1, 0x02,
+	0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x65, 0x65, 0x64, 0x42, 0x61, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x70, 0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x0f, 0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70, 0x12, 0x3f, 0x0a, 0x09, 0x66, 0x65, 0x65, 0x64, 0x62,
+	0x61, 0x63, 0x6b, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x6d, 0x61, 0x6e,
+	0x61, 0x67, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x65, 0x65, 0x64, 0x42, 0x61, 0x63, 0x6b,
+	0x52, 0x65, 0x73, 0x70, 0x2e, 0x46, 0x65, 0x65, 0x64, 0x42, 0x61, 0x63, 0x6b, 0x52, 0x09, 0x66,
+	0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x73, 0x1a, 0xa6, 0x01, 0x0a, 0x08, 0x46, 0x65, 0x65,
+	0x64, 0x42, 0x61, 0x63, 0x6b, 0x12, 0x1c, 0x0a, 0x09, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x61,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x61, 0x63, 0x74,
+	0x69, 0x6f, 0x6e, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x18,
+	0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x69, 0x6d,
+	0x65, 0x42, 0x45, 0x5a, 0x43, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73,
+	0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69,
+	0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74,
+	0x6f, 0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -573,29 +825,35 @@ func file_core_api_manage_proto_rawDescGZIP() []byte {
 	return file_core_api_manage_proto_rawDescData
 }
 
-var file_core_api_manage_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_core_api_manage_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_core_api_manage_proto_goTypes = []interface{}{
-	(*AdminLoginReq)(nil),     // 0: manage.AdminLoginReq
-	(*AdminLoginResp)(nil),    // 1: manage.AdminLoginResp
-	(*User)(nil),              // 2: manage.User
-	(*ListUserReq)(nil),       // 3: manage.ListUserReq
-	(*ListUserResp)(nil),      // 4: manage.ListUserResp
-	(*ForbiddenUserReq)(nil),  // 5: manage.ForbiddenUserReq
-	(*ForbiddenUserResp)(nil), // 6: manage.ForbiddenUserResp
-	(*basic.Response)(nil),    // 7: basic.Response
-	(*basic.Page)(nil),        // 8: basic.Page
+	(*AdminLoginReq)(nil),             // 0: manage.AdminLoginReq
+	(*AdminLoginResp)(nil),            // 1: manage.AdminLoginResp
+	(*User)(nil),                      // 2: manage.User
+	(*ListUserReq)(nil),               // 3: manage.ListUserReq
+	(*ListUserResp)(nil),              // 4: manage.ListUserResp
+	(*ForbiddenUserReq)(nil),          // 5: manage.ForbiddenUserReq
+	(*ForbiddenUserResp)(nil),         // 6: manage.ForbiddenUserResp
+	(*ListFeedBackReq)(nil),           // 7: manage.ListFeedBackReq
+	(*ListFeedBackResp)(nil),          // 8: manage.ListFeedBackResp
+	(*ListFeedBackResp_FeedBack)(nil), // 9: manage.ListFeedBackResp.FeedBack
+	(*basic.Response)(nil),            // 10: basic.Response
+	(*basic.Page)(nil),                // 11: basic.Page
 }
 var file_core_api_manage_proto_depIdxs = []int32{
-	7, // 0: manage.AdminLoginResp.resp:type_name -> basic.Response
-	8, // 1: manage.ListUserReq.page:type_name -> basic.Page
-	7, // 2: manage.ListUserResp.resp:type_name -> basic.Response
-	2, // 3: manage.ListUserResp.user:type_name -> manage.User
-	7, // 4: manage.ForbiddenUserResp.resp:type_name -> basic.Response
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	10, // 0: manage.AdminLoginResp.resp:type_name -> basic.Response
+	11, // 1: manage.ListUserReq.page:type_name -> basic.Page
+	10, // 2: manage.ListUserResp.resp:type_name -> basic.Response
+	2,  // 3: manage.ListUserResp.user:type_name -> manage.User
+	10, // 4: manage.ForbiddenUserResp.resp:type_name -> basic.Response
+	11, // 5: manage.ListFeedBackReq.page:type_name -> basic.Page
+	10, // 6: manage.ListFeedBackResp.resp:type_name -> basic.Response
+	9,  // 7: manage.ListFeedBackResp.feedbacks:type_name -> manage.ListFeedBackResp.FeedBack
+	8,  // [8:8] is the sub-list for method output_type
+	8,  // [8:8] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func file_core_api_manage_proto_init() {
@@ -687,15 +945,52 @@ func file_core_api_manage_proto_init() {
 				return nil
 			}
 		}
+		file_core_api_manage_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListFeedBackReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListFeedBackResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListFeedBackResp_FeedBack); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_core_api_manage_proto_msgTypes[5].OneofWrappers = []interface{}{}
+	file_core_api_manage_proto_msgTypes[7].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_core_api_manage_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

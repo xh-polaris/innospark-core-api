@@ -25,6 +25,10 @@ func Register(r *server.Hertz) {
 		_admin.POST("/forbidden", append(_forbiddenMw(), core_api.Forbidden)...)
 		_admin.POST("/list_user", append(_listuserMw(), core_api.ListUser)...)
 		_admin.POST("/login", append(_adminloginMw(), core_api.AdminLogin)...)
+		{
+			_feedback1 := _admin.Group("/feedback", _feedback1Mw()...)
+			_feedback1.POST("/list", append(_listfeedbackMw(), core_api.ListFeedback)...)
+		}
 	}
 	{
 		_agents := root.Group("/agents", _agentsMw()...)

@@ -48,7 +48,8 @@ func NewProvider() (*Provider, error) {
 	}
 	intelligenceService := &service.IntelligenceService{}
 	manageService := &service.ManageService{
-		UserMapper: userMongoMapper,
+		UserMapper:     userMongoMapper,
+		FeedbackMapper: feedbackMongoMapper,
 	}
 	providerProvider := &Provider{
 		Config:              configConfig,

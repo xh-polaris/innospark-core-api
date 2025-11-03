@@ -8,6 +8,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/manage"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -18,10 +19,12 @@ type IManageService interface {
 	AdminLogin(ctx context.Context, req *manage.AdminLoginReq) (resp *manage.AdminLoginResp, err error)
 	ListUser(ctx context.Context, req *manage.ListUserReq) (resp *manage.ListUserResp, err error)
 	Forbidden(ctx context.Context, req *manage.ForbiddenUserReq) (resp *manage.ForbiddenUserResp, err error)
+	ListFeedback(ctx context.Context, req *manage.ListFeedBackReq) (resp *manage.ListFeedBackResp, err error)
 }
 
 type ManageService struct {
-	UserMapper user.MongoMapper
+	UserMapper     user.MongoMapper
+	FeedbackMapper feedback.MongoMapper
 }
 
 var ManageServiceSet = wire.NewSet(
@@ -37,13 +40,8 @@ func (m *ManageService) AdminLogin(ctx context.Context, req *manage.AdminLoginRe
 }
 
 func (m *ManageService) ListUser(ctx context.Context, req *manage.ListUserReq) (resp *manage.ListUserResp, err error) {
-	c, err := adaptor.ExtractContext(ctx)
-	if err != nil {
+	if err = checkAdmin(ctx); err != nil {
 		return
-	}
-	token := string(c.GetHeader("Authorization"))
-	if token != config.GetConfig().Admin.Token {
-		return nil, errorx.New(errno.UnAuthErrCode)
 	}
 	total, us, err := m.UserMapper.ListUser(ctx, req.Page, req.Status, req.SortedBy, req.Reverse)
 	if err != nil {
@@ -76,13 +74,8 @@ func (m *ManageService) ListUser(ctx context.Context, req *manage.ListUserReq) (
 }
 
 func (m *ManageService) Forbidden(ctx context.Context, req *manage.ForbiddenUserReq) (resp *manage.ForbiddenUserResp, err error) {
-	c, err := adaptor.ExtractContext(ctx)
-	if err != nil {
+	if err = checkAdmin(ctx); err != nil {
 		return
-	}
-	token := string(c.GetHeader("Authorization"))
-	if token != config.GetConfig().Admin.Token {
-		return nil, errorx.New(errno.UnAuthErrCode)
 	}
 	if req.Status == user.StatusForbidden && req.Expire != nil {
 		err = m.UserMapper.Forbidden(ctx, req.Id, time.Unix(*req.Expire, 0))
@@ -93,4 +86,38 @@ func (m *ManageService) Forbidden(ctx context.Context, req *manage.ForbiddenUser
 		return
 	}
 	return &manage.ForbiddenUserResp{Resp: util.Success()}, nil
+}
+
+func (m *ManageService) ListFeedback(ctx context.Context, req *manage.ListFeedBackReq) (resp *manage.ListFeedBackResp, err error) {
+	if err = checkAdmin(ctx); err != nil {
+		return
+	}
+	fds, err := m.FeedbackMapper.ListFeedback(ctx, req.Page, req.MessageId, req.UserId, req.Action, req.Type)
+	if err != nil {
+		return
+	}
+	var feedbacks []*manage.ListFeedBackResp_FeedBack
+	for _, fd := range fds {
+		feedbacks = append(feedbacks, &manage.ListFeedBackResp_FeedBack{
+			MessageId:  fd.MessageId.Hex(),
+			UserId:     fd.UserId.Hex(),
+			Action:     fd.Action,
+			Type:       fd.Type,
+			Content:    fd.Content,
+			CreateTime: fd.UpdateTime.Unix(),
+		})
+	}
+	return &manage.ListFeedBackResp{
+		Resp:      util.Success(),
+		Feedbacks: feedbacks,
+	}, nil
+}
+
+func checkAdmin(ctx context.Context) error {
+	if c, err := adaptor.ExtractContext(ctx); err != nil {
+		return err
+	} else if string(c.GetHeader("Authorization")) != config.GetConfig().Admin.Token {
+		return errorx.New(errno.UnAuthErrCode)
+	}
+	return nil
 }
