@@ -92,24 +92,25 @@ func (m *ManageService) ListFeedback(ctx context.Context, req *manage.ListFeedBa
 	if err = checkAdmin(ctx); err != nil {
 		return
 	}
-	fds, err := m.FeedbackMapper.ListFeedback(ctx, req.Page, req.MessageId, req.UserId, req.Action, req.Type)
+	total, fbs, err := m.FeedbackMapper.ListFeedback(ctx, req.Page, req.MessageId, req.UserId, req.Action, req.Type)
 	if err != nil {
 		return
 	}
 	var feedbacks []*manage.ListFeedBackResp_FeedBack
-	for _, fd := range fds {
+	for _, fb := range fbs {
 		feedbacks = append(feedbacks, &manage.ListFeedBackResp_FeedBack{
-			MessageId:  fd.MessageId.Hex(),
-			UserId:     fd.UserId.Hex(),
-			Action:     fd.Action,
-			Type:       fd.Type,
-			Content:    fd.Content,
-			CreateTime: fd.UpdateTime.Unix(),
+			MessageId:  fb.MessageId.Hex(),
+			UserId:     fb.UserId.Hex(),
+			Action:     fb.Action,
+			Type:       fb.Type,
+			Content:    fb.Content,
+			CreateTime: fb.UpdateTime.Unix(),
 		})
 	}
 	return &manage.ListFeedBackResp{
 		Resp:      util.Success(),
 		Feedbacks: feedbacks,
+		Total:     total,
 	}, nil
 }
 
