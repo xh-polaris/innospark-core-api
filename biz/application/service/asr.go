@@ -19,7 +19,6 @@ import (
 
 const (
 	funASR = "funasr"
-	meta   = "{\"mode\": \"2pass\", \"wav_name\": \"%s\", \"is_speaking\": true, \"wav_format\":\"pcm\", \"chunk_size\":[5,10,5], \"itn\":true,\"audio_fs\":16000}"
 )
 
 func ASR(ctx context.Context, conn *websocket.Conn) {
@@ -121,7 +120,7 @@ func (m *funASRManager) handleTextMessage(data []byte) error {
 	if err != nil {
 		return fmt.Errorf("extract user id failed: %s", err)
 	}
-	m.meta = fmt.Sprintf(meta, uid)
+	m.meta = fmt.Sprintf(config.GetConfig().ASR.Meta, uid)
 	return nil
 }
 
