@@ -26,6 +26,7 @@ const (
 
 type MongoMapper interface {
 	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) // 查找或创建一个用户
+	FindById(ctx context.Context, id string) (*User, error)
 	CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error)
 	Warn(ctx context.Context, id string) error
 	Forbidden(ctx context.Context, id string, expire time.Time) error
@@ -69,6 +70,18 @@ func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, phone str
 	}
 	var u User
 	err = m.conn.FindOneAndUpdate(ctx, key, &u, filter, update, options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After))
+	return &u, err
+}
+
+func (m *mongoMapper) FindById(ctx context.Context, id string) (*User, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	key := cacheKeyPrefix + id
+	filter := bson.M{cst.Id: oid}
+	var u User
+	err = m.conn.FindOne(ctx, key, &u, filter)
 	return &u, err
 }
 

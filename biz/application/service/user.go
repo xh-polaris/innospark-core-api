@@ -23,6 +23,7 @@ import (
 
 type IUserService interface {
 	SendVerifyCode(ctx context.Context, req *core_api.SendVerifyCodeReq) (*core_api.SendVerifyCodeResp, error)
+	CheckVerifyCode(ctx context.Context, req *core_api.CheckVerifyCodeReq) (*core_api.CheckVerifyCodeResp, error)
 	Register(ctx context.Context, req *core_api.BasicUserRegisterReq) (*core_api.BasicUserRegisterResp, error)
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
 	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
@@ -72,6 +73,57 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 		}, nil
 	}
 	return &core_api.SendVerifyCodeResp{
+		Resp: util.Success(),
+	}, nil
+}
+
+func (u *UserService) CheckVerifyCode(ctx context.Context, req *core_api.CheckVerifyCodeReq) (*core_api.CheckVerifyCodeResp, error) {
+	c := config.GetConfig()
+	header := http.Header{}
+	header.Set("content-type", "application/json")
+	if c.State != "test" {
+		header.Set("X-Xh-Env", "test")
+	}
+
+	var phone string
+	switch req.AuthType {
+	case "phone-verify":
+		uid, err := adaptor.ExtractUserId(ctx)
+		if err != nil {
+			logs.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
+			return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+		}
+		usr, err := u.UserMapper.FindById(ctx, uid)
+		if err != nil {
+			return nil, err
+		}
+		phone = usr.Phone
+	default:
+		return nil, errorx.New(errno.UnImplementErrCode)
+	}
+
+	body := map[string]any{
+		"authType": req.AuthType,
+		"authId":   phone,
+		"expire":   300,
+		"cause":    req.Cause,
+		"app":      map[string]any{"name": "InnoSpark"},
+	}
+
+	url := config.GetConfig().SynapseURL + "/system/check_verify_code"
+	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	if err != nil {
+		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
+	}
+	if resp["code"].(float64) != 0 {
+		return &core_api.CheckVerifyCodeResp{
+			Resp: &basic.Response{
+				Code: int32(resp["code"].(float64)),
+				Msg:  resp["msg"].(string),
+			},
+		}, nil
+	}
+	return &core_api.CheckVerifyCodeResp{
 		Resp: util.Success(),
 	}, nil
 }

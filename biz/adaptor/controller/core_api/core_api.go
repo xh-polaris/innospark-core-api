@@ -267,3 +267,18 @@ func ThirdPartyLogin(ctx context.Context, c *app.RequestContext) {
 	resp, err := provider.Get().UserService.ThirdPartyLogin(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// CheckVerifyCode .
+// @router /system/check_verify_code [POST]
+func CheckVerifyCode(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.CheckVerifyCodeReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.CheckVerifyCode(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
