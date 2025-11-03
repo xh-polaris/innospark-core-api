@@ -46,11 +46,15 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 	if c.State != "test" {
 		header.Set("X-Xh-Env", "test")
 	}
+	cause := "passport"
+	if req.GetCause() != "" {
+		cause = req.GetCause()
+	}
 	body := map[string]any{
 		"authType": req.AuthType,
 		"authId":   req.AuthId,
 		"expire":   300,
-		"cause":    "passport",
+		"cause":    cause,
 		"app":      map[string]any{"name": "InnoSpark"},
 	}
 
