@@ -11,6 +11,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/graph"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/ac"
@@ -52,7 +53,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	}
 
 	// 检查用户输入是否有违禁词
-	sensitive, hits := ac.AcSearch(req.Messages[0].Content, true)
+	sensitive, hits := ac.AcSearch(req.Messages[0].Content, true, cst.SensitivePre)
 	if sensitive {
 		if err = s.UserMapper.Warn(ctx, uid); err != nil {
 			logs.Errorf("warn err: %v", err)

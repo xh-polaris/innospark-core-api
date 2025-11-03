@@ -66,7 +66,7 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 			content, typ := refine.SetContentWithTyp(msg.Content, msg.Extra[cst.EventMessageContentType].(int))
 			sb.WriteString(content)
 			cnt++
-			if cnt%config.GetConfig().SensitiveStreamGap == 0 {
+			if cnt%config.GetConfig().Sensitive.SensitiveStreamGap == 0 {
 				if t.checkSensitive(&sb) {
 					sw.Send(t.error(fmt.Sprintf("这个话题暂时还不能聊哦, 也请不要引导我聊敏感话题否则会被封禁哦")))
 					return
@@ -125,7 +125,7 @@ func (t *Transformer) collect() {
 }
 
 func (t *Transformer) checkSensitive(sb *strings.Builder) bool {
-	sensitive, hits := ac.AcSearch(sb.String(), true)
+	sensitive, hits := ac.AcSearch(sb.String(), true, cst.SensitivePost)
 	if sensitive {
 		t.relay.Sensitive.Hits = hits
 		t.relay.ModelCancel()

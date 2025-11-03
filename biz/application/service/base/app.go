@@ -6,7 +6,7 @@ import (
 )
 
 func InitInfra() {
-	if err := ac.InitAc(config.GetConfig().Sensitive); err != nil {
+	if err := ac.InitAc(config.GetConfig().Sensitive.Sensitive); err != nil {
 		panic(err)
 	}
 }

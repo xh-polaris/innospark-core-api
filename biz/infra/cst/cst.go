@@ -111,3 +111,8 @@ const (
 	FeedbackDislike
 	FeedbackDelete
 )
+
+const (
+	SensitivePre  = "Pre"
+	SensitivePost = "Post"
+)
