@@ -45,6 +45,7 @@ func Init() {
 	// 设置openTelemetry的传播器，用于分布式追踪中传递上下文信息
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(b3.New(), propagation.Baggage{}, propagation.TraceContext{}))
 	http.DefaultTransport = otelhttp.NewTransport(http.DefaultTransport)
+	// 初始化application依赖的基础组件
 	application.InitApp()
 }
 
@@ -63,10 +64,10 @@ func main() {
 
 	h.NoHijackConnPool = true
 
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowHeaders = []string{"*"}
-	corsHandler := cors.New(config)
+	corsConf := cors.DefaultConfig()
+	corsConf.AllowAllOrigins = true
+	corsConf.AllowHeaders = []string{"*"}
+	corsHandler := cors.New(corsConf)
 
 	h.Use(corsHandler)
 	// 增加全局中间件链
