@@ -19,6 +19,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const HertzContext = "hertz_context"
@@ -90,7 +91,7 @@ type data struct {
 // - 在controller中调用业务处理, 处理结束后调用PostProcess
 func PostProcess(ctx context.Context, c *app.RequestContext, req, resp any, err error) {
 	b3.New().Inject(ctx, &headerProvider{headers: &c.Response.Header})
-	logs.CtxInfof(ctx, "[%s] req=%s, resp=%s, err=%s", c.Path(), util.JSONF(req), util.JSONF(resp), errorx.ErrorWithoutStack(err))
+	logs.CtxInfof(ctx, "[%s] req=%s, resp=%s, err=%s, trace=%s", c.Path(), util.JSONF(req), util.JSONF(resp), errorx.ErrorWithoutStack(err), trace.SpanContextFromContext(ctx).TraceID().String())
 
 	// 无错, 正常响应
 	if err == nil {

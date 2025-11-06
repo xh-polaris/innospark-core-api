@@ -2,6 +2,7 @@ package httpx
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,7 +46,7 @@ func GetHttpClient() *HttpClient {
 }
 
 // do 发送请求
-func (c *HttpClient) do(method, url string, headers http.Header, body any) (resp *http.Response, err error) {
+func (c *HttpClient) do(ctx context.Context, method, url string, headers http.Header, body any) (resp *http.Response, err error) {
 	// 序列化 body 为 JSON
 	var bodyBytes []byte
 	var req *http.Request
@@ -53,7 +54,7 @@ func (c *HttpClient) do(method, url string, headers http.Header, body any) (resp
 		return nil, fmt.Errorf("[httpx]请求体序列化失败: %w", err)
 	}
 	// 创建新的请求
-	if req, err = http.NewRequest(method, url, bytes.NewBuffer(bodyBytes)); err != nil {
+	if req, err = http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(bodyBytes)); err != nil {
 		return nil, fmt.Errorf("创建请求失败: %w", err)
 	}
 	// 设置请求头
@@ -64,10 +65,10 @@ func (c *HttpClient) do(method, url string, headers http.Header, body any) (resp
 	return c.Client.Do(req)
 }
 
-func (c *HttpClient) ReqWithHeader(method, url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
+func (c *HttpClient) ReqWithHeader(ctx context.Context, method, url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
 	// 读取响应体
 	var _resp []byte
-	if header, _resp, err = c.getResp(method, url, headers, body); err != nil {
+	if header, _resp, err = c.getResp(ctx, method, url, headers, body); err != nil {
 		return
 	}
 	// 反序列化响应体
@@ -86,9 +87,9 @@ func checkStatusCode(resp *http.Response) error {
 	return nil
 }
 
-func (c *HttpClient) getResp(method, url string, headers http.Header, body any) (header http.Header, resp []byte, err error) {
+func (c *HttpClient) getResp(ctx context.Context, method, url string, headers http.Header, body any) (header http.Header, resp []byte, err error) {
 	var response *http.Response
-	if response, err = c.do(method, url, headers, body); err != nil {
+	if response, err = c.do(ctx, method, url, headers, body); err != nil {
 		return nil, nil, fmt.Errorf("[httpx] 发送请求失败: %w", err)
 	}
 	defer func() {
@@ -109,34 +110,34 @@ func (c *HttpClient) getResp(method, url string, headers http.Header, body any) 
 }
 
 // Req 非流式HTTP请求
-func (c *HttpClient) Req(method, url string, headers http.Header, body any) (resp map[string]any, err error) {
-	_, resp, err = c.ReqWithHeader(method, url, headers, body)
+func (c *HttpClient) Req(ctx context.Context, method, url string, headers http.Header, body any) (resp map[string]any, err error) {
+	_, resp, err = c.ReqWithHeader(ctx, method, url, headers, body)
 	return resp, err
 }
 
 // GetWithHeader 非流式Get, 返回请求头
-func (c *HttpClient) GetWithHeader(url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
-	return c.ReqWithHeader(GET, url, headers, body)
+func (c *HttpClient) GetWithHeader(ctx context.Context, url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
+	return c.ReqWithHeader(ctx, GET, url, headers, body)
 }
 
 // Get 非流式Get
-func (c *HttpClient) Get(url string, headers http.Header, body any) (resp map[string]any, err error) {
-	return c.Req(GET, url, headers, body)
+func (c *HttpClient) Get(ctx context.Context, url string, headers http.Header, body any) (resp map[string]any, err error) {
+	return c.Req(ctx, GET, url, headers, body)
 }
 
 // PostWithHeader 非流式Post, 返回请求头
-func (c *HttpClient) PostWithHeader(url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
-	return c.ReqWithHeader(POST, url, headers, body)
+func (c *HttpClient) PostWithHeader(ctx context.Context, url string, headers http.Header, body any) (header http.Header, resp map[string]any, err error) {
+	return c.ReqWithHeader(ctx, POST, url, headers, body)
 }
 
 // Post 非流式Post
-func (c *HttpClient) Post(url string, headers http.Header, body any) (resp map[string]any, err error) {
-	return c.Req(POST, url, headers, body)
+func (c *HttpClient) Post(ctx context.Context, url string, headers http.Header, body any) (resp map[string]any, err error) {
+	return c.Req(ctx, POST, url, headers, body)
 }
 
 // StreamWithHeader 流式HTTP请求. 返回请求头
-func (c *HttpClient) StreamWithHeader(method, url string, headers http.Header, body interface{}) (http.Header, *StreamReader, error) {
-	resp, err := c.do(method, url, headers, body)
+func (c *HttpClient) StreamWithHeader(ctx context.Context, method, url string, headers http.Header, body interface{}) (http.Header, *StreamReader, error) {
+	resp, err := c.do(ctx, method, url, headers, body)
 	if err != nil {
 		return nil, nil, fmt.Errorf("发送请求失败: %w", err)
 	}
@@ -155,35 +156,35 @@ func (c *HttpClient) StreamWithHeader(method, url string, headers http.Header, b
 }
 
 // Stream 流式HTTP请求
-func (c *HttpClient) Stream(method, url string, headers http.Header, body interface{}) (*StreamReader, error) {
-	_, reader, err := c.StreamWithHeader(method, url, headers, body)
+func (c *HttpClient) Stream(ctx context.Context, method, url string, headers http.Header, body interface{}) (*StreamReader, error) {
+	_, reader, err := c.StreamWithHeader(ctx, method, url, headers, body)
 	return reader, err
 }
 
 // StreamGetWithHeader 流式Get请求, 返回请求头
-func (c *HttpClient) StreamGetWithHeader(url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
-	return c.StreamWithHeader(GET, url, headers, body)
+func (c *HttpClient) StreamGetWithHeader(ctx context.Context, url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
+	return c.StreamWithHeader(ctx, GET, url, headers, body)
 }
 
 // StreamGet 流式Get请求
-func (c *HttpClient) StreamGet(url string, headers http.Header, body any) (*StreamReader, error) {
-	return c.Stream(GET, url, headers, body)
+func (c *HttpClient) StreamGet(ctx context.Context, url string, headers http.Header, body any) (*StreamReader, error) {
+	return c.Stream(ctx, GET, url, headers, body)
 }
 
 // StreamPostWithHeader 流式Post请求, 返回请求头
-func (c *HttpClient) StreamPostWithHeader(url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
-	return c.StreamWithHeader(POST, url, headers, body)
+func (c *HttpClient) StreamPostWithHeader(ctx context.Context, url string, headers http.Header, body any) (http.Header, *StreamReader, error) {
+	return c.StreamWithHeader(ctx, POST, url, headers, body)
 }
 
 // StreamPost 流式Post请求
-func (c *HttpClient) StreamPost(url string, headers http.Header, body any) (*StreamReader, error) {
-	return c.Stream(POST, url, headers, body)
+func (c *HttpClient) StreamPost(ctx context.Context, url string, headers http.Header, body any) (*StreamReader, error) {
+	return c.Stream(ctx, POST, url, headers, body)
 }
 
-func ReqWithHeader[T any](method, url string, headers http.Header, body any) (header http.Header, resp T, err error) {
+func ReqWithHeader[T any](ctx context.Context, method, url string, headers http.Header, body any) (header http.Header, resp T, err error) {
 	// 读取响应体
 	var _resp []byte
-	if header, _resp, err = GetHttpClient().getResp(method, url, headers, body); err != nil {
+	if header, _resp, err = GetHttpClient().getResp(ctx, method, url, headers, body); err != nil {
 		return
 	}
 	// 反序列化响应体
@@ -193,18 +194,18 @@ func ReqWithHeader[T any](method, url string, headers http.Header, body any) (he
 	return header, resp, nil
 }
 
-func Req[T any](method, url string, headers http.Header, body any) (resp T, err error) {
-	_, resp, err = ReqWithHeader[T](method, url, headers, body)
+func Req[T any](ctx context.Context, method, url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](ctx, method, url, headers, body)
 	return resp, err
 }
 
-func Get[T any](url string, headers http.Header, body any) (resp T, err error) {
-	_, resp, err = ReqWithHeader[T](GET, url, headers, body)
+func Get[T any](ctx context.Context, url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](ctx, GET, url, headers, body)
 	return resp, err
 }
 
-func Post[T any](url string, headers http.Header, body any) (resp T, err error) {
-	_, resp, err = ReqWithHeader[T](POST, url, headers, body)
+func Post[T any](ctx context.Context, url string, headers http.Header, body any) (resp T, err error) {
+	_, resp, err = ReqWithHeader[T](ctx, POST, url, headers, body)
 	return resp, err
 }
 

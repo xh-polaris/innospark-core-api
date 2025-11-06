@@ -92,7 +92,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 	header.Add("Content-Type", "application/json")
 	header.Add("Authorization", "Bearer "+t.apiKey)
 	body := &webAPIReq{Query: args["query"].(string), Freshness: "noLimit", Summary: true}
-	if resp, err = httpx.Post[*webAPIResp](webAPIEndPoint, header, body); err != nil {
+	if resp, err = httpx.Post[*webAPIResp](ctx, webAPIEndPoint, header, body); err != nil {
 		return "", err
 	}
 

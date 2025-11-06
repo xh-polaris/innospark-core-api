@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"net/http"
 	"sync"
 
@@ -17,28 +18,28 @@ type Coze struct {
 	mu       sync.Mutex
 }
 
-func (c *Coze) GetCookie() string {
+func (c *Coze) GetCookie(ctx context.Context) string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.cookie != "" {
 		return c.cookie
 	}
-	c.cookie = loginCoze(c.Account, c.Password)
+	c.cookie = loginCoze(ctx, c.Account, c.Password)
 	return c.cookie
 }
 
-func (c *Coze) RefreshCookie() string {
+func (c *Coze) RefreshCookie(ctx context.Context) string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.cookie = loginCoze(c.Account, c.Password)
+	c.cookie = loginCoze(ctx, c.Account, c.Password)
 	return c.cookie
 }
 
-func loginCoze(account, password string) string {
+func loginCoze(ctx context.Context, account, password string) string {
 	header := http.Header{}
 	header.Set("Content-Type", "application/json")
 	body := map[string]string{"email": account, "password": password}
-	header, _, err := httpx.GetHttpClient().PostWithHeader("https://coze.aiecnu.net/api/passport/web/email/login/", header, body)
+	header, _, err := httpx.GetHttpClient().PostWithHeader(ctx, "https://coze.aiecnu.net/api/passport/web/email/login/", header, body)
 	if err != nil {
 		logs.Errorf("loginCoze err: %s", errorx.ErrorWithoutStack(err))
 		return ""

@@ -60,7 +60,7 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 	}
 
 	url := config.GetConfig().SynapseURL + "/system/send_verify_code"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
@@ -111,7 +111,7 @@ func (u *UserService) CheckVerifyCode(ctx context.Context, req *core_api.CheckVe
 	}
 
 	url := config.GetConfig().SynapseURL + "/system/check_verify_code"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
@@ -144,7 +144,7 @@ func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegis
 	}
 
 	url := config.GetConfig().SynapseURL + "/basic_user/register"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ErrRegister)
 	}
@@ -177,7 +177,7 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 	}
 
 	url := config.GetConfig().SynapseURL + "/basic_user/login"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ErrLogin)
 	}
@@ -229,7 +229,7 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 	}
 
 	url := config.GetConfig().SynapseURL + "/basic_user/reset_password"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
@@ -292,7 +292,7 @@ func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPa
 	}
 
 	url := config.GetConfig().SynapseURL + "/thirdparty/login"
-	resp, err := httpx.GetHttpClient().Post(url, header, body)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, body)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}

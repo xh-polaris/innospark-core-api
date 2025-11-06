@@ -31,7 +31,7 @@ var IntelligenceServiceSet = wire.NewSet(
 
 func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_api.ListIntelligenceReq) (*core_api.ListIntelligenceResp, error) {
 	header := http.Header{}
-	header.Set("Cookie", config.GetConfig().Coze.GetCookie())
+	header.Set("Cookie", config.GetConfig().Coze.GetCookie(ctx))
 	header.Set("Content-Type", "application/json")
 	var listBody = map[string]interface{}{
 		"space_id":      "7558114583873847296",
@@ -53,7 +53,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	}
 
 	url := "https://coze.aiecnu.net/api/intelligence_api/search/get_draft_intelligence_list"
-	resp, err := httpx.GetHttpClient().Post(url, header, listBody)
+	resp, err := httpx.GetHttpClient().Post(ctx, url, header, listBody)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
@@ -62,8 +62,8 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 		return nil, errorx.New(errno.ErrListIntelligence, errorx.KV("msg", resp["msg"].(string)))
 	}
 	if resp["code"].(float64) == 700012006 {
-		header.Set("Cookie", config.GetConfig().Coze.RefreshCookie())
-		resp, err = httpx.GetHttpClient().Post(url, header, listBody)
+		header.Set("Cookie", config.GetConfig().Coze.RefreshCookie(ctx))
+		resp, err = httpx.GetHttpClient().Post(ctx, url, header, listBody)
 		if err != nil {
 			return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 		}
@@ -108,7 +108,7 @@ func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core
 	header.Set("Authorization", "Bearer"+config.GetConfig().Coze.PAT)
 	header.Set("Content-Type", "application/json")
 	url := fmt.Sprintf("https://coze.aiecnu.net/api/intelligence_api/intelligence/%s", req.GetId())
-	resp, err := httpx.GetHttpClient().Get(url, header, nil)
+	resp, err := httpx.GetHttpClient().Get(ctx, url, header, nil)
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.SynapseErrCode, errorx.KV("url", url))
 	}
