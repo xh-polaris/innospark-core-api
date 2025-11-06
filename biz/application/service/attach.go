@@ -44,8 +44,8 @@ func (s *AttachService) GenSignedURL(ctx context.Context, req *core_api.GenSigne
 		return nil, errorx.New(errno.ErrForbidden, errorx.KV("time", expire.Local().Format(time.RFC3339)))
 	}
 
-	// 使用 userID/conversationID/时间戳 作为对象键
-	key := strings.Join([]string{uid, req.GetConversationID(), time.Now().String()}, "/")
+	// 使用 userID/prefix/时间戳 作为对象键
+	key := strings.Join([]string{uid, req.GetPrefix(), time.Now().String()}, "/")
 
 	signedURL, err := s.CosInfra.GenPresignURL(ctx, key, nil)
 	if err != nil || signedURL == "" {
