@@ -195,13 +195,16 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 			if strings.HasPrefix(req.AuthType, "phone-") {
 				phone = req.AuthId
 			}
-			if _, err = u.UserMapper.FindOrCreateUser(ctx, id, phone, true); err != nil {
+			var usr *user.User
+			if usr, err = u.UserMapper.FindOrCreateUser(ctx, id, phone, true); err != nil {
 				return nil, errorx.WrapByCode(err, errno.ErrLogin)
 			}
 			return &core_api.BasicUserLoginResp{
-				Resp:  util.Success(),
-				Token: resp["token"].(string),
-				New:   resp["new"].(bool),
+				Resp:   util.Success(),
+				Token:  resp["token"].(string),
+				New:    resp["new"].(bool),
+				Name:   usr.Name,
+				Avatar: usr.Avatar,
 			}, nil
 		}
 	}

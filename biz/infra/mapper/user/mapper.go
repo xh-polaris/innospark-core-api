@@ -27,13 +27,14 @@ const (
 type MongoMapper interface {
 	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) // 查找或创建一个用户
 	FindById(ctx context.Context, id string) (*User, error)
+
 	CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error)
 	Warn(ctx context.Context, id string) error
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
 	ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error)
-	UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error
 
+	UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error
 	existField(ctx context.Context, field string, value interface{}) (bool, error)
 	ExistUsername(ctx context.Context, username string) (bool, error)
 }
@@ -173,7 +174,8 @@ func (m *mongoMapper) ListUser(ctx context.Context, page *basic.Page, status, so
 
 // UpdateField 更新字段
 func (m *mongoMapper) UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error {
-	if _, err := m.conn.UpdateByIDNoCache(ctx, uid, bson.M{"$set": update}); err != nil {
+	key := cacheKeyPrefix + uid.Hex()
+	if _, err := m.conn.UpdateByID(ctx, key, uid, bson.M{"$set": update}); err != nil {
 		logs.CtxErrorf(ctx, "failed to update user %s: %s", uid.Hex(), errorx.ErrorWithoutStack(err))
 		return err
 	}
