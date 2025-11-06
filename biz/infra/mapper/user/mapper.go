@@ -87,14 +87,8 @@ func (m *mongoMapper) FindById(ctx context.Context, id string) (*User, error) {
 }
 
 func (m *mongoMapper) CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error) {
-	oid, err := primitive.ObjectIDFromHex(id)
+	u, err := m.FindById(ctx, id)
 	if err != nil {
-		return 0, false, time.Time{}, err
-	}
-	filter := bson.M{cst.Id: oid}
-	key := cacheKeyPrefix + id
-	u := &User{}
-	if err = m.conn.FindOne(ctx, key, u, filter); err != nil {
 		return 0, false, time.Time{}, err
 	}
 	if u.Status == StatusForbidden {
