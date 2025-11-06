@@ -14,6 +14,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/storage"
 )
 
 // Injectors from wire.go:
@@ -51,6 +52,11 @@ func NewProvider() (*Provider, error) {
 		UserMapper:     userMongoMapper,
 		FeedbackMapper: feedbackMongoMapper,
 	}
+	cosInfra := storage.NewCOSInfra()
+	attachService := &service.AttachService{
+		CosInfra:   cosInfra,
+		UserMapper: userMongoMapper,
+	}
 	providerProvider := &Provider{
 		Config:              configConfig,
 		CompletionsService:  completionsService,
@@ -60,6 +66,7 @@ func NewProvider() (*Provider, error) {
 		IntelligenceService: intelligenceService,
 		ManageService:       manageService,
 		CompletionGraph:     completionGraph,
+		AttachService:       attachService,
 	}
 	return providerProvider, nil
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
@@ -82,4 +83,23 @@ func (t *LoggingTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	fmt.Println("========================")
 
 	return resp, nil
+}
+
+func Str2URL(raw string) *url.URL {
+	if u, err := url.Parse(raw); err == nil {
+		return u
+	}
+	return nil
+}
+
+// cOS2CDN COS源站URL转CDN URL 需在COS Console中配置自定义CDN域名和鉴权
+// CDN上的文件为公有读 采用回源鉴权
+func cOS2CDN(raw string) string {
+	conf := config.GetConfig().COS
+	return strings.Replace(raw, conf.BucketURL, conf.CDN, 1)
+}
+
+func SignedCOS2CDN(raw string) string {
+	// 预签名url去掉参数后即为
+	return cOS2CDN(strings.Split(raw, "?")[0])
 }

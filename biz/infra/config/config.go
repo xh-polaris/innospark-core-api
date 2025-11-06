@@ -50,24 +50,33 @@ type Claude struct {
 	APIKey  string
 }
 
+type COS struct {
+	AppID     string
+	BucketURL string
+	CDN       string
+	SecretID  string
+	SecretKey string
+}
+
 type Config struct {
 	service.ServiceConf
-	ListenOn   string
-	State      string
-	SynapseURL string
-	Auth       *Auth
-	InnoSpark  *InnoSpark
-	Cache      cache.CacheConf
-	Redis      redis.RedisConf
-	Mongo      *Mongo
-	Bocha      *Bocha
-	ARK        *ARK
-	Claude     *Claude
-	Coze       *Coze
-	ASR        *ASR
-	Sensitive  *Sensitive
-	Admin      *Admin
-	TitleGen   string
+	ListenOn           string
+	State              string
+	SynapseURL         string
+	Auth               *Auth
+	InnoSpark          *InnoSpark
+	Cache              cache.CacheConf
+	Redis              redis.RedisConf
+	Mongo              *Mongo
+	Bocha              *Bocha
+	ARK                *ARK
+	Claude             *Claude
+	Coze               *Coze
+	ASR                *ASR
+	Sensitive          []string
+	Admin              *Admin
+	TitleGen           string
+	COS                *COS
 }
 
 func NewConfig() (*Config, error) {

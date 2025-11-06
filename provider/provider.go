@@ -9,6 +9,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/storage"
 )
 
 var provider *Provider
@@ -31,6 +32,7 @@ type Provider struct {
 	IntelligenceService service.IIntelligenceService
 	ManageService       service.IManageService
 	CompletionGraph     *graph.CompletionGraph
+	AttachService       service.IAttachService
 }
 
 func Get() *Provider {
@@ -46,6 +48,7 @@ var ApplicationSet = wire.NewSet(
 	service.UserServiceSet,
 	service.IntelligenceServiceSet,
 	service.ManageServiceSet,
+	service.AttachServiceSet,
 )
 
 var DomainSet = wire.NewSet(
@@ -60,6 +63,7 @@ var InfraSet = wire.NewSet(
 	message.NewMessageMongoMapper,
 	feedback.NewFeedbackMongoMapper,
 	user.NewUserMongoMapper,
+	storage.NewCOSInfra,
 )
 
 var AllProvider = wire.NewSet(
