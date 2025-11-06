@@ -4,6 +4,7 @@ package core_api
 
 import (
 	"context"
+
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/provider"
 
@@ -13,7 +14,7 @@ import (
 )
 
 // GenSignedURL .
-// @router /system/get_signed_url [POST]
+// @router /system/gen_signed_url [POST]
 func GenSignedURL(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req core_api.GenSignedURLReq

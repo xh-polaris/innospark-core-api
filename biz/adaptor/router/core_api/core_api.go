@@ -59,7 +59,7 @@ func Register(r *server.Hertz) {
 	{
 		_system := root.Group("/system", _systemMw()...)
 		_system.POST("/check_verify_code", append(_checkverifycodeMw(), core_api.CheckVerifyCode)...)
-		_system.POST("/get_signed_url", append(_gensignedurlMw(), core_api.GenSignedURL)...)
+		_system.POST("/gen_signed_url", append(_gensignedurlMw(), core_api.GenSignedURL)...)
 		_system.POST("/send_verify_code", append(_sendverifycodeMw(), core_api.SendVerifyCode)...)
 	}
 	{
