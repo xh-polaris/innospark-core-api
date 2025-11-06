@@ -52,7 +52,7 @@ func (c *cosClient) GenPresignURL(ctx context.Context, key string, opt *cos.Pres
 		opt = &cos.PresignedURLOptions{}
 	}
 	u, err := c.Client.Object.GetPresignedURL2(ctx, http.MethodPut, key,
-		time.Hour, // 1分钟内过期
+		time.Minute, // 1分钟内过期
 		opt,
 	)
 	if err != nil || u == nil {
