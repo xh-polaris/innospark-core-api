@@ -7,6 +7,7 @@ const (
 	ErrRegister        = 100_000_002
 	ErrForbidden       = 100_000_003
 	ErrUpdateUserField = 100_000_004
+	ErrGetProfile      = 100_000_005
 )
 
 func init() {
@@ -28,6 +29,11 @@ func init() {
 	code.Register(
 		ErrUpdateUserField,
 		"更新用户字段失败",
+		code.WithAffectStability(false),
+	)
+	code.Register(
+		ErrGetProfile,
+		"获取用户信息失败",
 		code.WithAffectStability(false),
 	)
 }

@@ -205,3 +205,8 @@ func _checkverifycodeMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _basicusergetprofileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -253,6 +253,21 @@ func BasicUserUpdateProfile(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// BasicUserGetProfile .
+// @router /basic_user/profile [GET]
+func BasicUserGetProfile(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.BasicUserGetProfileReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := provider.Get().UserService.GetProfile(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // ThirdPartyLogin .
 // @router /thirdparty/login [POST]
 func ThirdPartyLogin(ctx context.Context, c *app.RequestContext) {

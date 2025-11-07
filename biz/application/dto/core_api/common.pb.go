@@ -2960,6 +2960,108 @@ func (x *BasicUserUpdateProfileResp) GetResp() *basic.Response {
 	return nil
 }
 
+// 获取用户信息
+type BasicUserGetProfileReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *BasicUserGetProfileReq) Reset() {
+	*x = BasicUserGetProfileReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_common_proto_msgTypes[45]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BasicUserGetProfileReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BasicUserGetProfileReq) ProtoMessage() {}
+
+func (x *BasicUserGetProfileReq) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_common_proto_msgTypes[45]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BasicUserGetProfileReq.ProtoReflect.Descriptor instead.
+func (*BasicUserGetProfileReq) Descriptor() ([]byte, []int) {
+	return file_core_api_common_proto_rawDescGZIP(), []int{45}
+}
+
+type BasicUserGetProfileResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Resp   *basic.Response `protobuf:"bytes,1,opt,name=resp,proto3" form:"resp" json:"resp" query:"resp"`
+	Name   string          `protobuf:"bytes,2,opt,name=name,proto3" form:"name" json:"name" query:"name"`
+	Avatar string          `protobuf:"bytes,3,opt,name=avatar,proto3" form:"avatar" json:"avatar" query:"avatar"`
+}
+
+func (x *BasicUserGetProfileResp) Reset() {
+	*x = BasicUserGetProfileResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_common_proto_msgTypes[46]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BasicUserGetProfileResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BasicUserGetProfileResp) ProtoMessage() {}
+
+func (x *BasicUserGetProfileResp) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_common_proto_msgTypes[46]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BasicUserGetProfileResp.ProtoReflect.Descriptor instead.
+func (*BasicUserGetProfileResp) Descriptor() ([]byte, []int) {
+	return file_core_api_common_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *BasicUserGetProfileResp) GetResp() *basic.Response {
+	if x != nil {
+		return x.Resp
+	}
+	return nil
+}
+
+func (x *BasicUserGetProfileResp) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *BasicUserGetProfileResp) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
 type GenSignedURLReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2972,7 +3074,7 @@ type GenSignedURLReq struct {
 func (x *GenSignedURLReq) Reset() {
 	*x = GenSignedURLReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[45]
+		mi := &file_core_api_common_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2985,7 +3087,7 @@ func (x *GenSignedURLReq) String() string {
 func (*GenSignedURLReq) ProtoMessage() {}
 
 func (x *GenSignedURLReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[45]
+	mi := &file_core_api_common_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2998,7 +3100,7 @@ func (x *GenSignedURLReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenSignedURLReq.ProtoReflect.Descriptor instead.
 func (*GenSignedURLReq) Descriptor() ([]byte, []int) {
-	return file_core_api_common_proto_rawDescGZIP(), []int{45}
+	return file_core_api_common_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *GenSignedURLReq) GetPrefix() string {
@@ -3028,7 +3130,7 @@ type GenSignedURLResp struct {
 func (x *GenSignedURLResp) Reset() {
 	*x = GenSignedURLResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[46]
+		mi := &file_core_api_common_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3041,7 +3143,7 @@ func (x *GenSignedURLResp) String() string {
 func (*GenSignedURLResp) ProtoMessage() {}
 
 func (x *GenSignedURLResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[46]
+	mi := &file_core_api_common_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3054,7 +3156,7 @@ func (x *GenSignedURLResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenSignedURLResp.ProtoReflect.Descriptor instead.
 func (*GenSignedURLResp) Descriptor() ([]byte, []int) {
-	return file_core_api_common_proto_rawDescGZIP(), []int{46}
+	return file_core_api_common_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GenSignedURLResp) GetResp() *basic.Response {
@@ -3090,7 +3192,7 @@ type EventChat_Message struct {
 func (x *EventChat_Message) Reset() {
 	*x = EventChat_Message{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[47]
+		mi := &file_core_api_common_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3103,7 +3205,7 @@ func (x *EventChat_Message) String() string {
 func (*EventChat_Message) ProtoMessage() {}
 
 func (x *EventChat_Message) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[47]
+	mi := &file_core_api_common_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3147,7 +3249,7 @@ type ListAgentsResp_Agent struct {
 func (x *ListAgentsResp_Agent) Reset() {
 	*x = ListAgentsResp_Agent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[48]
+		mi := &file_core_api_common_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3160,7 +3262,7 @@ func (x *ListAgentsResp_Agent) String() string {
 func (*ListAgentsResp_Agent) ProtoMessage() {}
 
 func (x *ListAgentsResp_Agent) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[48]
+	mi := &file_core_api_common_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3216,7 +3318,7 @@ type FeedbackReq_Feedback struct {
 func (x *FeedbackReq_Feedback) Reset() {
 	*x = FeedbackReq_Feedback{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[49]
+		mi := &file_core_api_common_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3229,7 +3331,7 @@ func (x *FeedbackReq_Feedback) String() string {
 func (*FeedbackReq_Feedback) ProtoMessage() {}
 
 func (x *FeedbackReq_Feedback) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[49]
+	mi := &file_core_api_common_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3633,24 +3735,32 @@ var file_core_api_common_proto_rawDesc = []byte{
 	0x73, 0x65, 0x72, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65,
 	0x52, 0x65, 0x73, 0x70, 0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70, 0x22, 0x41, 0x0a, 0x0f, 0x47, 0x65, 0x6e,
-	0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x52, 0x65, 0x71, 0x12, 0x16, 0x0a, 0x06,
-	0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x72,
-	0x65, 0x66, 0x69, 0x78, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x75, 0x66, 0x66, 0x69, 0x78, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x75, 0x66, 0x66, 0x69, 0x78, 0x22, 0x79, 0x0a, 0x10,
-	0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x52, 0x65, 0x73, 0x70,
-	0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f,
-	0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52,
-	0x04, 0x72, 0x65, 0x73, 0x70, 0x12, 0x22, 0x0a, 0x0c, 0x70, 0x72, 0x65, 0x73, 0x69, 0x67, 0x6e,
-	0x65, 0x64, 0x55, 0x52, 0x4c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72, 0x65,
-	0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x63, 0x63,
-	0x65, 0x73, 0x73, 0x55, 0x52, 0x4c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x63,
-	0x63, 0x65, 0x73, 0x73, 0x55, 0x52, 0x4c, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73,
-	0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d,
-	0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x73, 0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70, 0x22, 0x18, 0x0a, 0x16, 0x42, 0x61, 0x73,
+	0x69, 0x63, 0x55, 0x73, 0x65, 0x72, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65,
+	0x52, 0x65, 0x71, 0x22, 0x6a, 0x0a, 0x17, 0x42, 0x61, 0x73, 0x69, 0x63, 0x55, 0x73, 0x65, 0x72,
+	0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x12, 0x23,
+	0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62,
+	0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x04, 0x72,
+	0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x76, 0x61, 0x74, 0x61,
+	0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x76, 0x61, 0x74, 0x61, 0x72, 0x22,
+	0x41, 0x0a, 0x0f, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x52,
+	0x65, 0x71, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x75,
+	0x66, 0x66, 0x69, 0x78, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x75, 0x66, 0x66,
+	0x69, 0x78, 0x22, 0x79, 0x0a, 0x10, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55,
+	0x52, 0x4c, 0x52, 0x65, 0x73, 0x70, 0x12, 0x23, 0x0a, 0x04, 0x72, 0x65, 0x73, 0x70, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70, 0x12, 0x22, 0x0a, 0x0c, 0x70,
+	0x72, 0x65, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0c, 0x70, 0x72, 0x65, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x12,
+	0x1c, 0x0a, 0x09, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x55, 0x52, 0x4c, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x55, 0x52, 0x4c, 0x42, 0x47, 0x5a,
+	0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70,
+	0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b,
+	0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70,
+	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x63, 0x6f,
+	0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3665,7 +3775,7 @@ func file_core_api_common_proto_rawDescGZIP() []byte {
 	return file_core_api_common_proto_rawDescData
 }
 
-var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
+var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 52)
 var file_core_api_common_proto_goTypes = []interface{}{
 	(*Message)(nil),                    // 0: core_api.Message
 	(*CompletionsOption)(nil),          // 1: core_api.CompletionsOption
@@ -3712,54 +3822,57 @@ var file_core_api_common_proto_goTypes = []interface{}{
 	(*ThirdPartyLoginResp)(nil),        // 42: core_api.ThirdPartyLoginResp
 	(*BasicUserUpdateProfileReq)(nil),  // 43: core_api.BasicUserUpdateProfileReq
 	(*BasicUserUpdateProfileResp)(nil), // 44: core_api.BasicUserUpdateProfileResp
-	(*GenSignedURLReq)(nil),            // 45: core_api.GenSignedURLReq
-	(*GenSignedURLResp)(nil),           // 46: core_api.GenSignedURLResp
-	(*EventChat_Message)(nil),          // 47: core_api.EventChat.Message
-	(*ListAgentsResp_Agent)(nil),       // 48: core_api.ListAgentsResp.Agent
-	(*FeedbackReq_Feedback)(nil),       // 49: core_api.FeedbackReq.Feedback
-	(*basic.Response)(nil),             // 50: basic.Response
-	(*basic.Page)(nil),                 // 51: basic.Page
+	(*BasicUserGetProfileReq)(nil),     // 45: core_api.BasicUserGetProfileReq
+	(*BasicUserGetProfileResp)(nil),    // 46: core_api.BasicUserGetProfileResp
+	(*GenSignedURLReq)(nil),            // 47: core_api.GenSignedURLReq
+	(*GenSignedURLResp)(nil),           // 48: core_api.GenSignedURLResp
+	(*EventChat_Message)(nil),          // 49: core_api.EventChat.Message
+	(*ListAgentsResp_Agent)(nil),       // 50: core_api.ListAgentsResp.Agent
+	(*FeedbackReq_Feedback)(nil),       // 51: core_api.FeedbackReq.Feedback
+	(*basic.Response)(nil),             // 52: basic.Response
+	(*basic.Page)(nil),                 // 53: basic.Page
 }
 var file_core_api_common_proto_depIdxs = []int32{
 	3,  // 0: core_api.Ext.cite:type_name -> core_api.Cite
 	4,  // 1: core_api.Ext.code:type_name -> core_api.Code
 	2,  // 2: core_api.FullMessage.ext:type_name -> core_api.Ext
-	47, // 3: core_api.EventChat.message:type_name -> core_api.EventChat.Message
+	49, // 3: core_api.EventChat.message:type_name -> core_api.EventChat.Message
 	0,  // 4: core_api.CompletionsReq.messages:type_name -> core_api.Message
 	1,  // 5: core_api.CompletionsReq.completionsOption:type_name -> core_api.CompletionsOption
-	50, // 6: core_api.CreateConversationResp.resp:type_name -> basic.Response
-	51, // 7: core_api.ListConversationReq.page:type_name -> basic.Page
-	50, // 8: core_api.ListConversationResp.resp:type_name -> basic.Response
+	52, // 6: core_api.CreateConversationResp.resp:type_name -> basic.Response
+	53, // 7: core_api.ListConversationReq.page:type_name -> basic.Page
+	52, // 8: core_api.ListConversationResp.resp:type_name -> basic.Response
 	11, // 9: core_api.ListConversationResp.conversations:type_name -> core_api.Conversation
-	51, // 10: core_api.GetConversationReq.page:type_name -> basic.Page
-	50, // 11: core_api.GetConversationResp.resp:type_name -> basic.Response
+	53, // 10: core_api.GetConversationReq.page:type_name -> basic.Page
+	52, // 11: core_api.GetConversationResp.resp:type_name -> basic.Response
 	5,  // 12: core_api.GetConversationResp.messageList:type_name -> core_api.FullMessage
 	5,  // 13: core_api.GetConversationResp.regenList:type_name -> core_api.FullMessage
 	0,  // 14: core_api.GenerateBriefReq.messages:type_name -> core_api.Message
-	50, // 15: core_api.GenerateBriefResp.resp:type_name -> basic.Response
-	50, // 16: core_api.RenameConversationResp.resp:type_name -> basic.Response
-	50, // 17: core_api.DeleteConversationResp.resp:type_name -> basic.Response
-	51, // 18: core_api.SearchConversationReq.page:type_name -> basic.Page
-	50, // 19: core_api.SearchConversationResp.resp:type_name -> basic.Response
+	52, // 15: core_api.GenerateBriefResp.resp:type_name -> basic.Response
+	52, // 16: core_api.RenameConversationResp.resp:type_name -> basic.Response
+	52, // 17: core_api.DeleteConversationResp.resp:type_name -> basic.Response
+	53, // 18: core_api.SearchConversationReq.page:type_name -> basic.Page
+	52, // 19: core_api.SearchConversationResp.resp:type_name -> basic.Response
 	11, // 20: core_api.SearchConversationResp.conversations:type_name -> core_api.Conversation
-	51, // 21: core_api.ListAgentsReq.page:type_name -> basic.Page
-	50, // 22: core_api.ListAgentsResp.resp:type_name -> basic.Response
-	48, // 23: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
-	49, // 24: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
-	50, // 25: core_api.FeedbackResp.resp:type_name -> basic.Response
-	50, // 26: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
-	50, // 27: core_api.CheckVerifyCodeResp.resp:type_name -> basic.Response
-	50, // 28: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
-	50, // 29: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
-	50, // 30: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
-	50, // 31: core_api.ThirdPartyLoginResp.resp:type_name -> basic.Response
-	50, // 32: core_api.BasicUserUpdateProfileResp.resp:type_name -> basic.Response
-	50, // 33: core_api.GenSignedURLResp.resp:type_name -> basic.Response
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	53, // 21: core_api.ListAgentsReq.page:type_name -> basic.Page
+	52, // 22: core_api.ListAgentsResp.resp:type_name -> basic.Response
+	50, // 23: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
+	51, // 24: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
+	52, // 25: core_api.FeedbackResp.resp:type_name -> basic.Response
+	52, // 26: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
+	52, // 27: core_api.CheckVerifyCodeResp.resp:type_name -> basic.Response
+	52, // 28: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
+	52, // 29: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
+	52, // 30: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
+	52, // 31: core_api.ThirdPartyLoginResp.resp:type_name -> basic.Response
+	52, // 32: core_api.BasicUserUpdateProfileResp.resp:type_name -> basic.Response
+	52, // 33: core_api.BasicUserGetProfileResp.resp:type_name -> basic.Response
+	52, // 34: core_api.GenSignedURLResp.resp:type_name -> basic.Response
+	35, // [35:35] is the sub-list for method output_type
+	35, // [35:35] is the sub-list for method input_type
+	35, // [35:35] is the sub-list for extension type_name
+	35, // [35:35] is the sub-list for extension extendee
+	0,  // [0:35] is the sub-list for field type_name
 }
 
 func file_core_api_common_proto_init() {
@@ -4308,7 +4421,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GenSignedURLReq); i {
+			switch v := v.(*BasicUserGetProfileReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4320,7 +4433,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GenSignedURLResp); i {
+			switch v := v.(*BasicUserGetProfileResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4332,7 +4445,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventChat_Message); i {
+			switch v := v.(*GenSignedURLReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4344,7 +4457,7 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListAgentsResp_Agent); i {
+			switch v := v.(*GenSignedURLResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4356,6 +4469,30 @@ func file_core_api_common_proto_init() {
 			}
 		}
 		file_core_api_common_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*EventChat_Message); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_common_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListAgentsResp_Agent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_common_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FeedbackReq_Feedback); i {
 			case 0:
 				return &v.state
@@ -4380,7 +4517,7 @@ func file_core_api_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_core_api_common_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   50,
+			NumMessages:   52,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

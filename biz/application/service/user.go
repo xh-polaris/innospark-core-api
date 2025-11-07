@@ -28,6 +28,7 @@ type IUserService interface {
 	Login(ctx context.Context, req *core_api.BasicUserLoginReq) (*core_api.BasicUserLoginResp, error)
 	ResetPassword(ctx context.Context, req *core_api.BasicUserResetPasswordReq) (*core_api.BasicUserResetPasswordResp, error)
 	UpdateProfile(ctx context.Context, req *core_api.BasicUserUpdateProfileReq) (*core_api.BasicUserUpdateProfileResp, error)
+	GetProfile(ctx context.Context, req *core_api.BasicUserGetProfileReq) (*core_api.BasicUserGetProfileResp, error)
 	ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error)
 }
 
@@ -277,6 +278,24 @@ func (u *UserService) UpdateProfile(ctx context.Context, req *core_api.BasicUser
 	}
 
 	return &core_api.BasicUserUpdateProfileResp{Resp: util.Success()}, nil
+}
+
+func (u *UserService) GetProfile(ctx context.Context, req *core_api.BasicUserGetProfileReq) (*core_api.BasicUserGetProfileResp, error) {
+	// 鉴权
+	uid, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+	usr, err := u.UserMapper.FindById(ctx, uid)
+	if err != nil {
+		return nil, errorx.WrapByCode(err, errno.ErrGetProfile)
+	}
+	return &core_api.BasicUserGetProfileResp{
+		Resp:   util.Success(),
+		Name:   usr.Name,
+		Avatar: usr.Avatar,
+	}, nil
 }
 
 func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPartyLoginReq) (*core_api.ThirdPartyLoginResp, error) {
