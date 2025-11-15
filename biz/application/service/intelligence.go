@@ -105,7 +105,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 
 func (i *IntelligenceService) GetIntelligenceInfo(ctx context.Context, req *core_api.GetIntelligenceReq) (*core_api.GetIntelligenceResp, error) {
 	header := http.Header{}
-	header.Set("Authorization", "Bearer"+config.GetConfig().Coze.PAT)
+	header.Set("Authorization", "Bearer "+config.GetConfig().Coze.PAT)
 	header.Set("Content-Type", "application/json")
 	url := fmt.Sprintf("https://coze.aiecnu.net/api/intelligence_api/intelligence/%s", req.GetId())
 	resp, err := httpx.GetHttpClient().Get(ctx, url, header, nil)
