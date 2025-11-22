@@ -17,6 +17,10 @@ func DPrintf(format string, a ...interface{}) {
 	}
 }
 
+func Of[T any](v T) *T {
+	return &v
+}
+
 // Success 返回成功的basic.Response指针
 func Success() *basic.Response {
 	return &basic.Response{

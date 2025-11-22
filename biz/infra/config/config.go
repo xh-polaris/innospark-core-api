@@ -33,6 +33,8 @@ type InnoSpark struct {
 	DefaultAPIKey    string
 	DeepThinkBaseURL string
 	DeepThinkAPIKey  string
+	VlmURL           string
+	VlmAPIKey        string
 }
 
 type Bocha struct {

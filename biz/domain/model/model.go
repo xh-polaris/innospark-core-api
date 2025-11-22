@@ -56,7 +56,7 @@ func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ..
 	// messages翻转顺序, 调用模型时消息应该正序
 	var reverse []*schema.Message
 	for i := len(in) - 1; i >= 0; i-- {
-		if in[i].Content != "" {
+		if in[i].Content != "" || len(in[i].UserInputMultiContent) != 0 || len(in[i].AssistantGenMultiContent) != 0 {
 			in[i].Name = ""
 			reverse = append(reverse, in[i])
 		}

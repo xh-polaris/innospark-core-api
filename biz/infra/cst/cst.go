@@ -52,6 +52,7 @@ const (
 const (
 	ContentTypeText      = 0
 	MessageTypeText      = 0
+	MessageTypeMultiple  = 1
 	InputContentTypeText = 0
 	ConversationTypeText = 0
 )

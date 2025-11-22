@@ -34,6 +34,7 @@ type RelayContext struct {
 	ModelCancel       context.CancelFunc // 中断模型输出
 	SearchInfo        *SearchInfo        // 搜素信息
 	Sensitive         *Sensitive
+	Attach            []string // 附件信息
 }
 
 func (r *RelayContext) id() string {

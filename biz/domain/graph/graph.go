@@ -117,7 +117,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 					break
 				}
 			}
-		} else if strings.HasPrefix(state.ModelInfo.BotId, "intelligence-") {
+		} else if strings.HasPrefix(state.ModelInfo.BotId, "intelligence-") { // coze 智能体
 			state.ModelInfo.Model, state.ModelInfo.BotId = model.SelfCoze, state.ModelInfo.BotId[13:]
 		}
 		return in, nil

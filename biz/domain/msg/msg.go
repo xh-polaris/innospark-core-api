@@ -11,23 +11,44 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func UserMMsg(relay *info.RelayContext, index int) *mmsg.Message {
+func UserMMsg(relay *info.RelayContext, index int) (m *mmsg.Message) {
 	now := time.Now()
-	return &mmsg.Message{
+	m = &mmsg.Message{
 		MessageId:      primitive.NewObjectID(),
 		ConversationId: relay.ConversationId,
 		SectionId:      relay.SectionId,
 		UserId:         relay.UserId,
 		Index:          int32(index),
-		Content:        relay.OriginMessage.Content,
-		ContentType:    relay.OriginMessage.ContentType,
-		MessageType:    cst.MessageTypeText,
-		Ext:            &mmsg.Ext{Brief: relay.OriginMessage.Content},
 		Role:           cst.UserEnum,
+		ContentType:    relay.OriginMessage.ContentType,
+		Ext:            &mmsg.Ext{Brief: relay.OriginMessage.Content},
 		CreateTime:     now,
 		UpdateTime:     now,
 		Status:         0,
 	}
+	if len(relay.OriginMessage.Attaches) == 0 { // 有附件
+		m.Content = relay.OriginMessage.Content
+		m.MessageType = cst.MessageTypeText
+	} else {
+		m.MessageType = cst.MessageTypeMultiple
+		m.UserInputMultiContent = []*mmsg.MessageInputPart{}
+		m.UserInputMultiContent = append(m.UserInputMultiContent, &mmsg.MessageInputPart{
+			Type: mmsg.ChatMessagePartTypeText,
+			Text: relay.OriginMessage.Content,
+		})
+		for _, attach := range relay.OriginMessage.Attaches { // 添加图片消息
+			m.UserInputMultiContent = append(m.UserInputMultiContent, &mmsg.MessageInputPart{
+				Type: mmsg.ChatMessagePartTypeImageURL,
+				Image: &mmsg.MessageInputImage{
+					MessagePartCommon: mmsg.MessagePartCommon{
+						URL: &attach,
+					},
+					Detail: mmsg.ImageURLDetailAuto,
+				},
+			})
+		}
+	}
+	return
 }
 
 func NewModelMsg(relay *info.RelayContext, index int) *mmsg.Message {
@@ -72,8 +93,103 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 		Content: msg.Content,
 		Name:    msg.MessageId.Hex(),
 	}
-	if msg.Ext.ContentWithCite != nil {
-		m.Content = *msg.Ext.ContentWithCite
+	if msg.Ext.ContentWithCite != nil { // 联网搜索到的内容
+		if len(m.UserInputMultiContent) != 0 {
+			for i := range m.UserInputMultiContent {
+				if mmsg.ChatMessagePartType(m.UserInputMultiContent[i].Type) == mmsg.ChatMessagePartTypeText {
+					m.UserInputMultiContent[i].Text = *msg.Ext.ContentWithCite
+				}
+			}
+		} else {
+			m.Content = *msg.Ext.ContentWithCite
+		}
+	}
+	if len(msg.UserInputMultiContent) != 0 {
+		for _, uimc := range msg.UserInputMultiContent {
+			part := schema.MessageInputPart{Type: schema.ChatMessagePartType(uimc.Type)}
+			switch uimc.Type {
+			case mmsg.ChatMessagePartTypeText:
+				part.Text = uimc.Text
+			case mmsg.ChatMessagePartTypeImageURL:
+				part.Image = &schema.MessageInputImage{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        uimc.Image.URL,
+						Base64Data: uimc.Image.Base64Data,
+						MIMEType:   uimc.Image.MIMEType,
+						Extra:      uimc.Image.Extra,
+					},
+					Detail: schema.ImageURLDetail(uimc.Image.Detail),
+				}
+			case mmsg.ChatMessagePartTypeAudioURL:
+				part.Audio = &schema.MessageInputAudio{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        uimc.Audio.URL,
+						Base64Data: uimc.Audio.Base64Data,
+						MIMEType:   uimc.Audio.MIMEType,
+						Extra:      uimc.Audio.Extra,
+					},
+				}
+			case mmsg.ChatMessagePartTypeVideoURL:
+				part.Video = &schema.MessageInputVideo{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        uimc.Video.URL,
+						Base64Data: uimc.Video.Base64Data,
+						MIMEType:   uimc.Video.MIMEType,
+						Extra:      uimc.Video.Extra,
+					},
+				}
+			case mmsg.ChatMessagePartTypeFileURL:
+				part.File = &schema.MessageInputFile{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        uimc.File.URL,
+						Base64Data: uimc.File.Base64Data,
+						MIMEType:   uimc.File.MIMEType,
+						Extra:      uimc.File.Extra,
+					},
+				}
+			}
+			m.UserInputMultiContent = append(m.UserInputMultiContent, part)
+		}
+	}
+	if len(msg.AssistantGenMultiContent) != 0 {
+		for _, agmc := range msg.AssistantGenMultiContent {
+			part := schema.MessageOutputPart{Type: schema.ChatMessagePartType(agmc.Type)}
+			switch agmc.Type {
+			case mmsg.ChatMessagePartTypeText:
+				part.Text = agmc.Text
+
+			case mmsg.ChatMessagePartTypeImageURL:
+				part.Image = &schema.MessageOutputImage{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        agmc.Image.URL,
+						Base64Data: agmc.Image.Base64Data,
+						MIMEType:   agmc.Image.MIMEType,
+						Extra:      agmc.Image.Extra,
+					},
+				}
+
+			case mmsg.ChatMessagePartTypeAudioURL:
+				part.Audio = &schema.MessageOutputAudio{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        agmc.Audio.URL,
+						Base64Data: agmc.Audio.Base64Data,
+						MIMEType:   agmc.Audio.MIMEType,
+						Extra:      agmc.Audio.Extra,
+					},
+				}
+
+			case mmsg.ChatMessagePartTypeVideoURL:
+				part.Video = &schema.MessageOutputVideo{
+					MessagePartCommon: schema.MessagePartCommon{
+						URL:        agmc.Video.URL,
+						Base64Data: agmc.Video.Base64Data,
+						MIMEType:   agmc.Video.MIMEType,
+						Extra:      agmc.Video.Extra,
+					},
+				}
+			}
+			m.AssistantGenMultiContent = append(m.AssistantGenMultiContent, part)
+		}
 	}
 	return m
 }
@@ -111,6 +227,87 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 	if !msg.ReplyId.IsZero() {
 		reply := msg.ReplyId.Hex()
 		fm.ReplyId = &reply
+	}
+	if msg.UserInputMultiContent != nil {
+		for _, c := range msg.UserInputMultiContent {
+			part := &core_api.MessageInputPart{
+				Type: string(c.Type),
+			}
+			switch c.Type {
+			case mmsg.ChatMessagePartTypeText:
+				part.Text = &c.Text
+			case mmsg.ChatMessagePartTypeImageURL:
+				if c.Image != nil {
+					part.Image = &core_api.MessageInputImage{
+						Url:        c.Image.URL,
+						Base64Data: c.Image.Base64Data,
+						MimeType:   &c.Image.MIMEType,
+						Detail:     string(c.Image.Detail),
+					}
+				}
+			case mmsg.ChatMessagePartTypeAudioURL:
+				if c.Audio != nil {
+					part.Audio = &core_api.MessageInputAudio{
+						Url:        c.Audio.URL,
+						Base64Data: c.Audio.Base64Data,
+						MimeType:   &c.Audio.MIMEType,
+					}
+				}
+			case mmsg.ChatMessagePartTypeVideoURL:
+				if c.Video != nil {
+					part.Video = &core_api.MessageInputVideo{
+						Url:        c.Video.URL,
+						Base64Data: c.Video.Base64Data,
+						MimeType:   &c.Video.MIMEType,
+					}
+				}
+			case mmsg.ChatMessagePartTypeFileURL:
+				if c.File != nil {
+					part.File = &core_api.MessageInputFile{
+						Url:        c.File.URL,
+						Base64Data: c.File.Base64Data,
+						MimeType:   &c.File.MIMEType,
+					}
+				}
+			}
+			fm.UserInputMultiContent = append(fm.UserInputMultiContent, part)
+		}
+	}
+	if msg.AssistantGenMultiContent != nil {
+		for _, c := range msg.AssistantGenMultiContent {
+			part := &core_api.MessageOutputPart{
+				Type: string(c.Type),
+			}
+			switch c.Type {
+			case mmsg.ChatMessagePartTypeText:
+				part.Text = &c.Text
+			case mmsg.ChatMessagePartTypeImageURL:
+				if c.Image != nil {
+					part.Image = &core_api.MessageOutputImage{
+						Url:        c.Image.URL,
+						Base64Data: c.Image.Base64Data,
+						MimeType:   &c.Image.MIMEType,
+					}
+				}
+			case mmsg.ChatMessagePartTypeAudioURL:
+				if c.Audio != nil {
+					part.Audio = &core_api.MessageOutputAudio{
+						Url:        c.Audio.URL,
+						Base64Data: c.Audio.Base64Data,
+						MimeType:   &c.Audio.MIMEType,
+					}
+				}
+			case mmsg.ChatMessagePartTypeVideoURL:
+				if c.Video != nil {
+					part.Video = &core_api.MessageOutputVideo{
+						Url:        c.Video.URL,
+						Base64Data: c.Video.Base64Data,
+						MimeType:   &c.Video.MIMEType,
+					}
+				}
+			}
+			fm.AssistantGenMultiContent = append(fm.AssistantGenMultiContent, part)
+		}
 	}
 	return fm
 }
