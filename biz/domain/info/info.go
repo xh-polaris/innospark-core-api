@@ -141,6 +141,7 @@ type CompletionOptions struct {
 // ModelInfo 是模型相关配置
 type ModelInfo struct {
 	WebSearch bool   // 是否联网搜索
+	Thinking  bool   // 是否深度思考
 	Model     string // 模型名称
 	BotId     string // 智能体id
 	BotName   string // 智能体名称

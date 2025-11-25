@@ -119,6 +119,10 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 			}
 		} else if strings.HasPrefix(state.ModelInfo.BotId, "intelligence-") { // coze 智能体
 			state.ModelInfo.Model, state.ModelInfo.BotId = model.SelfCoze, state.ModelInfo.BotId[13:]
+		} else if needVL(in) { // 需要视觉模型
+			if !strings.HasSuffix(state.ModelInfo.Model, "-VL") {
+				state.ModelInfo.Model += "-VL"
+			}
 		}
 		return in, nil
 	})
@@ -178,4 +182,13 @@ func (g *CompletionGraph) CompileAndStream(ctx context.Context, input Input) (_ 
 	}
 	defer func() { _ = input.SSEWriter.Close() }() // 关闭sse 响应流
 	return r.Stream(ctx, input)
+}
+
+func needVL(in []*schema.Message) bool {
+	for _, m := range in {
+		if len(m.UserInputMultiContent) > 0 {
+			return true
+		}
+	}
+	return false
 }
