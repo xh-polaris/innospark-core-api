@@ -53,7 +53,7 @@ func (d *HistoryDomain) StoreHistory(ctx context.Context, relay *info.RelayConte
 
 func completeAssistantMsg(relay *info.RelayContext) {
 	am := relay.MessageInfo.AssistantMessage
-	am.Content, am.Ext = relay.MessageInfo.Text, &mmsg.Ext{
+	am.Content, am.Ext = relay.MessageInfo.Text, &mmsg.Ext{ // 模型信息和基本内容
 		BotState: fmt.Sprintf("{\"model\":\"%s\",\"bot_id\":\"%s\",\"bot_name\":\"%s\"}", relay.ModelInfo.Model, relay.ModelInfo.BotId, relay.ModelInfo.BotName),
 		Brief:    relay.MessageInfo.Text,
 		Think:    relay.MessageInfo.Think,
@@ -62,9 +62,19 @@ func completeAssistantMsg(relay *info.RelayContext) {
 	if relay.SearchInfo != nil { // 搜索信息
 		am.Ext.Cite = relay.SearchInfo.Cite
 	}
-	if relay.Sensitive.Hits != nil && len(relay.Sensitive.Hits) > 0 {
+	if relay.Sensitive.Hits != nil && len(relay.Sensitive.Hits) > 0 { // 敏感词信息
 		am.Content = ""
 		am.Ext.Sensitive = true
+	}
+	if relay.ResponseMeta != nil { // 用量信息
+		am.Ext.Usage = &mmsg.Usage{
+			PromptTokens: relay.ResponseMeta.Usage.PromptTokens,
+			PromptTokenDetails: &mmsg.PromptTokenDetails{
+				CachedTokens: relay.ResponseMeta.Usage.PromptTokenDetails.CachedTokens,
+			},
+			CompletionTokens: relay.ResponseMeta.Usage.CompletionTokens,
+			TotalTokens:      relay.ResponseMeta.Usage.TotalTokens,
+		}
 	}
 	am.Ext.Code = relay.MessageInfo.Code
 }

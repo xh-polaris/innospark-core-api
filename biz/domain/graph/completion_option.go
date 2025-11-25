@@ -22,7 +22,7 @@ func DoCompletionOption(relay *info.RelayContext, his []*mmsg.Message) ([]*mmsg.
 	case opt.IsRegen: // 重新生成, 覆盖掉最新的模型输出, 生成regen_list, 不需要增添user message
 		var regens []*mmsg.Message
 		relay.ReplyId = *opt.ReplyId
-		for _, msg := range his { // 将此前同一个replyId且不为空的消息置为空
+		for _, msg := range his { // 将此前同一个replyId且不为空的消息置为空 TODO: 暂时没有覆盖模型的多模态输出(因为没有)
 			if msg.ReplyId.Hex() == *opt.ReplyId && msg.Content != "" {
 				msg.Content = ""
 				regens = append(regens, msg)

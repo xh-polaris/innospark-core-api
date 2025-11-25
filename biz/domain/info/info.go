@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
@@ -19,20 +20,21 @@ import (
 // RelayContext 存储Completion接口过程中的上下文信息
 type RelayContext struct {
 	RequestContext    *app.RequestContext
-	CompletionOptions *CompletionOptions // 对话配置
-	ModelInfo         *ModelInfo         // 模型信息
-	MessageInfo       *MessageInfo       // 消息信息
-	ConversationId    primitive.ObjectID // 对话id
-	SectionId         primitive.ObjectID // 段落id
-	UserId            primitive.ObjectID // 用户id
-	ReplyId           string             // 响应ID
-	OriginMessage     *ReqMessage        // 用户原始消息
-	UserMessage       *mmsg.Message      // 用户消息
-	SSE               *adaptor.SSEStream // SSE流
-	SSEWriter         *sse.Writer        // SSE输出
-	SSEIndex          int                // SSE事件索引
-	ModelCancel       context.CancelFunc // 中断模型输出
-	SearchInfo        *SearchInfo        // 搜素信息
+	CompletionOptions *CompletionOptions   // 对话配置
+	ModelInfo         *ModelInfo           // 模型信息
+	MessageInfo       *MessageInfo         // 消息信息
+	ConversationId    primitive.ObjectID   // 对话id
+	SectionId         primitive.ObjectID   // 段落id
+	UserId            primitive.ObjectID   // 用户id
+	ReplyId           string               // 响应ID
+	OriginMessage     *ReqMessage          // 用户原始消息
+	UserMessage       *mmsg.Message        // 用户消息
+	ResponseMeta      *schema.ResponseMeta // 用量
+	SSE               *adaptor.SSEStream   // SSE流
+	SSEWriter         *sse.Writer          // SSE输出
+	SSEIndex          int                  // SSE事件索引
+	ModelCancel       context.CancelFunc   // 中断模型输出
+	SearchInfo        *SearchInfo          // 搜素信息
 	Sensitive         *Sensitive
 	Attach            []string // 附件信息
 }

@@ -14,7 +14,6 @@ import (
 
 func init() {
 	RegisterModel(DefaultModel, NewDefaultChatModel)
-
 	RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
 }
 

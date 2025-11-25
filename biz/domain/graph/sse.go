@@ -62,6 +62,9 @@ func (t *Transformer) TransformToEvent(mr *schema.StreamReader[*schema.Message],
 				logs.CondErrorf(!errors.Is(err, io.EOF), "[graph transformer] recv err:%s", errorx.ErrorWithoutStack(err))
 				return
 			}
+			if msg.ResponseMeta != nil { // 收集用量信息
+				t.relay.ResponseMeta = msg.ResponseMeta
+			}
 			refine := &info.RefineContent{}
 			content, typ := refine.SetContentWithTyp(msg.Content, msg.Extra[cst.EventMessageContentType].(int))
 			sb.WriteString(content)

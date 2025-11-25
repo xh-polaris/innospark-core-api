@@ -44,6 +44,7 @@ type Ext struct {
 	ContentWithCite *string       `json:"-" bson:"-"`                                         // 模型用到的引用, 会替换模型域的消息
 	Sensitive       bool          `json:"sensitive,omitempty" bson:"sensitive,omitempty"`     // 是否触发违禁词
 	AttachInfo      []*AttachInfo `json:"attach_info,omitempty" bson:"attach_info,omitempty"` // 附件信息
+	Usage           *Usage        `json:"usage,omitempty" bson:"usage,omitempty"`             // 用量信息
 }
 
 type Cite struct {
@@ -54,6 +55,22 @@ type Cite struct {
 	SiteName      string `json:"siteName" bson:"site_name"`
 	SiteIcon      string `json:"siteIcon" bson:"site_icon"`
 	DatePublished string `json:"datePublished" bson:"date_published"`
+}
+
+type Usage struct {
+	// PromptTokens is the number of prompt tokens, including all the input tokens of this request.
+	PromptTokens int `json:"prompt_tokens,omitempty" bson:"prompt_tokens,omitempty"`
+	// PromptTokenDetails is a breakdown of the prompt tokens.
+	PromptTokenDetails *PromptTokenDetails `json:"prompt_token_details,omitempty" bson:"prompt_token_details,omitempty"`
+	// CompletionTokens is the number of completion tokens.
+	CompletionTokens int `json:"completion_tokens,omitempty" bson:"completion_tokens,omitempty"`
+	// TotalTokens is the total number of tokens.
+	TotalTokens int `json:"total_tokens,omitempty" bson:"total_tokens,omitempty"`
+}
+
+type PromptTokenDetails struct {
+	// Cached tokens present in the prompt.
+	CachedTokens int `json:"cached_tokens,omitempty" bson:"cached_tokens,omitempty"`
 }
 
 type Code struct {

@@ -220,6 +220,7 @@ func MMsgToFMsg(msg *mmsg.Message) *core_api.FullMessage {
 			Cite:      MCiteToFCiteList(msg.Ext.Cite),
 			Code:      MCodeToFCodeList(msg.Ext.Code),
 			Sensitive: msg.Ext.Sensitive,
+			Usage:     MUsageToFUsage(msg.Ext.Usage),
 		},
 		Feedback: msg.Feedback,
 		UserType: msg.Role,
@@ -342,5 +343,17 @@ func MCodeToFCode(code *mmsg.Code) *core_api.Code {
 		Index:    code.Index,
 		CodeType: code.CodeType,
 		Code:     code.Code,
+	}
+}
+
+func MUsageToFUsage(usage *mmsg.Usage) *core_api.Usage {
+	if usage == nil {
+		return nil
+	}
+	return &core_api.Usage{
+		PromptTokens:       int64(usage.PromptTokens),
+		PromptTokenDetails: &core_api.Usage_PromptTokenDetails{CachedTokens: int64(usage.PromptTokenDetails.CachedTokens)},
+		CompletionTokens:   int64(usage.CompletionTokens),
+		TotalTokens:        int64(usage.TotalTokens),
 	}
 }
