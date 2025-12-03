@@ -296,10 +296,15 @@ func (u *UserService) GetProfile(ctx context.Context, req *core_api.BasicUserGet
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ErrGetProfile)
 	}
+	profile := &core_api.Profile{}
+	if usr.Profile != nil {
+		profile.Role = &usr.Profile.Role
+	}
 	return &core_api.BasicUserGetProfileResp{
-		Resp:   util.Success(),
-		Name:   usr.Name,
-		Avatar: usr.Avatar,
+		Resp:    util.Success(),
+		Name:    usr.Name,
+		Avatar:  usr.Avatar,
+		Profile: profile,
 	}, nil
 }
 
