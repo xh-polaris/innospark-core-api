@@ -98,6 +98,8 @@ const (
 	Score         = "score"
 	NE            = "$ne"
 	LT            = "$lt"
+	LTE           = "$lte"
+	GTE           = "$gte"
 	Set           = "$set"
 	Text          = "$text"
 	Search        = "$search"

@@ -637,6 +637,148 @@ func (x *ListFeedBackResp) GetTotal() int64 {
 	return 0
 }
 
+type UserStatisticsReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Start int64 `protobuf:"varint,1,opt,name=start,proto3" form:"start" json:"start" query:"start"`
+	End   int64 `protobuf:"varint,2,opt,name=end,proto3" form:"end" json:"end" query:"end"`
+}
+
+func (x *UserStatisticsReq) Reset() {
+	*x = UserStatisticsReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserStatisticsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatisticsReq) ProtoMessage() {}
+
+func (x *UserStatisticsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatisticsReq.ProtoReflect.Descriptor instead.
+func (*UserStatisticsReq) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UserStatisticsReq) GetStart() int64 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *UserStatisticsReq) GetEnd() int64 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+type UserStatisticsResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Resp               *basic.Response            `protobuf:"bytes,1,opt,name=resp,proto3" form:"resp" json:"resp" query:"resp"`
+	Growth             []*UserStatisticsResp_Item `protobuf:"bytes,2,rep,name=growth,proto3" form:"growth" json:"growth" query:"growth"`                                                   // 柱状图：每日新增用户数据
+	Accumulate         []*UserStatisticsResp_Item `protobuf:"bytes,3,rep,name=accumulate,proto3" form:"accumulate" json:"accumulate" query:"accumulate"`                                   // 折线图：每日累计用户数据
+	Trend              *UserStatisticsResp_Trend  `protobuf:"bytes,4,opt,name=trend,proto3" form:"trend" json:"trend" query:"trend"`                                                       // 直线, 趋势
+	TotalNewUsers      int64                      `protobuf:"varint,5,opt,name=totalNewUsers,proto3" form:"totalNewUsers" json:"totalNewUsers" query:"totalNewUsers"`                      // 统计周期内总新增用户数
+	AverageDailyGrowth float64                    `protobuf:"fixed64,6,opt,name=averageDailyGrowth,proto3" form:"averageDailyGrowth" json:"averageDailyGrowth" query:"averageDailyGrowth"` // 统计周期内的日均新增用户数
+}
+
+func (x *UserStatisticsResp) Reset() {
+	*x = UserStatisticsResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserStatisticsResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatisticsResp) ProtoMessage() {}
+
+func (x *UserStatisticsResp) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatisticsResp.ProtoReflect.Descriptor instead.
+func (*UserStatisticsResp) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UserStatisticsResp) GetResp() *basic.Response {
+	if x != nil {
+		return x.Resp
+	}
+	return nil
+}
+
+func (x *UserStatisticsResp) GetGrowth() []*UserStatisticsResp_Item {
+	if x != nil {
+		return x.Growth
+	}
+	return nil
+}
+
+func (x *UserStatisticsResp) GetAccumulate() []*UserStatisticsResp_Item {
+	if x != nil {
+		return x.Accumulate
+	}
+	return nil
+}
+
+func (x *UserStatisticsResp) GetTrend() *UserStatisticsResp_Trend {
+	if x != nil {
+		return x.Trend
+	}
+	return nil
+}
+
+func (x *UserStatisticsResp) GetTotalNewUsers() int64 {
+	if x != nil {
+		return x.TotalNewUsers
+	}
+	return 0
+}
+
+func (x *UserStatisticsResp) GetAverageDailyGrowth() float64 {
+	if x != nil {
+		return x.AverageDailyGrowth
+	}
+	return 0
+}
+
 type ListFeedBackResp_FeedBack struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -653,7 +795,7 @@ type ListFeedBackResp_FeedBack struct {
 func (x *ListFeedBackResp_FeedBack) Reset() {
 	*x = ListFeedBackResp_FeedBack{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_manage_proto_msgTypes[9]
+		mi := &file_core_api_manage_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -666,7 +808,7 @@ func (x *ListFeedBackResp_FeedBack) String() string {
 func (*ListFeedBackResp_FeedBack) ProtoMessage() {}
 
 func (x *ListFeedBackResp_FeedBack) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_manage_proto_msgTypes[9]
+	mi := &file_core_api_manage_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -720,6 +862,116 @@ func (x *ListFeedBackResp_FeedBack) GetContent() string {
 func (x *ListFeedBackResp_FeedBack) GetCreateTime() int64 {
 	if x != nil {
 		return x.CreateTime
+	}
+	return 0
+}
+
+type UserStatisticsResp_Item struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Date  int64 `protobuf:"varint,1,opt,name=date,proto3" form:"date" json:"date" query:"date"`
+	Count int64 `protobuf:"varint,2,opt,name=count,proto3" form:"count" json:"count" query:"count"`
+}
+
+func (x *UserStatisticsResp_Item) Reset() {
+	*x = UserStatisticsResp_Item{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserStatisticsResp_Item) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatisticsResp_Item) ProtoMessage() {}
+
+func (x *UserStatisticsResp_Item) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatisticsResp_Item.ProtoReflect.Descriptor instead.
+func (*UserStatisticsResp_Item) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{10, 0}
+}
+
+func (x *UserStatisticsResp_Item) GetDate() int64 {
+	if x != nil {
+		return x.Date
+	}
+	return 0
+}
+
+func (x *UserStatisticsResp_Item) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type UserStatisticsResp_Trend struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	W float64 `protobuf:"fixed64,1,opt,name=w,proto3" form:"w" json:"w" query:"w"` // 斜率 w，用于表示用户累计趋势的增长速度
+	B float64 `protobuf:"fixed64,2,opt,name=b,proto3" form:"b" json:"b" query:"b"` // 截距 b，用于表示趋势线在 x=0 时的理论值
+}
+
+func (x *UserStatisticsResp_Trend) Reset() {
+	*x = UserStatisticsResp_Trend{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_core_api_manage_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserStatisticsResp_Trend) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatisticsResp_Trend) ProtoMessage() {}
+
+func (x *UserStatisticsResp_Trend) ProtoReflect() protoreflect.Message {
+	mi := &file_core_api_manage_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatisticsResp_Trend.ProtoReflect.Descriptor instead.
+func (*UserStatisticsResp_Trend) Descriptor() ([]byte, []int) {
+	return file_core_api_manage_proto_rawDescGZIP(), []int{10, 1}
+}
+
+func (x *UserStatisticsResp_Trend) GetW() float64 {
+	if x != nil {
+		return x.W
+	}
+	return 0
+}
+
+func (x *UserStatisticsResp_Trend) GetB() float64 {
+	if x != nil {
+		return x.B
 	}
 	return 0
 }
@@ -815,12 +1067,41 @@ var file_core_api_manage_proto_rawDesc = []byte{
 	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
 	0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x63, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x42, 0x45, 0x5a, 0x43, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73,
-	0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d,
-	0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x3b, 0x0a, 0x11, 0x55, 0x73, 0x65, 0x72, 0x53,
+	0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x12, 0x14, 0x0a, 0x05,
+	0x73, 0x74, 0x61, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x73, 0x74, 0x61,
+	0x72, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x65, 0x6e, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x03, 0x65, 0x6e, 0x64, 0x22, 0x98, 0x03, 0x0a, 0x12, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61,
+	0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x12, 0x23, 0x0a, 0x04, 0x72,
+	0x65, 0x73, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x73, 0x69,
+	0x63, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x04, 0x72, 0x65, 0x73, 0x70,
+	0x12, 0x37, 0x0a, 0x06, 0x67, 0x72, 0x6f, 0x77, 0x74, 0x68, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x1f, 0x2e, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74,
+	0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x2e, 0x49, 0x74, 0x65,
+	0x6d, 0x52, 0x06, 0x67, 0x72, 0x6f, 0x77, 0x74, 0x68, 0x12, 0x3f, 0x0a, 0x0a, 0x61, 0x63, 0x63,
+	0x75, 0x6d, 0x75, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e,
+	0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x69,
+	0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x2e, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x0a,
+	0x61, 0x63, 0x63, 0x75, 0x6d, 0x75, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x36, 0x0a, 0x05, 0x74, 0x72,
+	0x65, 0x6e, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x6d, 0x61, 0x6e, 0x61,
+	0x67, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x2e, 0x54, 0x72, 0x65, 0x6e, 0x64, 0x52, 0x05, 0x74, 0x72, 0x65,
+	0x6e, 0x64, 0x12, 0x24, 0x0a, 0x0d, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x4e, 0x65, 0x77, 0x55, 0x73,
+	0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0d, 0x74, 0x6f, 0x74, 0x61, 0x6c,
+	0x4e, 0x65, 0x77, 0x55, 0x73, 0x65, 0x72, 0x73, 0x12, 0x2e, 0x0a, 0x12, 0x61, 0x76, 0x65, 0x72,
+	0x61, 0x67, 0x65, 0x44, 0x61, 0x69, 0x6c, 0x79, 0x47, 0x72, 0x6f, 0x77, 0x74, 0x68, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x12, 0x61, 0x76, 0x65, 0x72, 0x61, 0x67, 0x65, 0x44, 0x61, 0x69,
+	0x6c, 0x79, 0x47, 0x72, 0x6f, 0x77, 0x74, 0x68, 0x1a, 0x30, 0x0a, 0x04, 0x49, 0x74, 0x65, 0x6d,
+	0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04,
+	0x64, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x1a, 0x23, 0x0a, 0x05, 0x54, 0x72,
+	0x65, 0x6e, 0x64, 0x12, 0x0c, 0x0a, 0x01, 0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x01,
+	0x77, 0x12, 0x0c, 0x0a, 0x01, 0x62, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x01, 0x62, 0x42,
+	0x45, 0x5a, 0x43, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68,
+	0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61,
+	0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f,
+	0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f,
+	0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -835,7 +1116,7 @@ func file_core_api_manage_proto_rawDescGZIP() []byte {
 	return file_core_api_manage_proto_rawDescData
 }
 
-var file_core_api_manage_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_core_api_manage_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_core_api_manage_proto_goTypes = []interface{}{
 	(*AdminLoginReq)(nil),             // 0: manage.AdminLoginReq
 	(*AdminLoginResp)(nil),            // 1: manage.AdminLoginResp
@@ -846,24 +1127,32 @@ var file_core_api_manage_proto_goTypes = []interface{}{
 	(*ForbiddenUserResp)(nil),         // 6: manage.ForbiddenUserResp
 	(*ListFeedBackReq)(nil),           // 7: manage.ListFeedBackReq
 	(*ListFeedBackResp)(nil),          // 8: manage.ListFeedBackResp
-	(*ListFeedBackResp_FeedBack)(nil), // 9: manage.ListFeedBackResp.FeedBack
-	(*basic.Response)(nil),            // 10: basic.Response
-	(*basic.Page)(nil),                // 11: basic.Page
+	(*UserStatisticsReq)(nil),         // 9: manage.UserStatisticsReq
+	(*UserStatisticsResp)(nil),        // 10: manage.UserStatisticsResp
+	(*ListFeedBackResp_FeedBack)(nil), // 11: manage.ListFeedBackResp.FeedBack
+	(*UserStatisticsResp_Item)(nil),   // 12: manage.UserStatisticsResp.Item
+	(*UserStatisticsResp_Trend)(nil),  // 13: manage.UserStatisticsResp.Trend
+	(*basic.Response)(nil),            // 14: basic.Response
+	(*basic.Page)(nil),                // 15: basic.Page
 }
 var file_core_api_manage_proto_depIdxs = []int32{
-	10, // 0: manage.AdminLoginResp.resp:type_name -> basic.Response
-	11, // 1: manage.ListUserReq.page:type_name -> basic.Page
-	10, // 2: manage.ListUserResp.resp:type_name -> basic.Response
+	14, // 0: manage.AdminLoginResp.resp:type_name -> basic.Response
+	15, // 1: manage.ListUserReq.page:type_name -> basic.Page
+	14, // 2: manage.ListUserResp.resp:type_name -> basic.Response
 	2,  // 3: manage.ListUserResp.user:type_name -> manage.User
-	10, // 4: manage.ForbiddenUserResp.resp:type_name -> basic.Response
-	11, // 5: manage.ListFeedBackReq.page:type_name -> basic.Page
-	10, // 6: manage.ListFeedBackResp.resp:type_name -> basic.Response
-	9,  // 7: manage.ListFeedBackResp.feedbacks:type_name -> manage.ListFeedBackResp.FeedBack
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	14, // 4: manage.ForbiddenUserResp.resp:type_name -> basic.Response
+	15, // 5: manage.ListFeedBackReq.page:type_name -> basic.Page
+	14, // 6: manage.ListFeedBackResp.resp:type_name -> basic.Response
+	11, // 7: manage.ListFeedBackResp.feedbacks:type_name -> manage.ListFeedBackResp.FeedBack
+	14, // 8: manage.UserStatisticsResp.resp:type_name -> basic.Response
+	12, // 9: manage.UserStatisticsResp.growth:type_name -> manage.UserStatisticsResp.Item
+	12, // 10: manage.UserStatisticsResp.accumulate:type_name -> manage.UserStatisticsResp.Item
+	13, // 11: manage.UserStatisticsResp.trend:type_name -> manage.UserStatisticsResp.Trend
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func file_core_api_manage_proto_init() {
@@ -980,7 +1269,55 @@ func file_core_api_manage_proto_init() {
 			}
 		}
 		file_core_api_manage_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserStatisticsReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserStatisticsResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListFeedBackResp_FeedBack); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserStatisticsResp_Item); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_core_api_manage_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserStatisticsResp_Trend); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1000,7 +1337,7 @@ func file_core_api_manage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_core_api_manage_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

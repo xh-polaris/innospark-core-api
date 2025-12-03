@@ -172,7 +172,7 @@ var file_core_api_proto_rawDesc = []byte{
 	0x5f, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67,
 	0x65, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x22, 0x15, 0xd2, 0xc1, 0x18, 0x11, 0x2f, 0x69,
 	0x6e, 0x74, 0x65, 0x6c, 0x6c, 0x69, 0x67, 0x65, 0x6e, 0x63, 0x65, 0x2f, 0x67, 0x65, 0x74, 0x32,
-	0xdc, 0x02, 0x0a, 0x09, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x41, 0x70, 0x69, 0x12, 0x4d, 0x0a,
+	0xbf, 0x03, 0x0a, 0x09, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x41, 0x70, 0x69, 0x12, 0x4d, 0x0a,
 	0x0a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x15, 0x2e, 0x6d, 0x61,
 	0x6e, 0x61, 0x67, 0x65, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52,
 	0x65, 0x71, 0x1a, 0x16, 0x2e, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x2e, 0x41, 0x64, 0x6d, 0x69,
@@ -193,19 +193,26 @@ var file_core_api_proto_rawDesc = []byte{
 	0x65, 0x65, 0x64, 0x42, 0x61, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x1a, 0x18, 0x2e, 0x6d, 0x61, 0x6e,
 	0x61, 0x67, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x65, 0x65, 0x64, 0x42, 0x61, 0x63, 0x6b,
 	0x52, 0x65, 0x73, 0x70, 0x22, 0x18, 0xd2, 0xc1, 0x18, 0x14, 0x2f, 0x61, 0x64, 0x6d, 0x69, 0x6e,
-	0x2f, 0x66, 0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x2f, 0x6c, 0x69, 0x73, 0x74, 0x32, 0x6e,
-	0x0a, 0x09, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x41, 0x70, 0x69, 0x12, 0x61, 0x0a, 0x0c, 0x47,
-	0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x12, 0x19, 0x2e, 0x63, 0x6f,
-	0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64,
-	0x55, 0x52, 0x4c, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70,
-	0x69, 0x2e, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x52, 0x65,
-	0x73, 0x70, 0x22, 0x1a, 0xd2, 0xc1, 0x18, 0x16, 0x2f, 0x73, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2f,
-	0x67, 0x65, 0x6e, 0x5f, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x5f, 0x75, 0x72, 0x6c, 0x42, 0x47,
-	0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x68, 0x2d,
-	0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73, 0x70, 0x61, 0x72,
-	0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x61,
-	0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74, 0x6f, 0x2f, 0x63,
-	0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2f, 0x66, 0x65, 0x65, 0x64, 0x62, 0x61, 0x63, 0x6b, 0x2f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x61,
+	0x0a, 0x0d, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x12,
+	0x19, 0x2e, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61,
+	0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x6d, 0x61, 0x6e,
+	0x61, 0x67, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69,
+	0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x22, 0x19, 0xd2, 0xc1, 0x18, 0x15, 0x2f, 0x61, 0x64, 0x6d,
+	0x69, 0x6e, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x2f, 0x75, 0x73, 0x65,
+	0x72, 0x32, 0x6e, 0x0a, 0x09, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x41, 0x70, 0x69, 0x12, 0x61,
+	0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x12, 0x19,
+	0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67,
+	0x6e, 0x65, 0x64, 0x55, 0x52, 0x4c, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x63, 0x6f, 0x72, 0x65,
+	0x5f, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x55, 0x52,
+	0x4c, 0x52, 0x65, 0x73, 0x70, 0x22, 0x1a, 0xd2, 0xc1, 0x18, 0x16, 0x2f, 0x73, 0x79, 0x73, 0x74,
+	0x65, 0x6d, 0x2f, 0x67, 0x65, 0x6e, 0x5f, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x5f, 0x75, 0x72,
+	0x6c, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x78, 0x68, 0x2d, 0x70, 0x6f, 0x6c, 0x61, 0x72, 0x69, 0x73, 0x2f, 0x69, 0x6e, 0x6e, 0x6f, 0x73,
+	0x70, 0x61, 0x72, 0x6b, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2d, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69,
+	0x7a, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x64, 0x74,
+	0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var file_core_api_proto_goTypes = []interface{}{
@@ -233,31 +240,33 @@ var file_core_api_proto_goTypes = []interface{}{
 	(*manage.ListUserReq)(nil),         // 21: manage.ListUserReq
 	(*manage.ForbiddenUserReq)(nil),    // 22: manage.ForbiddenUserReq
 	(*manage.ListFeedBackReq)(nil),     // 23: manage.ListFeedBackReq
-	(*GenSignedURLReq)(nil),            // 24: core_api.GenSignedURLReq
-	(*SSEEvent)(nil),                   // 25: core_api.SSEEvent
-	(*CreateConversationResp)(nil),     // 26: core_api.CreateConversationResp
-	(*ListConversationResp)(nil),       // 27: core_api.ListConversationResp
-	(*GetConversationResp)(nil),        // 28: core_api.GetConversationResp
-	(*GenerateBriefResp)(nil),          // 29: core_api.GenerateBriefResp
-	(*RenameConversationResp)(nil),     // 30: core_api.RenameConversationResp
-	(*DeleteConversationResp)(nil),     // 31: core_api.DeleteConversationResp
-	(*SearchConversationResp)(nil),     // 32: core_api.SearchConversationResp
-	(*ListAgentsResp)(nil),             // 33: core_api.ListAgentsResp
-	(*FeedbackResp)(nil),               // 34: core_api.FeedbackResp
-	(*SendVerifyCodeResp)(nil),         // 35: core_api.SendVerifyCodeResp
-	(*CheckVerifyCodeResp)(nil),        // 36: core_api.CheckVerifyCodeResp
-	(*BasicUserRegisterResp)(nil),      // 37: core_api.BasicUserRegisterResp
-	(*BasicUserLoginResp)(nil),         // 38: core_api.BasicUserLoginResp
-	(*BasicUserUpdateProfileResp)(nil), // 39: core_api.BasicUserUpdateProfileResp
-	(*BasicUserGetProfileResp)(nil),    // 40: core_api.BasicUserGetProfileResp
-	(*ThirdPartyLoginResp)(nil),        // 41: core_api.ThirdPartyLoginResp
-	(*ListIntelligenceResp)(nil),       // 42: core_api.ListIntelligenceResp
-	(*GetIntelligenceResp)(nil),        // 43: core_api.GetIntelligenceResp
-	(*manage.AdminLoginResp)(nil),      // 44: manage.AdminLoginResp
-	(*manage.ListUserResp)(nil),        // 45: manage.ListUserResp
-	(*manage.ForbiddenUserResp)(nil),   // 46: manage.ForbiddenUserResp
-	(*manage.ListFeedBackResp)(nil),    // 47: manage.ListFeedBackResp
-	(*GenSignedURLResp)(nil),           // 48: core_api.GenSignedURLResp
+	(*manage.UserStatisticsReq)(nil),   // 24: manage.UserStatisticsReq
+	(*GenSignedURLReq)(nil),            // 25: core_api.GenSignedURLReq
+	(*SSEEvent)(nil),                   // 26: core_api.SSEEvent
+	(*CreateConversationResp)(nil),     // 27: core_api.CreateConversationResp
+	(*ListConversationResp)(nil),       // 28: core_api.ListConversationResp
+	(*GetConversationResp)(nil),        // 29: core_api.GetConversationResp
+	(*GenerateBriefResp)(nil),          // 30: core_api.GenerateBriefResp
+	(*RenameConversationResp)(nil),     // 31: core_api.RenameConversationResp
+	(*DeleteConversationResp)(nil),     // 32: core_api.DeleteConversationResp
+	(*SearchConversationResp)(nil),     // 33: core_api.SearchConversationResp
+	(*ListAgentsResp)(nil),             // 34: core_api.ListAgentsResp
+	(*FeedbackResp)(nil),               // 35: core_api.FeedbackResp
+	(*SendVerifyCodeResp)(nil),         // 36: core_api.SendVerifyCodeResp
+	(*CheckVerifyCodeResp)(nil),        // 37: core_api.CheckVerifyCodeResp
+	(*BasicUserRegisterResp)(nil),      // 38: core_api.BasicUserRegisterResp
+	(*BasicUserLoginResp)(nil),         // 39: core_api.BasicUserLoginResp
+	(*BasicUserUpdateProfileResp)(nil), // 40: core_api.BasicUserUpdateProfileResp
+	(*BasicUserGetProfileResp)(nil),    // 41: core_api.BasicUserGetProfileResp
+	(*ThirdPartyLoginResp)(nil),        // 42: core_api.ThirdPartyLoginResp
+	(*ListIntelligenceResp)(nil),       // 43: core_api.ListIntelligenceResp
+	(*GetIntelligenceResp)(nil),        // 44: core_api.GetIntelligenceResp
+	(*manage.AdminLoginResp)(nil),      // 45: manage.AdminLoginResp
+	(*manage.ListUserResp)(nil),        // 46: manage.ListUserResp
+	(*manage.ForbiddenUserResp)(nil),   // 47: manage.ForbiddenUserResp
+	(*manage.ListFeedBackResp)(nil),    // 48: manage.ListFeedBackResp
+	(*manage.UserStatisticsResp)(nil),  // 49: manage.UserStatisticsResp
+	(*GenSignedURLResp)(nil),           // 50: core_api.GenSignedURLResp
 }
 var file_core_api_proto_depIdxs = []int32{
 	0,  // 0: core_api.CoreApi.Completions:input_type -> core_api.CompletionsReq
@@ -285,35 +294,37 @@ var file_core_api_proto_depIdxs = []int32{
 	21, // 22: core_api.ManageApi.ListUser:input_type -> manage.ListUserReq
 	22, // 23: core_api.ManageApi.Forbidden:input_type -> manage.ForbiddenUserReq
 	23, // 24: core_api.ManageApi.ListFeedback:input_type -> manage.ListFeedBackReq
-	24, // 25: core_api.SystemApi.GenSignedURL:input_type -> core_api.GenSignedURLReq
-	25, // 26: core_api.CoreApi.Completions:output_type -> core_api.SSEEvent
-	26, // 27: core_api.CoreApi.CreateConversation:output_type -> core_api.CreateConversationResp
-	27, // 28: core_api.CoreApi.ListConversation:output_type -> core_api.ListConversationResp
-	28, // 29: core_api.CoreApi.GetConversation:output_type -> core_api.GetConversationResp
-	29, // 30: core_api.CoreApi.Generate:output_type -> core_api.GenerateBriefResp
-	30, // 31: core_api.CoreApi.RenameConversation:output_type -> core_api.RenameConversationResp
-	31, // 32: core_api.CoreApi.DeleteConversation:output_type -> core_api.DeleteConversationResp
-	32, // 33: core_api.CoreApi.SearchConversation:output_type -> core_api.SearchConversationResp
-	33, // 34: core_api.CoreApi.ListAgents:output_type -> core_api.ListAgentsResp
-	34, // 35: core_api.CoreApi.Feedback:output_type -> core_api.FeedbackResp
-	34, // 36: core_api.CoreApi.FeedbackContent:output_type -> core_api.FeedbackResp
-	35, // 37: core_api.CoreApi.SendVerifyCode:output_type -> core_api.SendVerifyCodeResp
-	36, // 38: core_api.CoreApi.CheckVerifyCode:output_type -> core_api.CheckVerifyCodeResp
-	37, // 39: core_api.CoreApi.BasicUserRegister:output_type -> core_api.BasicUserRegisterResp
-	38, // 40: core_api.CoreApi.BasicUserLogin:output_type -> core_api.BasicUserLoginResp
-	37, // 41: core_api.CoreApi.BasicUserResetPassword:output_type -> core_api.BasicUserRegisterResp
-	39, // 42: core_api.CoreApi.BasicUserUpdateProfile:output_type -> core_api.BasicUserUpdateProfileResp
-	40, // 43: core_api.CoreApi.BasicUserGetProfile:output_type -> core_api.BasicUserGetProfileResp
-	41, // 44: core_api.CoreApi.ThirdPartyLogin:output_type -> core_api.ThirdPartyLoginResp
-	42, // 45: core_api.IntelligenceApi.ListIntelligence:output_type -> core_api.ListIntelligenceResp
-	43, // 46: core_api.IntelligenceApi.GetIntelligence:output_type -> core_api.GetIntelligenceResp
-	44, // 47: core_api.ManageApi.AdminLogin:output_type -> manage.AdminLoginResp
-	45, // 48: core_api.ManageApi.ListUser:output_type -> manage.ListUserResp
-	46, // 49: core_api.ManageApi.Forbidden:output_type -> manage.ForbiddenUserResp
-	47, // 50: core_api.ManageApi.ListFeedback:output_type -> manage.ListFeedBackResp
-	48, // 51: core_api.SystemApi.GenSignedURL:output_type -> core_api.GenSignedURLResp
-	26, // [26:52] is the sub-list for method output_type
-	0,  // [0:26] is the sub-list for method input_type
+	24, // 25: core_api.ManageApi.UserStatistic:input_type -> manage.UserStatisticsReq
+	25, // 26: core_api.SystemApi.GenSignedURL:input_type -> core_api.GenSignedURLReq
+	26, // 27: core_api.CoreApi.Completions:output_type -> core_api.SSEEvent
+	27, // 28: core_api.CoreApi.CreateConversation:output_type -> core_api.CreateConversationResp
+	28, // 29: core_api.CoreApi.ListConversation:output_type -> core_api.ListConversationResp
+	29, // 30: core_api.CoreApi.GetConversation:output_type -> core_api.GetConversationResp
+	30, // 31: core_api.CoreApi.Generate:output_type -> core_api.GenerateBriefResp
+	31, // 32: core_api.CoreApi.RenameConversation:output_type -> core_api.RenameConversationResp
+	32, // 33: core_api.CoreApi.DeleteConversation:output_type -> core_api.DeleteConversationResp
+	33, // 34: core_api.CoreApi.SearchConversation:output_type -> core_api.SearchConversationResp
+	34, // 35: core_api.CoreApi.ListAgents:output_type -> core_api.ListAgentsResp
+	35, // 36: core_api.CoreApi.Feedback:output_type -> core_api.FeedbackResp
+	35, // 37: core_api.CoreApi.FeedbackContent:output_type -> core_api.FeedbackResp
+	36, // 38: core_api.CoreApi.SendVerifyCode:output_type -> core_api.SendVerifyCodeResp
+	37, // 39: core_api.CoreApi.CheckVerifyCode:output_type -> core_api.CheckVerifyCodeResp
+	38, // 40: core_api.CoreApi.BasicUserRegister:output_type -> core_api.BasicUserRegisterResp
+	39, // 41: core_api.CoreApi.BasicUserLogin:output_type -> core_api.BasicUserLoginResp
+	38, // 42: core_api.CoreApi.BasicUserResetPassword:output_type -> core_api.BasicUserRegisterResp
+	40, // 43: core_api.CoreApi.BasicUserUpdateProfile:output_type -> core_api.BasicUserUpdateProfileResp
+	41, // 44: core_api.CoreApi.BasicUserGetProfile:output_type -> core_api.BasicUserGetProfileResp
+	42, // 45: core_api.CoreApi.ThirdPartyLogin:output_type -> core_api.ThirdPartyLoginResp
+	43, // 46: core_api.IntelligenceApi.ListIntelligence:output_type -> core_api.ListIntelligenceResp
+	44, // 47: core_api.IntelligenceApi.GetIntelligence:output_type -> core_api.GetIntelligenceResp
+	45, // 48: core_api.ManageApi.AdminLogin:output_type -> manage.AdminLoginResp
+	46, // 49: core_api.ManageApi.ListUser:output_type -> manage.ListUserResp
+	47, // 50: core_api.ManageApi.Forbidden:output_type -> manage.ForbiddenUserResp
+	48, // 51: core_api.ManageApi.ListFeedback:output_type -> manage.ListFeedBackResp
+	49, // 52: core_api.ManageApi.UserStatistic:output_type -> manage.UserStatisticsResp
+	50, // 53: core_api.SystemApi.GenSignedURL:output_type -> core_api.GenSignedURLResp
+	27, // [27:54] is the sub-list for method output_type
+	0,  // [0:27] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
