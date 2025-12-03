@@ -73,6 +73,10 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	} else {
 		profile = u.Profile
 	}
+	ext := req.CompletionsOption.Ext
+	if ext == nil {
+		ext = make(map[string]string)
+	}
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
@@ -86,7 +90,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 			IsReplace:       req.CompletionsOption.IsReplace,
 			SelectedRegenId: req.CompletionsOption.SelectedRegenId},
 		Profile: profile,
-		Ext:     req.CompletionsOption.Ext,
+		Ext:     ext,
 		ModelInfo: &info.ModelInfo{Model: req.Model, BotId: req.BotId, WebSearch: req.CompletionsOption.GetWebSearch(),
 			Thinking: req.CompletionsOption.UseDeepThink},
 		MessageInfo:    &info.MessageInfo{},
