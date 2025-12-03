@@ -41,7 +41,12 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 		logs.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
 		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
 	}
-	if _, forbidden, expire, err := s.UserMapper.CheckForbidden(ctx, uid); err != nil {
+	var (
+		u         *user.User
+		expire    time.Time
+		forbidden bool
+	)
+	if u, _, forbidden, expire, err = s.UserMapper.CheckForbidden(ctx, uid); err != nil {
 		return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
 	} else if forbidden { // 封禁中
 		return nil, errorx.New(errno.ErrForbidden, errorx.KV("time", expire.Local().Format(time.RFC3339)))
@@ -73,6 +78,8 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 			IsRegen:         req.CompletionsOption.IsRegen,
 			IsReplace:       req.CompletionsOption.IsReplace,
 			SelectedRegenId: req.CompletionsOption.SelectedRegenId},
+		Profile: u.Profile,
+		Ext:     req.CompletionsOption.Ext,
 		ModelInfo: &info.ModelInfo{Model: req.Model, BotId: req.BotId, WebSearch: req.CompletionsOption.GetWebSearch(),
 			Thinking: req.CompletionsOption.UseDeepThink},
 		MessageInfo:    &info.MessageInfo{},
@@ -85,7 +92,8 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 		},
 		Sensitive: &info.Sensitive{},
 	}
-
+	state.Ext["query"] = req.Messages[0].Content // 将用户原始提问存入query中, 简化可能存在的提示词注入
+	state.Ext["role"] = state.Profile.Role
 	_, err = s.CompletionGraph.CompileAndStream(ctx, state)
 	return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
 }

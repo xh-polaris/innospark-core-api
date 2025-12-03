@@ -12,6 +12,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/msg"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/prompt_inject"
 	tool "github.com/xh-polaris/innospark-core-api/biz/domain/tool"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
@@ -101,7 +102,7 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 
 	// to optimize 根据模型配置, 路由到不同的分支
 	// 调用模型
-	modelOpt := compose.WithStatePreHandler(func(ctx context.Context, in []*schema.Message, state Context) ([]*schema.Message, error) {
+	modelOpt := compose.WithStatePreHandler(func(ctx context.Context, in []*schema.Message, state Context) (_ []*schema.Message, err error) {
 		if state.ModelInfo.BotId == "code-gen" {
 			state.ModelInfo.Model = model.Claude4Sonnet
 			// 填充模板
@@ -122,6 +123,12 @@ func DrawCompletionGraph(hd *HistoryDomain) *CompletionGraph {
 		} else if needVL(in) { // 需要视觉模型
 			if !strings.HasSuffix(state.ModelInfo.Model, "-VL") {
 				state.ModelInfo.Model += "-VL"
+			}
+		}
+		if strings.HasPrefix(state.ModelInfo.BotId, "cotea-") {
+			in, err = prompt_inject.CoTeaSysInject(ctx, in, state)
+			if err != nil {
+				return nil, err
 			}
 		}
 		return in, nil

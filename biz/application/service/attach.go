@@ -38,7 +38,7 @@ func (s *AttachService) GenSignedURL(ctx context.Context, req *core_api.GenSigne
 		logs.Error("extract user id error: %s", errorx.ErrorWithoutStack(err))
 		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
 	}
-	if _, forbidden, expire, err := s.UserMapper.CheckForbidden(ctx, uid); err != nil {
+	if _, _, forbidden, expire, err := s.UserMapper.CheckForbidden(ctx, uid); err != nil {
 		return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
 	} else if forbidden { // 封禁中
 		return nil, errorx.New(errno.ErrForbidden, errorx.KV("time", expire.Local().Format(time.RFC3339)))

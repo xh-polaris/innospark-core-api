@@ -28,7 +28,7 @@ type MongoMapper interface {
 	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) // 查找或创建一个用户
 	FindById(ctx context.Context, id string) (*User, error)
 
-	CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error)
+	CheckForbidden(ctx context.Context, id string) (*User, int, bool, time.Time, error)
 	Warn(ctx context.Context, id string) error
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
@@ -86,20 +86,20 @@ func (m *mongoMapper) FindById(ctx context.Context, id string) (*User, error) {
 	return &u, err
 }
 
-func (m *mongoMapper) CheckForbidden(ctx context.Context, id string) (int, bool, time.Time, error) {
+func (m *mongoMapper) CheckForbidden(ctx context.Context, id string) (*User, int, bool, time.Time, error) {
 	u, err := m.FindById(ctx, id)
 	if err != nil {
-		return 0, false, time.Time{}, err
+		return nil, 0, false, time.Time{}, err
 	}
 	if u.Status == StatusForbidden {
 		if time.Now().Unix() >= u.Expire.Unix() { // 解封
 			u.Status = StatusNormal
 			if err = m.UnForbidden(ctx, id); err != nil {
-				return 0, false, time.Time{}, err
+				return nil, 0, false, time.Time{}, err
 			}
 		}
 	}
-	return int(u.Status), u.Status == StatusForbidden, u.Expire, nil
+	return u, int(u.Status), u.Status == StatusForbidden, u.Expire, nil
 }
 
 func (m *mongoMapper) Warn(ctx context.Context, id string) error {

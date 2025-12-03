@@ -108,13 +108,14 @@ type CompletionsOption struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IsRegen         bool    `protobuf:"varint,1,opt,name=isRegen,proto3" form:"isRegen" json:"isRegen" query:"isRegen"`                                      // 是否重新生成
-	SelectedRegenId *string `protobuf:"bytes,2,opt,name=selectedRegenId,proto3,oneof" form:"selectedRegenId" json:"selectedRegenId" query:"selectedRegenId"` // 选择生成的id
-	WithSuggest     bool    `protobuf:"varint,3,opt,name=withSuggest,proto3" form:"withSuggest" json:"withSuggest" query:"withSuggest"`                      // 是否生成建议
-	IsReplace       bool    `protobuf:"varint,4,opt,name=isReplace,proto3" form:"isReplace" json:"isReplace" query:"isReplace"`                              // 是否替换
-	UseDeepThink    bool    `protobuf:"varint,5,opt,name=useDeepThink,proto3" form:"useDeepThink" json:"useDeepThink" query:"useDeepThink"`                  // 是否深度思考
-	Stream          bool    `protobuf:"varint,6,opt,name=stream,proto3" form:"stream" json:"stream" query:"stream"`                                          // 是否流式
-	WebSearch       *bool   `protobuf:"varint,7,opt,name=webSearch,proto3,oneof" form:"webSearch" json:"webSearch" query:"webSearch"`                        // 是否联网搜索
+	IsRegen         bool              `protobuf:"varint,1,opt,name=isRegen,proto3" form:"isRegen" json:"isRegen" query:"isRegen"`                                                                        // 是否重新生成
+	SelectedRegenId *string           `protobuf:"bytes,2,opt,name=selectedRegenId,proto3,oneof" form:"selectedRegenId" json:"selectedRegenId" query:"selectedRegenId"`                                   // 选择生成的id
+	WithSuggest     bool              `protobuf:"varint,3,opt,name=withSuggest,proto3" form:"withSuggest" json:"withSuggest" query:"withSuggest"`                                                        // 是否生成建议
+	IsReplace       bool              `protobuf:"varint,4,opt,name=isReplace,proto3" form:"isReplace" json:"isReplace" query:"isReplace"`                                                                // 是否替换
+	UseDeepThink    bool              `protobuf:"varint,5,opt,name=useDeepThink,proto3" form:"useDeepThink" json:"useDeepThink" query:"useDeepThink"`                                                    // 是否深度思考
+	Stream          bool              `protobuf:"varint,6,opt,name=stream,proto3" form:"stream" json:"stream" query:"stream"`                                                                            // 是否流式
+	WebSearch       *bool             `protobuf:"varint,7,opt,name=webSearch,proto3,oneof" form:"webSearch" json:"webSearch" query:"webSearch"`                                                          // 是否联网搜索
+	Ext             map[string]string `protobuf:"bytes,8,rep,name=ext,proto3" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" form:"ext" json:"ext" query:"ext"` // 额外信息
 }
 
 func (x *CompletionsOption) Reset() {
@@ -196,6 +197,13 @@ func (x *CompletionsOption) GetWebSearch() bool {
 		return *x.WebSearch
 	}
 	return false
+}
+
+func (x *CompletionsOption) GetExt() map[string]string {
+	if x != nil {
+		return x.Ext
+	}
+	return nil
 }
 
 type Ext struct {
@@ -3972,7 +3980,7 @@ type Usage_PromptTokenDetails struct {
 func (x *Usage_PromptTokenDetails) Reset() {
 	*x = Usage_PromptTokenDetails{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[60]
+		mi := &file_core_api_common_proto_msgTypes[61]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3985,7 +3993,7 @@ func (x *Usage_PromptTokenDetails) String() string {
 func (*Usage_PromptTokenDetails) ProtoMessage() {}
 
 func (x *Usage_PromptTokenDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[60]
+	mi := &file_core_api_common_proto_msgTypes[61]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4020,7 +4028,7 @@ type EventChat_Message struct {
 func (x *EventChat_Message) Reset() {
 	*x = EventChat_Message{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[61]
+		mi := &file_core_api_common_proto_msgTypes[62]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4033,7 +4041,7 @@ func (x *EventChat_Message) String() string {
 func (*EventChat_Message) ProtoMessage() {}
 
 func (x *EventChat_Message) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[61]
+	mi := &file_core_api_common_proto_msgTypes[62]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4077,7 +4085,7 @@ type ListAgentsResp_Agent struct {
 func (x *ListAgentsResp_Agent) Reset() {
 	*x = ListAgentsResp_Agent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[62]
+		mi := &file_core_api_common_proto_msgTypes[63]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4090,7 +4098,7 @@ func (x *ListAgentsResp_Agent) String() string {
 func (*ListAgentsResp_Agent) ProtoMessage() {}
 
 func (x *ListAgentsResp_Agent) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[62]
+	mi := &file_core_api_common_proto_msgTypes[63]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4146,7 +4154,7 @@ type FeedbackReq_Feedback struct {
 func (x *FeedbackReq_Feedback) Reset() {
 	*x = FeedbackReq_Feedback{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_core_api_common_proto_msgTypes[63]
+		mi := &file_core_api_common_proto_msgTypes[64]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4159,7 +4167,7 @@ func (x *FeedbackReq_Feedback) String() string {
 func (*FeedbackReq_Feedback) ProtoMessage() {}
 
 func (x *FeedbackReq_Feedback) ProtoReflect() protoreflect.Message {
-	mi := &file_core_api_common_proto_msgTypes[63]
+	mi := &file_core_api_common_proto_msgTypes[64]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4207,7 +4215,7 @@ var file_core_api_common_proto_rawDesc = []byte{
 	0x61, 0x63, 0x68, 0x65, 0x73, 0x12, 0x1e, 0x0a, 0x0a, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e,
 	0x63, 0x65, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x65, 0x66, 0x65, 0x72,
 	0x65, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x22, 0x9d, 0x02, 0x0a, 0x11, 0x43, 0x6f,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x22, 0x8d, 0x03, 0x0a, 0x11, 0x43, 0x6f,
 	0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12,
 	0x18, 0x0a, 0x07, 0x69, 0x73, 0x52, 0x65, 0x67, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
 	0x52, 0x07, 0x69, 0x73, 0x52, 0x65, 0x67, 0x65, 0x6e, 0x12, 0x2d, 0x0a, 0x0f, 0x73, 0x65, 0x6c,
@@ -4223,7 +4231,14 @@ var file_core_api_common_proto_rawDesc = []byte{
 	0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x73, 0x74,
 	0x72, 0x65, 0x61, 0x6d, 0x12, 0x21, 0x0a, 0x09, 0x77, 0x65, 0x62, 0x53, 0x65, 0x61, 0x72, 0x63,
 	0x68, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x48, 0x01, 0x52, 0x09, 0x77, 0x65, 0x62, 0x53, 0x65,
-	0x61, 0x72, 0x63, 0x68, 0x88, 0x01, 0x01, 0x42, 0x12, 0x0a, 0x10, 0x5f, 0x73, 0x65, 0x6c, 0x65,
+	0x61, 0x72, 0x63, 0x68, 0x88, 0x01, 0x01, 0x12, 0x36, 0x0a, 0x03, 0x65, 0x78, 0x74, 0x18, 0x08,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e,
+	0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x4f, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x2e, 0x45, 0x78, 0x74, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x03, 0x65, 0x78, 0x74, 0x1a,
+	0x36, 0x0a, 0x08, 0x45, 0x78, 0x74, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
+	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x12, 0x0a, 0x10, 0x5f, 0x73, 0x65, 0x6c, 0x65,
 	0x63, 0x74, 0x65, 0x64, 0x52, 0x65, 0x67, 0x65, 0x6e, 0x49, 0x64, 0x42, 0x0c, 0x0a, 0x0a, 0x5f,
 	0x77, 0x65, 0x62, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0xf5, 0x01, 0x0a, 0x03, 0x45, 0x78,
 	0x74, 0x12, 0x1b, 0x0a, 0x09, 0x62, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x01,
@@ -4750,7 +4765,7 @@ func file_core_api_common_proto_rawDescGZIP() []byte {
 	return file_core_api_common_proto_rawDescData
 }
 
-var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
+var file_core_api_common_proto_msgTypes = make([]protoimpl.MessageInfo, 65)
 var file_core_api_common_proto_goTypes = []interface{}{
 	(*Message)(nil),                    // 0: core_api.Message
 	(*CompletionsOption)(nil),          // 1: core_api.CompletionsOption
@@ -4812,67 +4827,69 @@ var file_core_api_common_proto_goTypes = []interface{}{
 	(*BasicUserGetProfileResp)(nil),    // 57: core_api.BasicUserGetProfileResp
 	(*GenSignedURLReq)(nil),            // 58: core_api.GenSignedURLReq
 	(*GenSignedURLResp)(nil),           // 59: core_api.GenSignedURLResp
-	(*Usage_PromptTokenDetails)(nil),   // 60: core_api.Usage.PromptTokenDetails
-	(*EventChat_Message)(nil),          // 61: core_api.EventChat.Message
-	(*ListAgentsResp_Agent)(nil),       // 62: core_api.ListAgentsResp.Agent
-	(*FeedbackReq_Feedback)(nil),       // 63: core_api.FeedbackReq.Feedback
-	(*basic.Response)(nil),             // 64: basic.Response
-	(*basic.Page)(nil),                 // 65: basic.Page
+	nil,                                // 60: core_api.CompletionsOption.ExtEntry
+	(*Usage_PromptTokenDetails)(nil),   // 61: core_api.Usage.PromptTokenDetails
+	(*EventChat_Message)(nil),          // 62: core_api.EventChat.Message
+	(*ListAgentsResp_Agent)(nil),       // 63: core_api.ListAgentsResp.Agent
+	(*FeedbackReq_Feedback)(nil),       // 64: core_api.FeedbackReq.Feedback
+	(*basic.Response)(nil),             // 65: basic.Response
+	(*basic.Page)(nil),                 // 66: basic.Page
 }
 var file_core_api_common_proto_depIdxs = []int32{
-	4,  // 0: core_api.Ext.cite:type_name -> core_api.Cite
-	5,  // 1: core_api.Ext.code:type_name -> core_api.Code
-	3,  // 2: core_api.Ext.usage:type_name -> core_api.Usage
-	60, // 3: core_api.Usage.promptTokenDetails:type_name -> core_api.Usage.PromptTokenDetails
-	7,  // 4: core_api.MessageInputPart.image:type_name -> core_api.MessageInputImage
-	8,  // 5: core_api.MessageInputPart.audio:type_name -> core_api.MessageInputAudio
-	9,  // 6: core_api.MessageInputPart.video:type_name -> core_api.MessageInputVideo
-	10, // 7: core_api.MessageInputPart.file:type_name -> core_api.MessageInputFile
-	12, // 8: core_api.MessageOutputPart.image:type_name -> core_api.MessageOutputImage
-	13, // 9: core_api.MessageOutputPart.audio:type_name -> core_api.MessageOutputAudio
-	14, // 10: core_api.MessageOutputPart.video:type_name -> core_api.MessageOutputVideo
-	6,  // 11: core_api.FullMessage.userInputMultiContent:type_name -> core_api.MessageInputPart
-	11, // 12: core_api.FullMessage.assistantGenMultiContent:type_name -> core_api.MessageOutputPart
-	2,  // 13: core_api.FullMessage.ext:type_name -> core_api.Ext
-	61, // 14: core_api.EventChat.message:type_name -> core_api.EventChat.Message
-	0,  // 15: core_api.CompletionsReq.messages:type_name -> core_api.Message
-	1,  // 16: core_api.CompletionsReq.completionsOption:type_name -> core_api.CompletionsOption
-	64, // 17: core_api.CreateConversationResp.resp:type_name -> basic.Response
-	65, // 18: core_api.ListConversationReq.page:type_name -> basic.Page
-	64, // 19: core_api.ListConversationResp.resp:type_name -> basic.Response
-	21, // 20: core_api.ListConversationResp.conversations:type_name -> core_api.Conversation
-	65, // 21: core_api.GetConversationReq.page:type_name -> basic.Page
-	64, // 22: core_api.GetConversationResp.resp:type_name -> basic.Response
-	15, // 23: core_api.GetConversationResp.messageList:type_name -> core_api.FullMessage
-	15, // 24: core_api.GetConversationResp.regenList:type_name -> core_api.FullMessage
-	0,  // 25: core_api.GenerateBriefReq.messages:type_name -> core_api.Message
-	64, // 26: core_api.GenerateBriefResp.resp:type_name -> basic.Response
-	64, // 27: core_api.RenameConversationResp.resp:type_name -> basic.Response
-	64, // 28: core_api.DeleteConversationResp.resp:type_name -> basic.Response
-	65, // 29: core_api.SearchConversationReq.page:type_name -> basic.Page
-	64, // 30: core_api.SearchConversationResp.resp:type_name -> basic.Response
-	21, // 31: core_api.SearchConversationResp.conversations:type_name -> core_api.Conversation
-	65, // 32: core_api.ListAgentsReq.page:type_name -> basic.Page
-	64, // 33: core_api.ListAgentsResp.resp:type_name -> basic.Response
-	62, // 34: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
-	63, // 35: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
-	64, // 36: core_api.FeedbackResp.resp:type_name -> basic.Response
-	64, // 37: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
-	64, // 38: core_api.CheckVerifyCodeResp.resp:type_name -> basic.Response
-	64, // 39: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
-	64, // 40: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
-	64, // 41: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
-	64, // 42: core_api.ThirdPartyLoginResp.resp:type_name -> basic.Response
-	22, // 43: core_api.BasicUserUpdateProfileReq.profile:type_name -> core_api.Profile
-	64, // 44: core_api.BasicUserUpdateProfileResp.resp:type_name -> basic.Response
-	64, // 45: core_api.BasicUserGetProfileResp.resp:type_name -> basic.Response
-	22, // 46: core_api.BasicUserGetProfileResp.profile:type_name -> core_api.Profile
-	64, // 47: core_api.GenSignedURLResp.resp:type_name -> basic.Response
-	48, // [48:48] is the sub-list for method output_type
-	48, // [48:48] is the sub-list for method input_type
-	48, // [48:48] is the sub-list for extension type_name
-	48, // [48:48] is the sub-list for extension extendee
-	0,  // [0:48] is the sub-list for field type_name
+	60, // 0: core_api.CompletionsOption.ext:type_name -> core_api.CompletionsOption.ExtEntry
+	4,  // 1: core_api.Ext.cite:type_name -> core_api.Cite
+	5,  // 2: core_api.Ext.code:type_name -> core_api.Code
+	3,  // 3: core_api.Ext.usage:type_name -> core_api.Usage
+	61, // 4: core_api.Usage.promptTokenDetails:type_name -> core_api.Usage.PromptTokenDetails
+	7,  // 5: core_api.MessageInputPart.image:type_name -> core_api.MessageInputImage
+	8,  // 6: core_api.MessageInputPart.audio:type_name -> core_api.MessageInputAudio
+	9,  // 7: core_api.MessageInputPart.video:type_name -> core_api.MessageInputVideo
+	10, // 8: core_api.MessageInputPart.file:type_name -> core_api.MessageInputFile
+	12, // 9: core_api.MessageOutputPart.image:type_name -> core_api.MessageOutputImage
+	13, // 10: core_api.MessageOutputPart.audio:type_name -> core_api.MessageOutputAudio
+	14, // 11: core_api.MessageOutputPart.video:type_name -> core_api.MessageOutputVideo
+	6,  // 12: core_api.FullMessage.userInputMultiContent:type_name -> core_api.MessageInputPart
+	11, // 13: core_api.FullMessage.assistantGenMultiContent:type_name -> core_api.MessageOutputPart
+	2,  // 14: core_api.FullMessage.ext:type_name -> core_api.Ext
+	62, // 15: core_api.EventChat.message:type_name -> core_api.EventChat.Message
+	0,  // 16: core_api.CompletionsReq.messages:type_name -> core_api.Message
+	1,  // 17: core_api.CompletionsReq.completionsOption:type_name -> core_api.CompletionsOption
+	65, // 18: core_api.CreateConversationResp.resp:type_name -> basic.Response
+	66, // 19: core_api.ListConversationReq.page:type_name -> basic.Page
+	65, // 20: core_api.ListConversationResp.resp:type_name -> basic.Response
+	21, // 21: core_api.ListConversationResp.conversations:type_name -> core_api.Conversation
+	66, // 22: core_api.GetConversationReq.page:type_name -> basic.Page
+	65, // 23: core_api.GetConversationResp.resp:type_name -> basic.Response
+	15, // 24: core_api.GetConversationResp.messageList:type_name -> core_api.FullMessage
+	15, // 25: core_api.GetConversationResp.regenList:type_name -> core_api.FullMessage
+	0,  // 26: core_api.GenerateBriefReq.messages:type_name -> core_api.Message
+	65, // 27: core_api.GenerateBriefResp.resp:type_name -> basic.Response
+	65, // 28: core_api.RenameConversationResp.resp:type_name -> basic.Response
+	65, // 29: core_api.DeleteConversationResp.resp:type_name -> basic.Response
+	66, // 30: core_api.SearchConversationReq.page:type_name -> basic.Page
+	65, // 31: core_api.SearchConversationResp.resp:type_name -> basic.Response
+	21, // 32: core_api.SearchConversationResp.conversations:type_name -> core_api.Conversation
+	66, // 33: core_api.ListAgentsReq.page:type_name -> basic.Page
+	65, // 34: core_api.ListAgentsResp.resp:type_name -> basic.Response
+	63, // 35: core_api.ListAgentsResp.agents:type_name -> core_api.ListAgentsResp.Agent
+	64, // 36: core_api.FeedbackReq.feedback:type_name -> core_api.FeedbackReq.Feedback
+	65, // 37: core_api.FeedbackResp.resp:type_name -> basic.Response
+	65, // 38: core_api.SendVerifyCodeResp.resp:type_name -> basic.Response
+	65, // 39: core_api.CheckVerifyCodeResp.resp:type_name -> basic.Response
+	65, // 40: core_api.BasicUserRegisterResp.resp:type_name -> basic.Response
+	65, // 41: core_api.BasicUserLoginResp.resp:type_name -> basic.Response
+	65, // 42: core_api.BasicUserResetPasswordResp.resp:type_name -> basic.Response
+	65, // 43: core_api.ThirdPartyLoginResp.resp:type_name -> basic.Response
+	22, // 44: core_api.BasicUserUpdateProfileReq.profile:type_name -> core_api.Profile
+	65, // 45: core_api.BasicUserUpdateProfileResp.resp:type_name -> basic.Response
+	65, // 46: core_api.BasicUserGetProfileResp.resp:type_name -> basic.Response
+	22, // 47: core_api.BasicUserGetProfileResp.profile:type_name -> core_api.Profile
+	65, // 48: core_api.GenSignedURLResp.resp:type_name -> basic.Response
+	49, // [49:49] is the sub-list for method output_type
+	49, // [49:49] is the sub-list for method input_type
+	49, // [49:49] is the sub-list for extension type_name
+	49, // [49:49] is the sub-list for extension extendee
+	0,  // [0:49] is the sub-list for field type_name
 }
 
 func file_core_api_common_proto_init() {
@@ -5600,7 +5617,7 @@ func file_core_api_common_proto_init() {
 				return nil
 			}
 		}
-		file_core_api_common_proto_msgTypes[60].Exporter = func(v interface{}, i int) interface{} {
+		file_core_api_common_proto_msgTypes[61].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Usage_PromptTokenDetails); i {
 			case 0:
 				return &v.state
@@ -5612,7 +5629,7 @@ func file_core_api_common_proto_init() {
 				return nil
 			}
 		}
-		file_core_api_common_proto_msgTypes[61].Exporter = func(v interface{}, i int) interface{} {
+		file_core_api_common_proto_msgTypes[62].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EventChat_Message); i {
 			case 0:
 				return &v.state
@@ -5624,7 +5641,7 @@ func file_core_api_common_proto_init() {
 				return nil
 			}
 		}
-		file_core_api_common_proto_msgTypes[62].Exporter = func(v interface{}, i int) interface{} {
+		file_core_api_common_proto_msgTypes[63].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListAgentsResp_Agent); i {
 			case 0:
 				return &v.state
@@ -5636,7 +5653,7 @@ func file_core_api_common_proto_init() {
 				return nil
 			}
 		}
-		file_core_api_common_proto_msgTypes[63].Exporter = func(v interface{}, i int) interface{} {
+		file_core_api_common_proto_msgTypes[64].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FeedbackReq_Feedback); i {
 			case 0:
 				return &v.state
@@ -5671,7 +5688,7 @@ func file_core_api_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_core_api_common_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   64,
+			NumMessages:   65,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

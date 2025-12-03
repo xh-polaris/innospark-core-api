@@ -12,6 +12,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -29,6 +30,8 @@ type RelayContext struct {
 	ReplyId           string               // 响应ID
 	OriginMessage     *ReqMessage          // 用户原始消息
 	UserMessage       *mmsg.Message        // 用户消息
+	Profile           *user.Profile        // 用户个性化配置
+	Ext               map[string]string    // 额外配置
 	ResponseMeta      *schema.ResponseMeta // 用量
 	SSE               *adaptor.SSEStream   // SSE流
 	SSEWriter         *sse.Writer          // SSE输出
