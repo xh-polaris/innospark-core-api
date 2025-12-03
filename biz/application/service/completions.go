@@ -65,7 +65,14 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 		}
 		return nil, errorx.New(errno.ErrSensitive, errorx.KV("text", strings.Join(hits, ",")))
 	}
-
+	var profile *user.Profile
+	if u.Profile == nil {
+		profile = &user.Profile{
+			Role: "未知",
+		}
+	} else {
+		profile = u.Profile
+	}
 	// 构建RelayContext
 	oids, err := util.ObjectIDsFromHex(uid, req.ConversationId)
 	if err != nil {
@@ -78,7 +85,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 			IsRegen:         req.CompletionsOption.IsRegen,
 			IsReplace:       req.CompletionsOption.IsReplace,
 			SelectedRegenId: req.CompletionsOption.SelectedRegenId},
-		Profile: u.Profile,
+		Profile: profile,
 		Ext:     req.CompletionsOption.Ext,
 		ModelInfo: &info.ModelInfo{Model: req.Model, BotId: req.BotId, WebSearch: req.CompletionsOption.GetWebSearch(),
 			Thinking: req.CompletionsOption.UseDeepThink},
@@ -93,7 +100,7 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 		Sensitive: &info.Sensitive{},
 	}
 	state.Ext["query"] = req.Messages[0].Content // 将用户原始提问存入query中, 简化可能存在的提示词注入
-	state.Ext["role"] = state.Profile.Role
+	state.Ext["role"] = profile.Role
 	_, err = s.CompletionGraph.CompileAndStream(ctx, state)
 	return nil, errorx.WrapByCode(err, errno.CompletionsErrCode)
 }
