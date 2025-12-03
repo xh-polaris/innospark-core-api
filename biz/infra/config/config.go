@@ -79,11 +79,12 @@ type Config struct {
 	Admin      *Admin
 	TitleGen   string
 	COS        *COS
+	CoTea      *CoTea
 }
 
 func NewConfig() (*Config, error) {
 	once.Do(func() {
-		paths := []string{"etc/config.yaml", "etc/sensitive.yaml"}
+		paths := []string{"etc/config.yaml", "etc/sensitive.yaml", "etc/cotea.yaml"}
 		var err error
 		var data []byte
 		var yamlDocs []string

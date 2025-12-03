@@ -268,6 +268,11 @@ func (u *UserService) UpdateProfile(ctx context.Context, req *core_api.BasicUser
 	if req.Avatar != nil {
 		update[cst.Avatar] = *req.Avatar
 	}
+	if req.Profile != nil {
+		if req.Profile.Role != nil {
+			update[cst.Profile+"."+cst.Role] = *req.Profile.Role
+		}
+	}
 
 	// 一次性更新所有字段
 	if len(update) > 0 {

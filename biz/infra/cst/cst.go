@@ -104,8 +104,10 @@ const (
 	Regex         = "$regex"
 	Options       = "$options"
 
-	Name   = "name"
-	Avatar = "avatar"
+	Name    = "name"
+	Avatar  = "avatar"
+	Profile = "profile"
+	Role    = "role"
 )
 
 const (
