@@ -5,15 +5,37 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 )
 
 func DPrintf(format string, a ...interface{}) {
-	if config.GetConfig().State == "debug" {
+	if conf.GetConfig().State == "debug" {
 		fmt.Printf(format, a...)
+	}
+}
+
+func NilDefault[T any](v T, def T) T {
+	if isNil(v) {
+		return def
+	}
+	return v
+}
+
+func isNil(v any) bool {
+	if v == nil {
+		return true
+	}
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Slice,
+		reflect.Func, reflect.Chan, reflect.Interface:
+		return rv.IsNil()
+	default:
+		return false
 	}
 }
 
@@ -41,7 +63,7 @@ func ToCDN(u, host string) string {
 }
 
 func NewDebugClient() *http.Client {
-	if config.GetConfig().State == "debug" {
+	if conf.GetConfig().State == "debug" {
 		return &http.Client{
 			Transport: NewLoggingTransport(),
 		}
@@ -99,7 +121,7 @@ func Str2URL(raw string) *url.URL {
 // cOS2CDN COS源站URL转CDN URL 需在COS Console中配置自定义CDN域名和鉴权
 // CDN上的文件为公有读 采用回源鉴权
 func cOS2CDN(raw string) string {
-	conf := config.GetConfig().COS
+	conf := conf.GetConfig().COS
 	return strings.Replace(raw, conf.BucketURL, conf.CDN, 1)
 }
 

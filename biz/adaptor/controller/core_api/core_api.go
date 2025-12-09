@@ -9,7 +9,10 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
-	"github.com/xh-polaris/innospark-core-api/provider"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/completions"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/conversation"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/feedback"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/user"
 )
 
 // Completions .
@@ -23,8 +26,8 @@ func Completions(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	_, err = provider.Get().CompletionsService.Completions(c, ctx, &req)
-	adaptor.PostProcess(ctx, c, &req, nil, err)
+	sse, err := completions.CompletionsSVC.Completions(c, ctx, &req)
+	adaptor.SSE(ctx, c, &req, sse, err)
 }
 
 // CreateConversation .
@@ -38,7 +41,7 @@ func CreateConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.CreateConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.CreateConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -53,7 +56,7 @@ func Generate(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.GenerateBrief(ctx, &req)
+	resp, err := conversation.ConversationSVC.GenerateBrief(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -68,7 +71,7 @@ func RenameConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.RenameConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.RenameConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -83,7 +86,7 @@ func ListConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.ListConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.ListConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -98,7 +101,7 @@ func GetConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.GetConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.GetConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -113,7 +116,7 @@ func DeleteConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.DeleteConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.DeleteConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -128,7 +131,7 @@ func SearchConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ConversationService.SearchConversation(ctx, &req)
+	resp, err := conversation.ConversationSVC.SearchConversation(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -159,7 +162,7 @@ func Feedback(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().FeedbackService.Feedback(ctx, &req)
+	resp, err := feedback.FeedbackSVC.Feedback(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -174,7 +177,7 @@ func FeedbackContent(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().FeedbackService.Content(ctx, &req)
+	resp, err := feedback.FeedbackSVC.Content(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -189,7 +192,7 @@ func SendVerifyCode(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.SendVerifyCode(ctx, &req)
+	resp, err := user.UserSVC.SendVerifyCode(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -204,7 +207,7 @@ func BasicUserRegister(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.Register(ctx, &req)
+	resp, err := user.UserSVC.Register(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -219,7 +222,7 @@ func BasicUserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.Login(ctx, &req)
+	resp, err := user.UserSVC.Login(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -234,7 +237,7 @@ func BasicUserResetPassword(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.ResetPassword(ctx, &req)
+	resp, err := user.UserSVC.ResetPassword(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -249,7 +252,7 @@ func BasicUserUpdateProfile(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.UpdateProfile(ctx, &req)
+	resp, err := user.UserSVC.UpdateProfile(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -264,7 +267,7 @@ func BasicUserGetProfile(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.GetProfile(ctx, &req)
+	resp, err := user.UserSVC.GetProfile(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -279,7 +282,7 @@ func ThirdPartyLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.ThirdPartyLogin(ctx, &req)
+	resp, err := user.UserSVC.ThirdPartyLogin(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -294,6 +297,6 @@ func CheckVerifyCode(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().UserService.CheckVerifyCode(ctx, &req)
+	resp, err := user.UserSVC.CheckVerifyCode(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

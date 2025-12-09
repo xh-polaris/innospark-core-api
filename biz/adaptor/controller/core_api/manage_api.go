@@ -8,8 +8,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	manage "github.com/xh-polaris/innospark-core-api/biz/application/dto/manage"
-	"github.com/xh-polaris/innospark-core-api/provider"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/manage"
+	manageapp "github.com/xh-polaris/innospark-core-api/biz/application/service/manage"
 )
 
 // AdminLogin .
@@ -23,7 +23,7 @@ func AdminLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ManageService.AdminLogin(ctx, &req)
+	resp, err := manageapp.ManageSVC.AdminLogin(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -38,7 +38,7 @@ func ListUser(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ManageService.ListUser(ctx, &req)
+	resp, err := manageapp.ManageSVC.ListUser(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -53,7 +53,7 @@ func Forbidden(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ManageService.Forbidden(ctx, &req)
+	resp, err := manageapp.ManageSVC.Forbidden(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -68,7 +68,7 @@ func ListFeedback(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ManageService.ListFeedback(ctx, &req)
+	resp, err := manageapp.ManageSVC.ListFeedback(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -83,6 +83,6 @@ func UserStatistic(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().ManageService.UserStatistics(ctx, &req)
+	resp, err := manageapp.ManageSVC.UserStatistics(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

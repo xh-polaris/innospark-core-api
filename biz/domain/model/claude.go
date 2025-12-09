@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
@@ -31,8 +31,8 @@ type ClaudeChatModel struct {
 func NewClaudeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		APIKey:     config.GetConfig().Claude.APIKey,
-		BaseURL:    config.GetConfig().Claude.BaseURL,
+		APIKey:     conf.GetConfig().Claude.APIKey,
+		BaseURL:    conf.GetConfig().Claude.BaseURL,
 		Model:      Claude4Sonnet,
 		MaxTokens:  &MaxToken,
 		User:       &uid,
@@ -85,20 +85,20 @@ func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamRead
 			}
 			if noCodeType { // 记录代码类型
 				//var find bool
-				//for i := 0; i < len(msg.Content)-1; i++ {
-				//	if msg.Content[i] == '<' { // 有代码内容
+				//for i := 0; i < len(message.Content)-1; i++ {
+				//	if message.Content[i] == '<' { // 有代码内容
 				//		find = true
-				//		codeType := schema.AssistantMessage(strings.Trim(msg.Content[:i], "\n"), nil)
+				//		codeType := schema.AssistantMessage(strings.Trim(message.Content[:i], "\n"), nil)
 				//		util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
 				//		writer.Send(codeType, nil)
-				//		msg.Content = msg.Content[i:]
+				//		message.Content = message.Content[i:]
 				//		break
 				//	}
 				//}
 				//if !find { // 没有代码内容, 整个都是代码类型
-				//	msg.Content = strings.Trim(msg.Content, "\n")
-				//	util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
-				//	writer.Send(msg, nil)
+				//	message.Content = strings.Trim(message.Content, "\n")
+				//	util.AddExtra(message, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
+				//	writer.Send(message, nil)
 				//	continue
 				//}
 				right := strings.Split(msg.Content, "html")
@@ -142,9 +142,9 @@ func (c *ClaudeChatModel) process(ctx context.Context, reader *schema.StreamRead
 							//		codeType := schema.AssistantMessage(strings.Trim(ss[1][:i], "\n"), nil)
 							//		util.AddExtra(codeType, cst.EventMessageContentType, cst.EventMessageContentTypeCodeType)
 							//		writer.Send(codeType, nil)
-							//		msg.Content = strings.TrimLeft(ss[1][i:], "\n")
-							//		util.AddExtra(msg, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
-							//		writer.Send(msg, nil)
+							//		message.Content = strings.TrimLeft(ss[1][i:], "\n")
+							//		util.AddExtra(message, cst.EventMessageContentType, cst.EventMessageContentTypeCode)
+							//		writer.Send(message, nil)
 							//		noCodeType = false // 有了代码类型
 							//		break
 							//	}

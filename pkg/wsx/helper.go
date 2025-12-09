@@ -177,7 +177,7 @@ func (ws *WSClient) WritePing() error {
 func (ws *WSClient) Close() error {
 	if !ws.closed {
 		if err := ws.conn.WriteControl(websocket.CloseMessage, NormalCLoseMsg, time.Now().Add(DefaultTimeout)); err != nil {
-			logs.Errorf("[WSClient] send close msg error: %s", errorx.ErrorWithoutStack(err))
+			logs.Errorf("[WSClient] send close message error: %s", errorx.ErrorWithoutStack(err))
 		}
 		ws.closed = true
 		return ws.conn.Close()

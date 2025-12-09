@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-var _ MongoMapper = (*mongoMapper)(nil)
+var Mapper MongoMapper = (*mongoMapper)(nil)
 
 const (
 	collection     = "conversation"
@@ -35,9 +35,10 @@ type mongoMapper struct {
 	conn *monc.Model
 }
 
-func NewConversationMongoMapper(config *config.Config) MongoMapper {
-	conn := monc.MustNewModel(config.Mongo.URL, config.Mongo.DB, collection, config.Cache)
-	return &mongoMapper{conn: conn}
+func NewConversationMongoMapper(config *conf.Config) MongoMapper {
+	conn := monc.MustNewModel(config.Mongo.URL, config.Mongo.DB, collection, config.CacheConf)
+	Mapper = &mongoMapper{conn: conn}
+	return Mapper
 }
 
 // CreateNewConversation 创建并缓存一个新的对话

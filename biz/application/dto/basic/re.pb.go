@@ -26,7 +26,7 @@ type Response struct {
 	unknownFields protoimpl.UnknownFields
 
 	Code int32  `protobuf:"varint,1,opt,name=code,proto3" form:"code" json:"code" query:"code"`
-	Msg  string `protobuf:"bytes,2,opt,name=msg,proto3" form:"msg" json:"msg" query:"msg"`
+	Msg  string `protobuf:"bytes,2,opt,name=message,proto3" form:"message" json:"message" query:"message"`
 }
 
 func (x *Response) Reset() {

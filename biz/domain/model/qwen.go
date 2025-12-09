@@ -6,7 +6,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/qwen"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
@@ -30,8 +30,8 @@ type QwenChatModel struct {
 func NewQwenChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *qwen.ChatModel
 	cli, err = qwen.NewChatModel(ctx, &qwen.ChatModelConfig{
-		APIKey:     config.GetConfig().InnoSpark.VlmAPIKey,
-		BaseURL:    config.GetConfig().InnoSpark.VlmURL,
+		APIKey:     conf.GetConfig().InnoSpark.VlmAPIKey,
+		BaseURL:    conf.GetConfig().InnoSpark.VlmURL,
 		Model:      VLMFlash,
 		User:       &uid,
 		HTTPClient: util.NewDebugClient(),
@@ -46,8 +46,8 @@ func NewQwenChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingCh
 func NewQwenChatModelWithThinking(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *qwen.ChatModel
 	cli, err = qwen.NewChatModel(ctx, &qwen.ChatModelConfig{
-		APIKey:         config.GetConfig().InnoSpark.VlmAPIKey,
-		BaseURL:        config.GetConfig().InnoSpark.VlmURL,
+		APIKey:         conf.GetConfig().InnoSpark.VlmAPIKey,
+		BaseURL:        conf.GetConfig().InnoSpark.VlmURL,
 		Model:          VLMFlash,
 		User:           &uid,
 		HTTPClient:     util.NewDebugClient(),

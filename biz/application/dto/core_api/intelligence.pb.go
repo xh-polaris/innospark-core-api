@@ -806,7 +806,7 @@ type GetIntelligenceResp struct {
 	unknownFields protoimpl.UnknownFields
 
 	Resp *basic.Response   `protobuf:"bytes,1,opt,name=resp,proto3" form:"resp" json:"resp" query:"resp"`
-	Info *IntelligenceInfo `protobuf:"bytes,2,opt,name=info,proto3" form:"info" json:"info" query:"info"`
+	Info *IntelligenceInfo `protobuf:"bytes,2,opt,name=state,proto3" form:"state" json:"state" query:"state"`
 }
 
 func (x *GetIntelligenceResp) Reset() {
@@ -1029,7 +1029,7 @@ var file_core_api_intelligence_proto_depIdxs = []int32{
 	13, // 7: core_api.ListIntelligenceResp.resp:type_name -> basic.Response
 	0,  // 8: core_api.ListIntelligenceResp.intelligences:type_name -> core_api.Intelligence
 	13, // 9: core_api.GetIntelligenceResp.resp:type_name -> basic.Response
-	1,  // 10: core_api.GetIntelligenceResp.info:type_name -> core_api.IntelligenceInfo
+	1,  // 10: core_api.GetIntelligenceResp.state:type_name -> core_api.IntelligenceInfo
 	11, // [11:11] is the sub-list for method output_type
 	11, // [11:11] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name

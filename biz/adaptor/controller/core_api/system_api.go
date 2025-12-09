@@ -5,12 +5,11 @@ package core_api
 import (
 	"context"
 
-	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
-	"github.com/xh-polaris/innospark-core-api/provider"
-
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	core_api "github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/system"
 )
 
 // GenSignedURL .
@@ -24,6 +23,6 @@ func GenSignedURL(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().AttachService.GenSignedURL(ctx, &req)
+	resp, err := system.AttachSVC.GenSignedURL(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

@@ -133,7 +133,7 @@ func (ws *HZWSClient) SetCloseHandler(h func(code int, text string) error) {
 func (ws *HZWSClient) Close() error {
 	if !ws.closed {
 		if err := ws.conn.WriteControl(websocket.CloseMessage, NormalCLoseMsg, time.Now().Add(DefaultTimeout)); err != nil {
-			logx.Error("[HZWSClient] send close msg error", err)
+			logx.Error("[HZWSClient] send close message error", err)
 		}
 		ws.closed = true
 		return ws.conn.Close()

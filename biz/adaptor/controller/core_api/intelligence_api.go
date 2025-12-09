@@ -9,7 +9,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
-	"github.com/xh-polaris/innospark-core-api/provider"
+	"github.com/xh-polaris/innospark-core-api/biz/application/service/intelligence"
 )
 
 // ListIntelligence .
@@ -23,7 +23,7 @@ func ListIntelligence(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().IntelligenceService.ListIntelligence(ctx, &req)
+	resp, err := intelligence.IntelligenceSVC.ListIntelligence(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
@@ -38,6 +38,6 @@ func GetIntelligence(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := provider.Get().IntelligenceService.GetIntelligenceInfo(ctx, &req)
+	resp, err := intelligence.IntelligenceSVC.GetIntelligenceInfo(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }

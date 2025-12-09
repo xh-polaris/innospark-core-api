@@ -7,26 +7,26 @@ import (
 	"time"
 
 	"github.com/tencentyun/cos-go-sdk-v5"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 )
 
-var _ COSInfra = (*cosClient)(nil)
+var _ COS = (*cosClient)(nil)
 
-type COSInfra interface {
+type COS interface {
 	Upload(ctx context.Context, key string, r io.Reader, opt *cos.ObjectPutOptions) (*cos.Response, error)
 	GenPresignURL(ctx context.Context, key string, opt *cos.PresignedURLOptions) (string, error)
 	GetPermanentAccessURL(key string) string
 }
 
 type cosClient struct {
-	Conf   *config.COS
+	Conf   *conf.COS
 	Client *cos.Client
 }
 
-func NewCOSInfra() COSInfra {
-	return newcosClient()
+func NewCOS(c *conf.Config) COS {
+	return newcosClient(c)
 }
 
 // Upload 管理员上传对象
@@ -65,27 +65,25 @@ func (c *cosClient) GetPermanentAccessURL(key string) string {
 	return c.Client.Object.GetObjectURL(key).String()
 }
 
-func newcosClient() *cosClient {
-	conf := config.GetConfig().COS
+func newcosClient(c *conf.Config) *cosClient {
 	b := &cos.BaseURL{
-		BucketURL: util.Str2URL(conf.BucketURL), // 访问 bucket, object 相关 API 的基础 URL（不包含 path 部分）
+		BucketURL: util.Str2URL(c.COS.BucketURL), // 访问 bucket, object 相关 API 的基础 URL（不包含 path 部分）
 	}
-	client := cos.NewClient(b, mustNewCOSHTTPClient())
+	client := cos.NewClient(b, mustNewCOSHTTPClient(c))
 	return &cosClient{
-		Conf:   conf,
+		Conf:   c.COS,
 		Client: client,
 	}
 }
 
-func mustNewCOSHTTPClient() *http.Client {
+func mustNewCOSHTTPClient(c *conf.Config) *http.Client {
 	// 与全局单例http客户端采用不同transport，单独为cos服务创建新http客户端实例
 	// 其余配置复用单例cli
-	conf := config.GetConfig().COS
 	gCli := httpx.GetHttpClient()
 
 	authTransport := &cos.AuthorizationTransport{
-		SecretID:  conf.SecretID,
-		SecretKey: conf.SecretKey,
+		SecretID:  c.COS.SecretID,
+		SecretKey: c.COS.SecretKey,
 		Transport: gCli.Client.Transport,
 	}
 

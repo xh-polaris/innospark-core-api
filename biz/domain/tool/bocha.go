@@ -1,5 +1,7 @@
 package graph
 
+// tool.search.bocha 使用博查API的搜索工具
+
 import (
 	"context"
 	"encoding/json"
@@ -10,7 +12,8 @@ import (
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/info"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/state/info"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 )
@@ -18,7 +21,7 @@ import (
 const webAPIEndPoint = "https://api.bochaai.com/v1/web-search"
 
 type BochaSearchTool struct {
-	relay  *info.RelayContext
+	relay  *state.RelayContext
 	apiKey string
 }
 
@@ -33,7 +36,7 @@ type webAPIReq struct {
 type webAPIResp struct {
 	Code  int    `json:"code"`
 	LogId string `json:"log_id"`
-	Msg   string `json:"msg"`
+	Msg   string `json:"message"`
 	Data  struct {
 		Type         string `json:"_type"`
 		QueryContext struct {
@@ -62,7 +65,7 @@ type webAPIResp struct {
 	} `json:"data"`
 }
 
-func NewBochaSearchTool(relay *info.RelayContext, apiKey string) WebSearchTool {
+func NewBochaSearchTool(relay *state.RelayContext, apiKey string) WebSearchTool {
 	return &BochaSearchTool{relay: relay, apiKey: apiKey}
 }
 
@@ -82,8 +85,8 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 		return "", err
 	}
 
-	r := t.relay
-	if err = r.SSEEvent(r.SearchStartEvent()); err != nil { // 开始搜索
+	inter, inf := t.relay.Interaction, t.relay.Info
+	if err = inter.WriteEvent(inter.SearchStartEvent()); err != nil { // 开始搜索
 		return "", err
 	}
 
@@ -98,7 +101,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 
 	// SSE: 查找多少篇?
 	find := resp.Data.WebPages.TotalEstimatedMatches%50 + len(resp.Data.WebPages.Value)
-	if err = r.SSEEvent(r.SearchFindEvent(find)); err != nil {
+	if err = inter.WriteEvent(inter.SearchFindEvent(find)); err != nil {
 		return "", err
 	}
 	// 随机引用一下, 避免每次引用次数都是一样多
@@ -107,7 +110,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 	}
 	// SSE: 选择多少篇
 	choose := len(resp.Data.WebPages.Value)
-	if err = r.SSEEvent(r.SearchChooseEvent(choose)); err != nil {
+	if err = inter.WriteEvent(inter.SearchChooseEvent(choose)); err != nil {
 		return "", err
 	}
 
@@ -124,13 +127,13 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 			SiteName: v.SiteName, SiteIcon: v.SiteIcon, DatePublished: v.DatePublished}
 		cite = append(cite, c)
 		// SSE: 返回引用
-		if err = r.SSEEvent(r.SearchCiteEvent(c)); err != nil {
+		if err = inter.WriteEvent(inter.SearchCiteEvent(c)); err != nil {
 			return "", err
 		}
 	}
-	if err = r.SSEEvent(r.SearchEndEvent()); err != nil {
+	if err = inter.WriteEvent(inter.SearchEndEvent()); err != nil {
 		return "", err
 	}
-	r.SearchInfo = &info.SearchInfo{Find: find, Choose: choose, Cite: cite}
+	inf.SearchInfo = &info.SearchInfo{Find: find, Choose: choose, Cite: cite}
 	return sb.String(), nil
 }

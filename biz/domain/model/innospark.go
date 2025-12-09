@@ -7,7 +7,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
@@ -31,8 +31,8 @@ type InnosparkChatModel struct {
 func NewDefaultChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		APIKey:     config.GetConfig().InnoSpark.DefaultAPIKey,
-		BaseURL:    config.GetConfig().InnoSpark.DefaultBaseURL,
+		APIKey:     conf.GetConfig().InnoSpark.DefaultAPIKey,
+		BaseURL:    conf.GetConfig().InnoSpark.DefaultBaseURL,
 		APIVersion: APIVersion,
 		Model:      DefaultModel,
 		User:       &uid,
@@ -48,8 +48,8 @@ func NewDefaultChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallin
 func NewDeepThinkChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *openai.ChatModel
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		APIKey:     config.GetConfig().InnoSpark.DeepThinkAPIKey,
-		BaseURL:    config.GetConfig().InnoSpark.DeepThinkBaseURL,
+		APIKey:     conf.GetConfig().InnoSpark.DeepThinkAPIKey,
+		BaseURL:    conf.GetConfig().InnoSpark.DeepThinkBaseURL,
 		APIVersion: APIVersion,
 		Model:      DeepThinkModel,
 		User:       &uid,
