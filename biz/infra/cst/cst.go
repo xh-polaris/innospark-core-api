@@ -16,7 +16,9 @@ const (
 )
 
 // ctx 存储键
-const ()
+const (
+	CtxState = "state"
+)
 
 // sse事件类型
 const (

@@ -17,37 +17,39 @@ import (
 
 // SSEStream SSE事件流
 type SSEStream struct {
-	C    chan *sse.Event
-	W    *sse.Writer
-	id   int
-	Done chan struct{}
+	id     int
+	closed bool
+	W      *sse.Writer
+	Done   chan struct{}
 }
 
 // NewSSEStream 创建事件流
 func NewSSEStream(c *app.RequestContext) *SSEStream {
-	return &SSEStream{C: make(chan *sse.Event, 100), id: 0, Done: make(chan struct{}), W: sse.NewWriter(c)}
+	return &SSEStream{id: -1, Done: make(chan struct{}), W: sse.NewWriter(c)}
 }
 
 func (s *SSEStream) Close() {
-	close(s.C)
 	_ = s.W.Close()
 }
 
-// Nex 获取下一个事件并返回是否关闭
-func (s *SSEStream) Nex() (*sse.Event, bool) {
-	event, ok := <-s.C
-	if !ok {
-		return nil, false
+func (s *SSEStream) Write(e *sse.Event) (err error) {
+	e.ID = s.getID()
+	if err = s.W.Write(e); err != nil {
+		s.closed = true
+		logs.Errorf("[interaction] write see err: %s", errorx.ErrorWithoutStack(err))
 	}
-	event.ID = strconv.Itoa(s.id)
+	return s.W.Write(e)
+}
+
+func (s *SSEStream) getID() string {
 	s.id++
-	return event, true
+	return strconv.Itoa(s.id)
 }
 
 // SSE 实现sse流响应
 func SSE(ctx context.Context, c *app.RequestContext, req any, stream *SSEStream, err error) {
 	b3.New().Inject(ctx, &headerProvider{headers: &c.Response.Header})
-	logs.CtxInfof(ctx, "[%s] req=%s, resp=sse stream, err=%s, trace=%s", c.Path(), util.JSONF(req), errorx.ErrorWithoutStack(err), trace.SpanContextFromContext(ctx).TraceID().String())
+	logs.CtxInfof(ctx, "[%s] req=%s, resp=event stream, err=%s, trace=%s", c.Path(), util.JSONF(req), errorx.ErrorWithoutStack(err), trace.SpanContextFromContext(ctx).TraceID().String())
 
 	if err != nil { // 有错误
 		PostError(ctx, c, err)

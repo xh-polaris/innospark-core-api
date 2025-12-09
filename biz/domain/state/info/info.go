@@ -3,14 +3,13 @@ package info
 // 信息域, 负责跨节点消息传递, 只持有, 不操作
 
 import (
-	"context"
-
 	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
+	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -29,12 +28,40 @@ type Info struct {
 	Profile           *user.Profile        // 用户个性化配置
 	Ext               map[string]string    // 额外配置
 	ResponseMeta      *schema.ResponseMeta // 用量
-	SSE               *adaptor.SSEStream   // SSE流
-	SSEIndex          int                  // SSE事件索引
-	ModelCancel       context.CancelFunc   // 中断模型输出
 	SearchInfo        *SearchInfo          // 搜素信息
 	Sensitive         *Sensitive
 	Attach            []string // 附件信息
+}
+
+func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, conversationId, sectionId primitive.ObjectID) (info *Info) {
+	inf := &Info{
+		RequestContext: c, // 请求上下文
+		CompletionOptions: &CompletionOptions{ // 对话配置
+			ReplyId:         req.ReplyId,                            // 回复ID
+			IsRegen:         req.CompletionsOption.IsRegen,          // 重新生成用
+			IsReplace:       req.CompletionsOption.IsReplace,        // 替换消息用户
+			SelectedRegenId: req.CompletionsOption.SelectedRegenId}, // 确定重新生成用
+		Profile: util.NilDefault(u.Profile, &user.Profile{Role: "未知"}),           // 个性化信息
+		Ext:     util.NilDefault(req.CompletionsOption.Ext, map[string]string{}), // 额外信息(用于cotea模式)
+		ModelInfo: &ModelInfo{
+			Model:     req.Model,                            // 模型名称
+			BotId:     req.BotId,                            // agent名称
+			WebSearch: req.CompletionsOption.GetWebSearch(), // 是否搜索
+			Thinking:  req.CompletionsOption.UseDeepThink},  // 是否深度思考
+		MessageInfo:    &MessageInfo{}, // 消息信息
+		ConversationId: conversationId, // 对话id
+		SectionId:      sectionId,      // 段id
+		UserId:         u.ID,           // 用户id
+		OriginMessage: &ReqMessage{ // 原始消息
+			Content:     req.Messages[0].Content,                                          // 原始内容
+			ContentType: req.Messages[0].ContentType,                                      // 原始消息类型
+			Attaches:    req.Messages[0].Attaches, References: req.Messages[0].References, // 附件
+		},
+		Sensitive: &Sensitive{}, // 命中的敏感词
+	}
+	inf.Ext["query"] = req.Messages[0].Content // 将用户原始提问存入query中, 简化可能存在的提示词注入
+	inf.Ext["role"] = inf.Profile.Role         // 用户角色
+	return inf
 }
 
 // CompletionOptions 是对话相关配置

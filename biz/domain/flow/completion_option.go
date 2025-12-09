@@ -1,14 +1,15 @@
-package graph
+package flow
 
 import (
+	"github.com/xh-polaris/innospark-core-api/biz/domain/interaction"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/message"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 )
 
-func DoCompletionOption(relay *state.RelayContext, his []*mmsg.Message) ([]*mmsg.Message, error) {
-	info, opt := relay.Info, relay.Info.CompletionOptions
+func DoCompletionOption(st *state.RelayContext, his []*mmsg.Message) ([]*mmsg.Message, error) {
+	info, opt := st.Info, st.Info.CompletionOptions
 	opt.Typ = cst.Default
 	// 据自定义对话选项, 对消息进行处理
 	switch {
@@ -54,20 +55,22 @@ func DoCompletionOption(relay *state.RelayContext, his []*mmsg.Message) ([]*mmsg
 	}
 
 	if !opt.IsRegen { // 不是重新生成需要创建用户消息
-		um := message.NewUserMMsg(relay, len(his))
+		um := message.NewUserMMsg(st, len(his))
 		his = append([]*mmsg.Message{um}, his...)
 		info.UserMessage = um
 		info.ReplyId = um.MessageId.Hex()
 	}
 	// 创建模型消息
-	info.MessageInfo.AssistantMessage = message.NewModelMMsg(relay, len(his))
+	info.MessageInfo.AssistantMessage = message.NewModelMMsg(st, len(his))
 
 	// 写入元事件
-	if err := relay.Interaction.WriteEvent(relay.Interaction.MetaEvent()); err != nil { // 元数据事件
-		return nil, err
-	}
-	// 写入模型事件 TODO 后移至模型域
-	if err := relay.Interaction.WriteEvent(relay.Interaction.ModelEvent()); err != nil { // 模型信息事件
+	if err := st.EventStream.Write(interaction.MetaEvent(
+		info.MessageInfo.AssistantMessage.MessageId.Hex(),
+		info.ConversationId.Hex(),
+		info.SectionId.Hex(),
+		info.MessageInfo.AssistantMessage.Index,
+		info.ReplyId,
+	)); err != nil {
 		return nil, err
 	}
 	return his, nil

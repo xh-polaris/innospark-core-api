@@ -23,17 +23,17 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 		Content: msg.Content,
 		Name:    msg.MessageId.Hex(),
 	}
-	if msg.Ext.ContentWithCite != nil { // 联网搜索到的内容
-		if len(m.UserInputMultiContent) != 0 {
-			for i := range m.UserInputMultiContent {
-				if mmsg.ChatMessagePartType(m.UserInputMultiContent[i].Type) == mmsg.ChatMessagePartTypeText {
-					m.UserInputMultiContent[i].Text = *msg.Ext.ContentWithCite
-				}
-			}
-		} else {
-			m.Content = *msg.Ext.ContentWithCite
-		}
-	}
+	//if msg.Ext.ContentWithCite != nil { // 联网搜索到的内容
+	//	if len(m.UserInputMultiContent) != 0 {
+	//		for i := range m.UserInputMultiContent {
+	//			if mmsg.ChatMessagePartType(m.UserInputMultiContent[i].Type) == mmsg.ChatMessagePartTypeText {
+	//				m.UserInputMultiContent[i].Text = *msg.Ext.ContentWithCite
+	//			}
+	//		}
+	//	} else {
+	//		m.Content = *msg.Ext.ContentWithCite
+	//	}
+	//}
 	if len(msg.UserInputMultiContent) != 0 {
 		for _, uimc := range msg.UserInputMultiContent {
 			part := schema.MessageInputPart{Type: schema.ChatMessagePartType(uimc.Type)}

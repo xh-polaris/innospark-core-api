@@ -7,7 +7,6 @@ import (
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 type getModelFunc func(ctx context.Context, uid, botId string) (model.ToolCallingChatModel, error)
@@ -26,13 +25,6 @@ func getModel(ctx context.Context, model, uid, botId string) (model.ToolCallingC
 type ModelFactory struct{}
 
 func (m *ModelFactory) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (_ *schema.Message, err error) {
-	var r *state.RelayContext
-	if r, err = util.GetState[*state.RelayContext](ctx); err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithCancel(ctx)
-	r.Info.ModelCancel = cancel
-
 	// messages翻转顺序, 调用模型时消息应该正序
 	var reverse []*schema.Message
 	for i := len(in) - 1; i >= 0; i-- {
@@ -46,13 +38,6 @@ func (m *ModelFactory) Generate(ctx context.Context, in []*schema.Message, opts 
 	return cm.Generate(ctx, reverse, opts...)
 }
 func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (_ *schema.StreamReader[*schema.Message], err error) {
-	var r *state.RelayContext
-	if r, err = util.GetState[*state.RelayContext](ctx); err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithCancel(ctx)
-	r.Info.ModelCancel = cancel
-
 	// messages翻转顺序, 调用模型时消息应该正序
 	var reverse []*schema.Message
 	for i := len(in) - 1; i >= 0; i-- {

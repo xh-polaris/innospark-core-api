@@ -35,16 +35,15 @@ type Message struct {
 }
 
 type Ext struct {
-	BotState        string        `json:"bot_state" bson:"bot_state"`                         // json字符串, 模型信息
-	Brief           string        `json:"brief,omitempty" bson:"brief,omitempty"`             // 内容备份
-	Think           string        `json:"think,omitempty" bson:"think,omitempty"`             // 深度思考内容
-	Suggest         string        `json:"suggest,omitempty" bson:"suggest,omitempty"`         // 建议内容
-	Cite            []*Cite       `json:"cite,omitempty" bson:"cite,omitempty"`               // 引用
-	Code            []*Code       `json:"code,omitempty" bson:"code,omitempty"`               // 代码
-	ContentWithCite *string       `json:"-" bson:"-"`                                         // 模型用到的引用, 会替换模型域的消息
-	Sensitive       bool          `json:"sensitive,omitempty" bson:"sensitive,omitempty"`     // 是否触发违禁词
-	AttachInfo      []*AttachInfo `json:"attach_info,omitempty" bson:"attach_info,omitempty"` // 附件信息
-	Usage           *Usage        `json:"usage,omitempty" bson:"usage,omitempty"`             // 用量信息
+	BotState   string        `json:"bot_state" bson:"bot_state"`                         // json字符串, 模型信息
+	Brief      string        `json:"brief,omitempty" bson:"brief,omitempty"`             // 内容备份
+	Think      string        `json:"think,omitempty" bson:"think,omitempty"`             // 深度思考内容
+	Suggest    string        `json:"suggest,omitempty" bson:"suggest,omitempty"`         // 建议内容
+	Cite       []*Cite       `json:"cite,omitempty" bson:"cite,omitempty"`               // 引用
+	Code       []*Code       `json:"code,omitempty" bson:"code,omitempty"`               // 代码
+	Sensitive  bool          `json:"sensitive,omitempty" bson:"sensitive,omitempty"`     // 是否触发违禁词
+	AttachInfo []*AttachInfo `json:"attach_info,omitempty" bson:"attach_info,omitempty"` // 附件信息
+	Usage      *Usage        `json:"usage,omitempty" bson:"usage,omitempty"`             // 用量信息
 }
 
 type Cite struct {
