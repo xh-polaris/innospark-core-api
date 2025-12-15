@@ -7,7 +7,7 @@ import (
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
 	"github.com/coze-dev/coze-go"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -34,7 +34,7 @@ type SelfCozeModel struct {
 }
 
 func NewSelfCozeModel(ctx context.Context, uid, botId string) (_ model.ToolCallingChatModel, err error) {
-	cozeCli := coze.NewCozeAPI(coze.NewTokenAuth(config.GetConfig().Coze.PAT),
+	cozeCli := coze.NewCozeAPI(coze.NewTokenAuth(conf.GetConfig().Coze.PAT),
 		coze.WithBaseURL(BaseURL),
 		coze.WithHttpClient(util.NewDebugClient()))
 	return &SelfCozeModel{SelfCoze, &cozeCli, uid, botId}, nil

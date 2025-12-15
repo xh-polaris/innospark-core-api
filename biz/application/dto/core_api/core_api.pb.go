@@ -242,7 +242,7 @@ var file_core_api_proto_goTypes = []interface{}{
 	(*manage.ListFeedBackReq)(nil),     // 23: manage.ListFeedBackReq
 	(*manage.UserStatisticsReq)(nil),   // 24: manage.UserStatisticsReq
 	(*GenSignedURLReq)(nil),            // 25: core_api.GenSignedURLReq
-	(*SSEEvent)(nil),                   // 26: core_api.SSEEvent
+	(*SSEEvent)(nil),                   // 26: core_api.WriteEvent
 	(*CreateConversationResp)(nil),     // 27: core_api.CreateConversationResp
 	(*ListConversationResp)(nil),       // 28: core_api.ListConversationResp
 	(*GetConversationResp)(nil),        // 29: core_api.GetConversationResp
@@ -296,7 +296,7 @@ var file_core_api_proto_depIdxs = []int32{
 	23, // 24: core_api.ManageApi.ListFeedback:input_type -> manage.ListFeedBackReq
 	24, // 25: core_api.ManageApi.UserStatistic:input_type -> manage.UserStatisticsReq
 	25, // 26: core_api.SystemApi.GenSignedURL:input_type -> core_api.GenSignedURLReq
-	26, // 27: core_api.CoreApi.Completions:output_type -> core_api.SSEEvent
+	26, // 27: core_api.CoreApi.Completions:output_type -> core_api.WriteEvent
 	27, // 28: core_api.CoreApi.CreateConversation:output_type -> core_api.CreateConversationResp
 	28, // 29: core_api.CoreApi.ListConversation:output_type -> core_api.ListConversationResp
 	29, // 30: core_api.CoreApi.GetConversation:output_type -> core_api.GetConversationResp

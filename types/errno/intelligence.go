@@ -10,12 +10,12 @@ const (
 func init() {
 	code.Register(
 		ErrListIntelligence,
-		"获取智能体列表失败: {msg}",
+		"获取智能体列表失败: {message}",
 		code.WithAffectStability(false),
 	)
 	code.Register(
 		ErrGetIntelligence,
-		"获取智能体失败: {msg}",
+		"获取智能体失败: {message}",
 		code.WithAffectStability(false),
 	)
 }

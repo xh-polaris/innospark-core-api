@@ -123,3 +123,10 @@ const (
 	SensitivePre  = "Pre"
 	SensitivePost = "Post"
 )
+
+const (
+	Default     = "default"
+	Regen       = "regen"
+	Replace     = "replace"
+	SelectRegen = "select_regen"
+)

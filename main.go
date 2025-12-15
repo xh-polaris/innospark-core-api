@@ -17,9 +17,8 @@ import (
 	xhlog "github.com/xh-polaris/gopkg/util/log"
 	"github.com/xh-polaris/innospark-core-api/biz/adaptor"
 	application "github.com/xh-polaris/innospark-core-api/biz/application/service/base"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
-	"github.com/xh-polaris/innospark-core-api/provider"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
@@ -27,13 +26,11 @@ import (
 )
 
 func Init() {
-	// 初始化依赖注入
-	provider.Init()
 	// 初始化自定义日志
 	hlog.SetLogger(xhlog.NewHlogLogger())
 
 	// 根据环境设置不同的日志级别
-	c := config.GetConfig()
+	c := conf.GetConfig()
 	if c.State == "debug" {
 		logs.SetLevel(logs.LevelDebug)
 	} else if c.State == "test" {
@@ -51,7 +48,7 @@ func Init() {
 
 func main() {
 	Init()
-	c := provider.Get().Config
+	c := conf.GetConfig()
 
 	// 创建服务器追踪器
 	tracer, cfg := tracing.NewServerTracer()

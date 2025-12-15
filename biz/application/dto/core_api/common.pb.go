@@ -1358,7 +1358,7 @@ func (x *SSEEvent) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SSEEvent.ProtoReflect.Descriptor instead.
+// Deprecated: Use WriteEvent.ProtoReflect.Descriptor instead.
 func (*SSEEvent) Descriptor() ([]byte, []int) {
 	return file_core_api_common_proto_rawDescGZIP(), []int{16}
 }
@@ -4783,7 +4783,7 @@ var file_core_api_common_proto_goTypes = []interface{}{
 	(*MessageOutputAudio)(nil),         // 13: core_api.MessageOutputAudio
 	(*MessageOutputVideo)(nil),         // 14: core_api.MessageOutputVideo
 	(*FullMessage)(nil),                // 15: core_api.FullMessage
-	(*SSEEvent)(nil),                   // 16: core_api.SSEEvent
+	(*SSEEvent)(nil),                   // 16: core_api.WriteEvent
 	(*EventMeta)(nil),                  // 17: core_api.EventMeta
 	(*EventModel)(nil),                 // 18: core_api.EventModel
 	(*EventChat)(nil),                  // 19: core_api.EventChat

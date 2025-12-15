@@ -1,24 +1,36 @@
 package adaptor
 
+// SSE流处理
+
 import (
+	"context"
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
+	"github.com/xh-polaris/gopkg/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // SSEStream SSE事件流
 type SSEStream struct {
 	C    chan *sse.Event
+	W    *sse.Writer
 	id   int
 	Done chan struct{}
 }
 
 // NewSSEStream 创建事件流
-func NewSSEStream() *SSEStream {
-	return &SSEStream{C: make(chan *sse.Event, 5), id: 0, Done: make(chan struct{})}
+func NewSSEStream(c *app.RequestContext) *SSEStream {
+	return &SSEStream{C: make(chan *sse.Event, 100), id: 0, Done: make(chan struct{}), W: sse.NewWriter(c)}
+}
+
+func (s *SSEStream) Close() {
+	close(s.C)
+	_ = s.W.Close()
 }
 
 // Nex 获取下一个事件并返回是否关闭
@@ -32,32 +44,18 @@ func (s *SSEStream) Nex() (*sse.Event, bool) {
 	return event, true
 }
 
-// 实现sse流响应, TODO 实现中断
-func makeSSE(c *app.RequestContext, stream *SSEStream) {
-	var err error
-	w := sse.NewWriter(c)
-	defer func(w *sse.Writer) {
-		close(stream.Done) // 关闭结束channel
-		if closeErr := w.Close(); err != nil && closeErr != nil {
-			logs.Errorf("close sse writer fail, err=%s", errorx.ErrorWithoutStack(err))
-		}
-	}(w)
+// SSE 实现sse流响应
+func SSE(ctx context.Context, c *app.RequestContext, req any, stream *SSEStream, err error) {
+	b3.New().Inject(ctx, &headerProvider{headers: &c.Response.Header})
+	logs.CtxInfof(ctx, "[%s] req=%s, resp=sse stream, err=%s, trace=%s", c.Path(), util.JSONF(req), errorx.ErrorWithoutStack(err), trace.SpanContextFromContext(ctx).TraceID().String())
 
-	var ok bool
-	var event *sse.Event
-	for {
-		if event, ok = stream.Nex(); !ok {
-			return
-		}
-		if err = w.Write(event); err != nil {
-			stream.Done <- struct{}{} // 给这个流写入提前终止信号
-			logs.Errorf("write sse-event error, err=%s", errorx.ErrorWithoutStack(err))
-			return
-		}
+	if err != nil { // 有错误
+		PostError(ctx, c, err)
+		return
 	}
 }
 
-// EventMeta 对话元数据
+// EventMeta 元数据事件
 type EventMeta struct {
 	ReplyId          string `json:"replyId"`
 	MessageId        string `json:"messageId"`
@@ -67,6 +65,7 @@ type EventMeta struct {
 	ConversationType int    `json:"conversationType"`
 }
 
+// EventModel 模型信息事件
 type EventModel struct {
 	Model   string `json:"model"`
 	BotId   string `json:"botId"`
@@ -78,7 +77,7 @@ type ChatMessage struct {
 	ContentType int    `json:"contentType"`
 }
 
-// EventChat 模型消息
+// EventChat 消息事件
 type EventChat struct {
 	Message          *ChatMessage `json:"message"`
 	ConversationId   string       `json:"conversationId"`
@@ -91,7 +90,7 @@ type EventChat struct {
 	BotId            string       `json:"botId"`
 }
 
-// EventSearchCite 引用内容
+// EventSearchCite 引用内容事件
 type EventSearchCite struct {
 	Index         int32  `json:"index" bson:"index"`
 	Name          string `json:"name" bson:"name"`

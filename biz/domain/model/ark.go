@@ -7,7 +7,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/ark"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
@@ -31,7 +31,7 @@ func NewDoubao15Pro32KChatModel(ctx context.Context, uid, _ string) (_ model.Too
 	cli, err = ark.NewChatModel(ctx, &ark.ChatModelConfig{
 		BaseURL:    ARKBeijing,
 		Region:     "cn-beijing",
-		APIKey:     config.GetConfig().ARK.APIKey,
+		APIKey:     conf.GetConfig().ARK.APIKey,
 		Model:      Doubao15Pro32K,
 		HTTPClient: nil,
 	})

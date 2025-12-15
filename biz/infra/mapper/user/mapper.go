@@ -5,13 +5,12 @@ import (
 	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 	"github.com/zeromicro/go-zero/core/stores/monc"
-	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -42,15 +41,12 @@ type MongoMapper interface {
 
 type mongoMapper struct {
 	conn *monc.Model
-	rs   *redis.Redis
 }
 
-func NewUserMongoMapper(config *config.Config) MongoMapper {
-	conn := monc.MustNewModel(config.Mongo.URL, config.Mongo.DB, collection, config.Cache)
-	rs := redis.MustNewRedis(config.Redis)
-	m := &mongoMapper{conn: conn, rs: rs}
-	Mapper = m // 这里依赖的provider的初始化来创建一个全局变量, 不是很好
-	return m
+func NewUserMongoMapper(config *conf.Config) MongoMapper {
+	conn := monc.MustNewModel(config.Mongo.URL, config.Mongo.DB, collection, config.CacheConf)
+	Mapper = &mongoMapper{conn: conn}
+	return Mapper
 }
 
 func (m *mongoMapper) FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) {

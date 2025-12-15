@@ -5,9 +5,13 @@ import (
 	"strings"
 
 	ahocorasick "github.com/anknown/ahocorasick"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
+	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 )
+
+// AC自动机算法描述
+// 构建Trie树结构, 层序遍历构建fail指针, 规则是如果父节点的fail指针指向的节点的子节点包含与当前节点相同的子节点，则当前节点的fail指针指向父节点的fail指针的子节点
+// 搜索时失败就跳转到fail指针
 
 var m *ahocorasick.Machine
 
@@ -37,11 +41,11 @@ func InitAc(dict []string) error {
 func AcSearch(findText string, stopImmediately bool, stage string) (bool, []string) {
 	switch stage {
 	case cst.SensitivePre:
-		if !config.GetConfig().Sensitive.Pre {
+		if !conf.GetConfig().Sensitive.Pre {
 			return false, []string{}
 		}
 	case cst.SensitivePost:
-		if !config.GetConfig().Sensitive.Post {
+		if !conf.GetConfig().Sensitive.Post {
 			return false, []string{}
 		}
 	}
