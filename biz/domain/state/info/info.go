@@ -3,6 +3,8 @@ package info
 // 信息域, 负责跨节点消息传递, 只持有, 不操作
 
 import (
+	"strings"
+
 	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
@@ -47,7 +49,9 @@ func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, 
 			Model:     req.Model,                            // 模型名称
 			BotId:     req.BotId,                            // agent名称
 			WebSearch: req.CompletionsOption.GetWebSearch(), // 是否搜索
-			Thinking:  req.CompletionsOption.UseDeepThink},  // 是否深度思考
+			Thinking:  req.CompletionsOption.UseDeepThink,   // 是否深度思考
+			Suggest:   req.CompletionsOption.GetSuggest(),   // 是否建议
+		},
 		MessageInfo:    &MessageInfo{}, // 消息信息
 		ConversationId: conversationId, // 对话id
 		SectionId:      sectionId,      // 段id
@@ -79,6 +83,7 @@ type CompletionOptions struct {
 // ModelInfo 是模型相关配置
 type ModelInfo struct {
 	WebSearch bool   // 是否联网搜索
+	Suggest   bool   // 是否建议
 	Thinking  bool   // 是否深度思考
 	Model     string // 模型名称
 	BotId     string // 智能体id
@@ -86,11 +91,12 @@ type ModelInfo struct {
 }
 
 type MessageInfo struct {
-	AssistantMessage *mmsg.Message
-	Text             string       // 对话内容
-	Think            string       // 思考内容
-	Suggest          string       // 建议内容
-	Code             []*mmsg.Code // 代码内容
+	RuntimeAssistantMessage strings.Builder // 过程中模型输出
+	AssistantMessage        *mmsg.Message
+	Text                    string       // 对话内容
+	Think                   string       // 思考内容
+	Suggest                 string       // 建议内容
+	Code                    []*mmsg.Code // 代码内容
 }
 
 type ReqMessage struct {

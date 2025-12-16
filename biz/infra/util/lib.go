@@ -39,6 +39,14 @@ func isNil(v any) bool {
 	}
 }
 
+func ZeroDefault[T comparable](v, def T) T {
+	var zero T
+	if v == zero {
+		return def
+	}
+	return v
+}
+
 func Of[T any](v T) *T {
 	return &v
 }

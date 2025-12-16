@@ -3,6 +3,7 @@ package flow
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"github.com/xh-polaris/innospark-core-api/biz/domain/interaction"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/memory"
@@ -37,10 +38,6 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 	}
 	subCtx, cancel := context.WithCancel(ctx)
 	st.CancelFunc = cancel
-	// 构建图并执行, 有效数据会通过st.EventStream传递给interaction
-	if _, err = StreamExecute(BuildFlow(st), subCtx, messages); err != nil {
-		return err
-	}
 
 	// 收集事件处理后响应给前端
 	inter := interaction.NewInteraction(st)
@@ -49,8 +46,39 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 			logs.CtxErrorf(ctx, "close interaction error: %s", ice)
 		}
 	}()
-	if err = inter.HandleEvent(subCtx); err != nil && !errors.Is(err, interaction.Interrupt) {
+
+	var wg sync.WaitGroup
+	var err1, err2 error
+	wg.Add(2)
+	// 收集图中事件
+	go func() {
+		defer wg.Done()
+		err1 = inter.HandleEvent(subCtx)
+	}()
+	// 构建图并执行, 有效数据会通过st.EventStream传递给interaction
+	go func() {
+		defer wg.Done()
+		_, err2 = StreamExecuteFlow(BuildFlow(st), subCtx, messages)
+	}()
+	wg.Wait()
+
+	if (err1 != nil && !errors.Is(err1, interaction.Interrupt)) || (err2 != nil && !errors.Is(err2, interaction.Interrupt)) {
 		return err
+	}
+
+	if needSuggest(st) {
+		wg.Add(2)
+		// 收集图中事件
+		go func() {
+			defer wg.Done()
+			err1 = inter.HandleEvent(subCtx)
+		}()
+		// 构建图并执行, 有效数据会通过st.EventStream传递给interaction
+		go func() {
+			defer wg.Done()
+			_, err2 = StreamExecuteSuggest(BuildSuggest(st), subCtx, st)
+		}()
+		wg.Wait()
 	}
 	// 除中断外错误均不存储历史记录
 	if err = memory.StoreHistory(ctx, st); err != nil {

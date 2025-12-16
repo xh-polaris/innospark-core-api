@@ -25,7 +25,6 @@ type Interaction struct {
 	event *event.EventStream  // 事件流
 	st    *state.RelayContext // 状态上下文
 
-	sb         strings.Builder          // 全内容收集
 	containers map[int]*strings.Builder // 记录不同类型内容
 	code       []*strings.Builder       // 记录代码内容
 	codeTyp    []string                 // 记录代码类型
@@ -37,8 +36,9 @@ func NewInteraction(st *state.RelayContext) (i *Interaction) {
 		sse:   ss.NewSSEStream(st.Info.RequestContext),
 		event: st.EventStream,
 		containers: map[int]*strings.Builder{
-			cst.EventMessageContentTypeText:  {}, // 文本消息
-			cst.EventMessageContentTypeThink: {}, // 思考消息
+			cst.EventMessageContentTypeText:    {}, // 文本消息
+			cst.EventMessageContentTypeThink:   {}, // 思考消息
+			cst.EventMessageContentTypeSuggest: {}, // 建议消息
 		}}
 	return
 }
@@ -68,6 +68,10 @@ func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 				if err = i.handleChatModel(e.Message); err != nil {
 					return
 				}
+			case event.Suggest:
+				if err = i.handleSuggest(e.Message); err != nil {
+					return
+				}
 			}
 		}
 	}
@@ -75,6 +79,25 @@ func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 
 func (i *Interaction) handleSSE(e *sse.Event) error {
 	if err := i.sse.Write(e); err != nil {
+		return Interrupt
+	}
+	return nil
+}
+
+func (i *Interaction) handleSuggest(msg *schema.Message) (err error) {
+	// 精化消息
+	refine := &info.RefineContent{}
+	content, typ := refine.SetContentWithTyp(msg.Content, cst.EventMessageContentTypeSuggest)
+
+	i.containers[cst.EventMessageContentTypeSuggest].WriteString(content) // 收集 suggest
+
+	inf := i.st.Info
+	ce, err := ChatEvent(inf.ConversationId.Hex(), inf.SectionId.Hex(), inf.ReplyId,
+		inf.MessageInfo.AssistantMessage.Index, inf.ModelInfo.BotId, refine, typ)
+	if err != nil {
+		return
+	}
+	if err = i.sse.Write(ce.SSEEvent); err != nil {
 		return Interrupt
 	}
 	return nil
@@ -90,7 +113,6 @@ func (i *Interaction) handleChatModel(msg *schema.Message) (err error) {
 	refine := &info.RefineContent{}
 	content, typ := refine.SetContentWithTyp(msg.Content, msg.Extra[cst.EventMessageContentType].(int))
 	// 收集信息
-	i.sb.WriteString(content)
 	if typ == cst.EventMessageContentTypeCodeType {
 		i.codeTyp = append(i.codeTyp, content)
 		i.code = append(i.code, &strings.Builder{})
@@ -114,8 +136,9 @@ func (i *Interaction) handleChatModel(msg *schema.Message) (err error) {
 // collect 收集各类消息内容
 func (i *Interaction) collect() {
 	// 存储各类消息内容
-	i.st.Info.MessageInfo.Text = i.containers[cst.EventMessageContentTypeText].String()   // 文本
-	i.st.Info.MessageInfo.Think = i.containers[cst.EventMessageContentTypeThink].String() // 思考
+	i.st.Info.MessageInfo.Text = i.containers[cst.EventMessageContentTypeText].String()       // 文本
+	i.st.Info.MessageInfo.Think = i.containers[cst.EventMessageContentTypeThink].String()     // 思考
+	i.st.Info.MessageInfo.Suggest = i.containers[cst.EventMessageContentTypeSuggest].String() // 建议
 
 	// 构造代码段信息
 	codes := make([]*mmsg.Code, len(i.code))

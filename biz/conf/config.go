@@ -36,6 +36,7 @@ type Config struct {
 	TitleGen   string
 	COS        *COS
 	CoTea      *CoTea
+	Suggest    *Suggest
 }
 
 func NewConfig() (*Config, error) {

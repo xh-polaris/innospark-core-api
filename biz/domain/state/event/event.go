@@ -44,6 +44,7 @@ func (es *EventStream) Read() (*Event, error) {
 const (
 	SSE       = "sse"        // sse事件
 	ChatModel = "chat_model" // 模型消息
+	Suggest   = "suggest"    // 建议消息
 )
 
 type Event struct {

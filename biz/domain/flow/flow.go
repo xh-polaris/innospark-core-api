@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/interaction"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/message"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/message/prompt_inject"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
@@ -20,7 +21,7 @@ import (
 
 type Flow = *compose.Graph[[]*schema.Message, *event.Event]
 
-func StreamExecute(f Flow, ctx context.Context, input []*schema.Message) (output *schema.StreamReader[*event.Event], err error) {
+func StreamExecuteFlow(f Flow, ctx context.Context, input []*schema.Message) (*schema.StreamReader[*event.Event], error) {
 	compiled, err := f.Compile(ctx)
 	if err != nil {
 		return nil, err
@@ -44,26 +45,30 @@ func BuildFlow(st *state.RelayContext) Flow {
 		_ = flow.AddLambdaNode(WebSearch, search, compose.WithNodeName(WebSearch))
 	}
 
-	// TODO 建议
-
 	// 模型节点
-	cm := &model.ModelFactory{}
+	cm := model.NewModelFactory()
 	_ = flow.AddChatModelNode(ChatModel, cm, compose.WithNodeName(ChatModel))
 
-	// 将模型消息写入事件流
-	assembleModelEvents := compose.TransformableLambda(func(ctx context.Context, input *schema.StreamReader[*schema.Message]) (_ *schema.StreamReader[*event.Event], err error) {
+	// 将模型事件写入事件流
+	assembleModelEvents := compose.CollectableLambda(func(ctx context.Context, input *schema.StreamReader[*schema.Message]) (_ *state.RelayContext, err error) {
 		go func() {
 			var m *schema.Message
 			for {
 				m, err = input.Recv()
+				if m != nil {
+					st.Info.MessageInfo.RuntimeAssistantMessage.WriteString(message.GetText(m))
+				}
 				st.EventStream.W.Send(&event.Event{Type: event.ChatModel, Message: m}, err)
+				if err != nil {
+					return
+				}
 			}
 		}()
-		return nil, nil
+		return st, nil
 	})
 	_ = flow.AddLambdaNode(ChatModelEventSend, assembleModelEvents, compose.WithNodeName(ChatModelEventSend))
 
-	output := compose.TransformableLambda(func(ctx context.Context, input *schema.StreamReader[*event.Event]) (_ *schema.StreamReader[*event.Event], err error) {
+	output := compose.StreamableLambda(func(ctx context.Context, st *state.RelayContext) (_ *schema.StreamReader[*event.Event], err error) {
 		return st.EventStream.R, nil
 	})
 	_ = flow.AddLambdaNode(Output, output, compose.WithNodeName(Output))
@@ -73,7 +78,7 @@ func BuildFlow(st *state.RelayContext) Flow {
 		_ = flow.AddEdge(compose.START, WebSearch)
 		pre = WebSearch
 	}
-	// TODO 建议
+
 	_ = flow.AddEdge(pre, ChatModel)
 	_ = flow.AddEdge(ChatModel, ChatModelEventSend)
 	_ = flow.AddEdge(ChatModelEventSend, Output)
@@ -134,6 +139,14 @@ func needVL(in []*schema.Message) bool {
 		if len(m.UserInputMultiContent) > 0 {
 			return true
 		}
+	}
+	return false
+}
+
+// 判断是否需要建议子图, 开启且不是coze时需要
+func needSuggest(st *state.RelayContext) bool {
+	if st.Info.ModelInfo.Suggest && !strings.HasPrefix(st.Info.ModelInfo.BotId, "intelligence-") {
+		return true
 	}
 	return false
 }
