@@ -2,6 +2,7 @@ package interaction
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"strings"
@@ -10,11 +11,13 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
 	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	ss "github.com/xh-polaris/innospark-core-api/biz/domain/interaction/sse"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/message"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state/event"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state/info"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 var Interrupt = errors.New("interrupt")
@@ -47,6 +50,13 @@ func (i *Interaction) Close() error {
 }
 func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 	defer i.collect() // 收集各类型消息
+	defer func() {    // 发送建议
+		if err != nil && !errors.Is(err, Interrupt) {
+			return
+		}
+		err = i.sendSuggest()
+	}()
+
 	var e *event.Event
 	for {
 		select {
@@ -84,21 +94,33 @@ func (i *Interaction) handleSSE(e *sse.Event) error {
 	return nil
 }
 
+// 仅收集建议
 func (i *Interaction) handleSuggest(msg *schema.Message) (err error) {
-	// 精化消息
-	refine := &info.RefineContent{}
-	content, typ := refine.SetContentWithTyp(msg.Content, cst.EventMessageContentTypeSuggest)
-
-	i.containers[cst.EventMessageContentTypeSuggest].WriteString(content) // 收集 suggest
-
-	inf := i.st.Info
-	ce, err := ChatEvent(inf.ConversationId.Hex(), inf.SectionId.Hex(), inf.ReplyId,
-		inf.MessageInfo.AssistantMessage.Index, inf.ModelInfo.BotId, refine, typ)
-	if err != nil {
-		return
-	}
-	if err = i.sse.Write(ce.SSEEvent); err != nil {
-		return Interrupt
+	i.containers[cst.EventMessageContentTypeSuggest].WriteString(message.GetText(msg)) // 收集 suggest
+	return nil
+}
+func (i *Interaction) sendSuggest() error {
+	if i.containers[cst.EventMessageContentTypeSuggest].Len() > 0 {
+		array := i.containers[cst.EventMessageContentTypeSuggest].String()
+		var suggests []string
+		if err := json.Unmarshal([]byte(array), &suggests); err != nil {
+			logs.Error("unmarshal suggest err: %v, suggest:%s", err, array)
+			return err
+		}
+		inf := i.st.Info
+		for _, s := range suggests {
+			refine := &info.RefineContent{}
+			_, typ := refine.SetContentWithTyp(s, cst.EventMessageContentTypeSuggest)
+			ce, err := ChatEvent(inf.ConversationId.Hex(), inf.SectionId.Hex(), inf.ReplyId,
+				inf.MessageInfo.AssistantMessage.Index, inf.ModelInfo.BotId, refine, typ)
+			if err != nil {
+				logs.Error("[interaction] chat event err: %v", err)
+				continue
+			}
+			if err = i.sse.Write(ce.SSEEvent); err != nil {
+				return Interrupt
+			}
+		}
 	}
 	return nil
 }
