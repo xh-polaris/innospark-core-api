@@ -51,6 +51,14 @@ func Of[T any](v T) *T {
 	return &v
 }
 
+func Deref[T any](v *T) T {
+	var zero T
+	if v == nil {
+		return zero
+	}
+	return *v
+}
+
 // Success 返回成功的basic.Response指针
 func Success() *basic.Response {
 	return &basic.Response{

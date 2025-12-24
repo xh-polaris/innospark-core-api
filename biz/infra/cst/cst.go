@@ -112,6 +112,8 @@ const (
 	Avatar  = "avatar"
 	Profile = "profile"
 	Role    = "role"
+	Subject = "subject"
+	Grade   = "grade"
 )
 
 const (

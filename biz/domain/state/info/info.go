@@ -18,21 +18,21 @@ import (
 // Info 存储Completion接口过程中的上下文信息
 type Info struct {
 	RequestContext    *app.RequestContext
-	CompletionOptions *CompletionOptions   // 对话配置
-	ModelInfo         *ModelInfo           // 模型信息
-	MessageInfo       *MessageInfo         // 消息信息
-	ConversationId    primitive.ObjectID   // 对话id
-	SectionId         primitive.ObjectID   // 段落id
-	UserId            primitive.ObjectID   // 用户id
-	ReplyId           string               // 响应ID
-	OriginMessage     *ReqMessage          // 用户原始消息
-	UserMessage       *mmsg.Message        // 用户消息
-	Profile           *user.Profile        // 用户个性化配置
-	Ext               map[string]string    // 额外配置
-	ResponseMeta      *schema.ResponseMeta // 用量
-	SearchInfo        *SearchInfo          // 搜素信息
-	Sensitive         *Sensitive
-	Attach            []string // 附件信息
+	CompletionOptions *CompletionOptions // 对话配置
+	ModelInfo         *ModelInfo         // 模型信息
+	MessageInfo       *MessageInfo       // 消息信息
+	ConversationId    primitive.ObjectID // 对话id
+	SectionId         primitive.ObjectID // 段落id
+	UserId            primitive.ObjectID // 用户id
+	ReplyId           string             // 响应ID
+	OriginMessage     *ReqMessage        // 用户原始消息
+	UserMessage       *mmsg.Message      // 用户消息
+	//Profile           *user.Profile        // 用户个性化配置
+	Ext          map[string]string    // 额外配置
+	ResponseMeta *schema.ResponseMeta // 用量
+	SearchInfo   *SearchInfo          // 搜素信息
+	Sensitive    *Sensitive
+	Attach       []string // 附件信息
 }
 
 func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, conversationId, sectionId primitive.ObjectID) (info *Info) {
@@ -43,8 +43,7 @@ func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, 
 			IsRegen:         req.CompletionsOption.IsRegen,          // 重新生成用
 			IsReplace:       req.CompletionsOption.IsReplace,        // 替换消息用户
 			SelectedRegenId: req.CompletionsOption.SelectedRegenId}, // 确定重新生成用
-		Profile: util.NilDefault(u.Profile, &user.Profile{Role: "未知"}),           // 个性化信息
-		Ext:     util.NilDefault(req.CompletionsOption.Ext, map[string]string{}), // 额外信息(用于cotea模式)
+		Ext: util.NilDefault(req.CompletionsOption.Ext, map[string]string{}), // 额外信息(用于cotea模式)
 		ModelInfo: &ModelInfo{
 			Model:     req.Model,                            // 模型名称
 			BotId:     req.BotId,                            // agent名称
@@ -63,8 +62,11 @@ func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, 
 		},
 		Sensitive: &Sensitive{}, // 命中的敏感词
 	}
-	inf.Ext["query"] = req.Messages[0].Content // 将用户原始提问存入query中, 简化可能存在的提示词注入
-	inf.Ext["role"] = inf.Profile.Role         // 用户角色
+	inf.Ext["query"] = req.Messages[0].Content                         // 将用户原始提问存入query中, 简化可能存在的提示词注入
+	profile := util.NilDefault(u.Profile, &user.Profile{})             // 个性化信息
+	inf.Ext[cst.Profile+"."+cst.Role] = util.Deref(profile.Role)       // 用户角色
+	inf.Ext[cst.Profile+"."+cst.Grade] = util.Deref(profile.Grade)     // 用户年级
+	inf.Ext[cst.Profile+"."+cst.Subject] = util.Deref(profile.Subject) // 学科
 	return inf
 }
 

@@ -3,9 +3,10 @@ package conversation
 import (
 	"context"
 	"fmt"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"regexp"
 	"strings"
+
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/schema"
