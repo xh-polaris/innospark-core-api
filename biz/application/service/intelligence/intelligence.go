@@ -83,7 +83,7 @@ func (i *IntelligenceService) ListIntelligence(ctx context.Context, req *core_ap
 	liResp := &core_api.ListIntelligenceResp{
 		Resp: &basic.Response{
 			Code: int32(int(resp["code"].(float64))),
-			Msg:  resp["message"].(string),
+			Msg:  resp["msg"].(string),
 		},
 		Intelligences: intelligences,
 		HasMore:       data["has_more"].(bool),

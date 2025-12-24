@@ -3,6 +3,7 @@ package conversation
 import (
 	"context"
 	"fmt"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"regexp"
 	"strings"
 
@@ -147,9 +148,9 @@ func (s *ConversationService) GetConversation(ctx context.Context, req *core_api
 		logs.Errorf("get conversation messages error: %s", errorx.ErrorWithoutStack(err))
 		return nil, errorx.WrapByCode(err, errno.ConversationGetErrCode)
 	}
-	// 判断是否有regen
+	// 判断最后一条消息是否是regen的模型消息
 	var regen []*mmsg.Message
-	if len(msgs) > 0 {
+	if len(msgs) > 0 && msgs[0].Role == cst.AssistantEnum {
 		replyId := msgs[0].ReplyId.Hex()
 		for _, msg := range msgs[1:] {
 			if msg.ReplyId.Hex() == replyId {
