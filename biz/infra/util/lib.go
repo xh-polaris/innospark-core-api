@@ -137,3 +137,16 @@ func SignedCOS2CDN(raw string) string {
 	// 预签名url去掉参数后即为
 	return cOS2CDN(strings.Split(raw, "?")[0])
 }
+
+func IsImg(s string) bool {
+	imgExt := []string{
+		".jpg", ".jpeg", ".png",
+		".bmp", ".webp", ".ico",
+	}
+	for _, ext := range imgExt {
+		if strings.Contains(s, ext) {
+			return true
+		}
+	}
+	return false
+}

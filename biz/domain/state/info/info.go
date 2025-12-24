@@ -85,6 +85,7 @@ type ModelInfo struct {
 	WebSearch bool   // 是否联网搜索
 	Suggest   bool   // 是否建议
 	Thinking  bool   // 是否深度思考
+	OCR       bool   // 是否调用ocr
 	Model     string // 模型名称
 	BotId     string // 智能体id
 	BotName   string // 智能体名称
