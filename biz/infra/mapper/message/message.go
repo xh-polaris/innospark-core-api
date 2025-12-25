@@ -44,6 +44,7 @@ type Ext struct {
 	Sensitive  bool          `json:"sensitive,omitempty" bson:"sensitive,omitempty"`     // 是否触发违禁词
 	AttachInfo []*AttachInfo `json:"attach_info,omitempty" bson:"attach_info,omitempty"` // 附件信息
 	Usage      *Usage        `json:"usage,omitempty" bson:"usage,omitempty"`             // 用量信息
+	Tex        string        `json:"tex,omitempty" bson:"tex,omitempty"`                 // ocr结果，Tex字符串
 }
 
 type Cite struct {

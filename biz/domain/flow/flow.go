@@ -37,6 +37,16 @@ func BuildFlow(st *state.RelayContext) Flow {
 	}
 	flow := compose.NewGraph[[]*schema.Message, *event.Event](compose.WithGenLocalState(gls))
 
+	// OCR
+	if strings.HasPrefix(st.Info.ModelInfo.BotId, "cotea-") && len(st.Info.OriginMessage.Attaches) > 0 {
+		st.Info.ModelInfo.OCR = true
+
+		ocr := compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (_ []*schema.Message, err error) {
+			return DoOCR(ctx, conf.GetConfig().OCR.URL, input)
+		})
+		_ = flow.AddLambdaNode(OCR, ocr, compose.WithNodeName(OCR))
+	}
+
 	// 搜索
 	if st.Info.ModelInfo.WebSearch {
 		search := compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (_ []*schema.Message, err error) {
@@ -74,8 +84,13 @@ func BuildFlow(st *state.RelayContext) Flow {
 	_ = flow.AddLambdaNode(Output, output, compose.WithNodeName(Output))
 
 	var pre = compose.START
+	if st.Info.ModelInfo.OCR {
+		_ = flow.AddEdge(compose.START, OCR)
+		pre = OCR
+	}
+
 	if st.Info.ModelInfo.WebSearch {
-		_ = flow.AddEdge(compose.START, WebSearch)
+		_ = flow.AddEdge(pre, WebSearch)
 		pre = WebSearch
 	}
 
@@ -91,6 +106,7 @@ const (
 	ChatModel          = "chat-model"
 	ChatModelEventSend = "chat-model-event-send"
 	Output             = "output"
+	OCR                = "ocr"
 )
 
 // BuildChatModel 构建不同模型
@@ -118,6 +134,7 @@ func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Me
 		}
 	}
 	if strings.HasPrefix(info.ModelInfo.BotId, "cotea-") {
+		info.ModelInfo.Model = strings.TrimSuffix(info.ModelInfo.Model, "-VL")
 		in, err = prompt_inject.CoTeaSysInject(ctx, in, st)
 		if err != nil {
 			return err
