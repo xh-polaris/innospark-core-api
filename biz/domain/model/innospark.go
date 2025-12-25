@@ -67,6 +67,15 @@ func (c *InnosparkChatModel) Generate(ctx context.Context, in []*schema.Message,
 
 func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
 	var raw *schema.StreamReader[*schema.Message]
+	var single []*schema.Message
+	for _, i := range in {
+		if len(i.UserInputMultiContent) > 0 {
+			i.Content = util.GetInputText(i)
+			i.UserInputMultiContent = nil
+		}
+		single = append(single, i)
+	}
+	in = single
 	if raw, err = c.cli.Stream(ctx, in, opts...); err != nil {
 		return nil, err
 	}
