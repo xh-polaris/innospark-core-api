@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,7 +38,8 @@ func (s *AttachService) GenSignedURL(ctx context.Context, req *core_api.GenSigne
 	}
 
 	// 使用 userID/prefix/时间戳 作为对象键
-	key := strings.Join([]string{uid, req.GetPrefix(), time.Now().String()}, "/")
+	key := strings.Join([]string{uid, req.GetPrefix(), strconv.Itoa(int(time.Now().Unix()))}, "/")
+	key += "." + req.GetSuffix()
 
 	signedURL, err := s.Cos.GenPresignURL(ctx, key, nil)
 	if err != nil || signedURL == "" {
