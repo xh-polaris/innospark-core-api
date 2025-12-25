@@ -1,5 +1,6 @@
 package conf
 
 type OCR struct {
-	URL string
+	URL    string
+	Prompt string
 }

@@ -42,7 +42,7 @@ func BuildFlow(st *state.RelayContext) Flow {
 		st.Info.ModelInfo.OCR = true
 
 		ocr := compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (_ []*schema.Message, err error) {
-			return DoOCR(ctx, conf.GetConfig().OCR.URL, input)
+			return DoOCR(ctx, st, conf.GetConfig().OCR.URL, conf.GetConfig().OCR.Prompt, input)
 		})
 		_ = flow.AddLambdaNode(OCR, ocr, compose.WithNodeName(OCR))
 	}
@@ -115,7 +115,7 @@ func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Me
 	if info.ModelInfo.BotId == "code-gen" {
 		info.ModelInfo.Model = model.Claude4Sonnet
 		format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: cst.User, Content: conf.GetConfig().ARK.CodeGenTemplate}).Format(ctx,
-			map[string]any{"userQuery": info.OriginMessage.Content})
+			map[string]any{"query": info.OriginMessage.Content})
 		if err != nil {
 			return err
 		}

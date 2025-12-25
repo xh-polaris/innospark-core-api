@@ -146,13 +146,12 @@ func SignedCOS2CDN(raw string) string {
 	return cOS2CDN(strings.Split(raw, "?")[0])
 }
 
+var imgExt = []string{".jpg", ".jpeg", ".png", ".webp"}
+
 func IsImg(s string) bool {
-	imgExt := []string{
-		".jpg", ".jpeg", ".png",
-		".bmp", ".webp", ".ico",
-	}
+	s = strings.ToLower(s)
 	for _, ext := range imgExt {
-		if strings.Contains(s, ext) {
+		if strings.HasSuffix(s, ext) {
 			return true
 		}
 	}

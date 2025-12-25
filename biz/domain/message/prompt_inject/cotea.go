@@ -19,13 +19,8 @@ func CoTeaSysInject(ctx context.Context, in []*schema.Message, st *state.RelayCo
 
 	injectInfo := make(map[string]any)
 	for _, k := range template.Key {
-		if v, ok := st.Info.Ext[k]; ok {
-			injectInfo[k] = v
-		}
+		injectInfo[k] = st.Info.Ext[k]
 	}
-	// TODO 移除测试用语句
-	injectInfo["level"] = "大学学生水平"
-	injectInfo["style"] = "简短"
 	sys, err := prompt.FromMessages(schema.FString, &schema.Message{Role: schema.System, Content: template.Template}).Format(ctx, injectInfo)
 	if err != nil {
 		return nil, err

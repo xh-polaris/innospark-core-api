@@ -61,3 +61,41 @@ func AddExtra(m *schema.Message, key string, value any) {
 	}
 	m.Extra[key] = value
 }
+
+// GetInputText 获取消息中的文本
+func GetInputText(m *schema.Message) string {
+	if len(m.UserInputMultiContent) > 0 {
+		for _, c := range m.UserInputMultiContent {
+			if c.Type == schema.ChatMessagePartTypeText {
+				return c.Text
+			}
+		}
+	}
+	return m.Content
+}
+
+// SetInputText 设置消息的文本
+func SetInputText(m *schema.Message, text string) {
+	if len(m.UserInputMultiContent) > 0 {
+		for _, c := range m.UserInputMultiContent {
+			if c.Type == schema.ChatMessagePartTypeText {
+				c.Text = text
+				return
+			}
+		}
+	}
+	m.Content = text
+}
+
+func RemoveImg(m *schema.Message) {
+	if len(m.UserInputMultiContent) > 0 {
+		ipt := make([]schema.MessageInputPart, 0)
+		for _, c := range m.UserInputMultiContent {
+			if c.Type != schema.ChatMessagePartTypeImageURL {
+				ipt = append(ipt, c)
+			}
+		}
+		m.UserInputMultiContent = ipt
+	}
+	return
+}

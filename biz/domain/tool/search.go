@@ -39,7 +39,7 @@ func Search(ctx context.Context, provider, apiKey, template string, input []*sch
 
 	// 填充模板
 	format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: "user", Content: template}).Format(ctx,
-		map[string]any{"searchContent": result, "userQuery": relay.Info.OriginMessage.Content})
+		map[string]any{"searchContent": result, "query": relay.Info.OriginMessage.Content})
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/compose"
@@ -13,6 +14,7 @@ import (
 type getModelFunc func(ctx context.Context, uid, botId string) (model.ToolCallingChatModel, error)
 
 var models = map[string]getModelFunc{}
+var NoSuchModel = errors.New("no such model")
 
 func RegisterModel(name string, f getModelFunc) {
 	models[name] = f
@@ -20,7 +22,11 @@ func RegisterModel(name string, f getModelFunc) {
 
 // getModel 获取模型
 func getModel(ctx context.Context, model, uid, botId string) (model.ToolCallingChatModel, error) {
-	return models[model](ctx, uid, botId)
+	fn, ok := models[model]
+	if !ok {
+		return nil, NoSuchModel
+	}
+	return fn(ctx, uid, botId)
 }
 
 type ModelFactory struct {
