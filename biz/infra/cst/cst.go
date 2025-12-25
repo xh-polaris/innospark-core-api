@@ -16,7 +16,9 @@ const (
 )
 
 // ctx 存储键
-const ()
+const (
+	CtxState = "state"
+)
 
 // sse事件类型
 const (
@@ -110,6 +112,8 @@ const (
 	Avatar  = "avatar"
 	Profile = "profile"
 	Role    = "role"
+	Subject = "subject"
+	Grade   = "grade"
 )
 
 const (

@@ -3,6 +3,8 @@ package message
 // 不同邻域消息的转换
 
 import (
+	"strings"
+
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/core_api"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
@@ -22,17 +24,6 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 		Role:    schema.RoleType(mmsg.RoleItoS[msg.Role]),
 		Content: msg.Content,
 		Name:    msg.MessageId.Hex(),
-	}
-	if msg.Ext.ContentWithCite != nil { // 联网搜索到的内容
-		if len(m.UserInputMultiContent) != 0 {
-			for i := range m.UserInputMultiContent {
-				if mmsg.ChatMessagePartType(m.UserInputMultiContent[i].Type) == mmsg.ChatMessagePartTypeText {
-					m.UserInputMultiContent[i].Text = *msg.Ext.ContentWithCite
-				}
-			}
-		} else {
-			m.Content = *msg.Ext.ContentWithCite
-		}
 	}
 	if len(msg.UserInputMultiContent) != 0 {
 		for _, uimc := range msg.UserInputMultiContent {
@@ -286,4 +277,17 @@ func MUsageToFUsage(usage *mmsg.Usage) *core_api.Usage {
 		CompletionTokens:   int64(usage.CompletionTokens),
 		TotalTokens:        int64(usage.TotalTokens),
 	}
+}
+
+// GetText 获取消息中的文本
+func GetText(message *schema.Message) string {
+	var sb strings.Builder
+	if len(message.UserInputMultiContent) != 0 {
+		for _, part := range message.UserInputMultiContent {
+			sb.WriteString(part.Text)
+		}
+	} else if message.Content != "" {
+		return message.Content
+	}
+	return sb.String()
 }

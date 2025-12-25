@@ -39,8 +39,24 @@ func isNil(v any) bool {
 	}
 }
 
+func ZeroDefault[T comparable](v, def T) T {
+	var zero T
+	if v == zero {
+		return def
+	}
+	return v
+}
+
 func Of[T any](v T) *T {
 	return &v
+}
+
+func Deref[T any](v *T) T {
+	var zero T
+	if v == nil {
+		return zero
+	}
+	return *v
 }
 
 // Success 返回成功的basic.Response指针
@@ -128,4 +144,16 @@ func cOS2CDN(raw string) string {
 func SignedCOS2CDN(raw string) string {
 	// 预签名url去掉参数后即为
 	return cOS2CDN(strings.Split(raw, "?")[0])
+}
+
+var imgExt = []string{".jpg", ".jpeg", ".png", ".webp"}
+
+func IsImg(s string) bool {
+	s = strings.ToLower(s)
+	for _, ext := range imgExt {
+		if strings.HasSuffix(s, ext) {
+			return true
+		}
+	}
+	return false
 }

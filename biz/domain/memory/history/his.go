@@ -64,13 +64,15 @@ func (h *HistoryManager) RetrieveMessagesFromCache(ctx context.Context, id strin
 	}
 
 	msgs := make([]*message.Message, len(result), len(result))
+	i := 0
 	for _, data := range result {
 		var msg message.Message
 		if err = sonic.Unmarshal([]byte(data), &msg); err != nil {
 			logs.Errorf("[message mapper] listAllMsg: json.Unmarshal err:%s", errorx.ErrorWithoutStack(err))
 			return nil, err
 		}
-		msgs = append(msgs, &msg)
+		msgs[i] = &msg
+		i++
 	}
 
 	if len(msgs) > 0 {

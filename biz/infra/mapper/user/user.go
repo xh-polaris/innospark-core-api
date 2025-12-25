@@ -28,5 +28,7 @@ type User struct {
 
 // Profile 个性化内容
 type Profile struct {
-	Role string `json:"role,omitempty" bson:"role,omitempty"` // 角色设定
+	Role    *string `json:"role,omitempty" bson:"role,omitempty"`       // 角色设定
+	Grade   *string `json:"grade,omitempty" bson:"grade,omitempty"`     // 年级
+	Subject *string `json:"subject,omitempty" bson:"subject,omitempty"` // 学科
 }

@@ -26,8 +26,8 @@ func Completions(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	sse, err := completions.CompletionsSVC.Completions(c, ctx, &req)
-	adaptor.SSE(ctx, c, &req, sse, err)
+	err = completions.CompletionsSVC.Completions(c, ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, nil, err)
 }
 
 // CreateConversation .

@@ -6,9 +6,7 @@ import (
 
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
-	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 func init() {
@@ -26,13 +24,6 @@ func (m *TestModelFactory) Generate(ctx context.Context, in []*schema.Message, o
 }
 
 func (m *TestModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (_ *schema.StreamReader[*schema.Message], err error) {
-	var r *state.RelayContext
-	if r, err = util.GetState[*state.RelayContext](ctx); err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithCancel(ctx)
-	r.Info.ModelCancel = cancel
-
 	sr, sw := schema.Pipe[*schema.Message](5)
 	go func() {
 		for _, s := range ss {

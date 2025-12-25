@@ -1,5 +1,10 @@
 package conf
 
+type Suggest struct {
+	Model    string
+	Template string
+}
+
 // InnoSpark 启创配置
 type InnoSpark struct {
 	DefaultBaseURL   string

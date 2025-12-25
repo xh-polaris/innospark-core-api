@@ -8,8 +8,6 @@ import (
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
-	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
@@ -26,7 +24,7 @@ func NewSearchTool(provider string, relay *state.RelayContext, apiKey string) We
 	return nil
 }
 
-func Search(ctx context.Context, provider, apiKey, template string, input []*mmsg.Message) (_ []*mmsg.Message, err error) {
+func Search(ctx context.Context, provider, apiKey, template string, input []*schema.Message) (_ []*schema.Message, err error) {
 	var relay *state.RelayContext
 	if relay, err = util.GetState[*state.RelayContext](ctx); err != nil {
 		return
@@ -41,17 +39,24 @@ func Search(ctx context.Context, provider, apiKey, template string, input []*mms
 
 	// 填充模板
 	format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: "user", Content: template}).Format(ctx,
-		map[string]any{"searchContent": result, "userQuery": relay.Info.OriginMessage.Content})
+		map[string]any{"searchContent": result, "query": relay.Info.OriginMessage.Content})
 	if err != nil {
 		return nil, err
 	}
 
 	cite := format[0].Content
-	// 找到最近一条有效的用户消息, 主要是为了适配regen的情况
+	// 找到最近一条有效的用户消息, 替换为带引用内容
 	for _, m := range input {
-		if m.Role == cst.UserEnum && m.Content != "" {
-			m.Ext.ContentWithCite = &cite
-			break
+		if m.Role == schema.User {
+			if m.Content != "" {
+				m.Content = cite
+			} else if len(m.UserInputMultiContent) != 0 {
+				for i := range m.UserInputMultiContent {
+					if m.UserInputMultiContent[i].Type == schema.ChatMessagePartTypeText {
+						m.UserInputMultiContent[i].Text = cite
+					}
+				}
+			}
 		}
 	}
 	return input, nil

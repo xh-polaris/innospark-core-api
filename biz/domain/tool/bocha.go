@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
+	"github.com/xh-polaris/innospark-core-api/biz/domain/interaction"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state/info"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
@@ -21,7 +22,7 @@ import (
 const webAPIEndPoint = "https://api.bochaai.com/v1/web-search"
 
 type BochaSearchTool struct {
-	relay  *state.RelayContext
+	st     *state.RelayContext
 	apiKey string
 }
 
@@ -66,7 +67,7 @@ type webAPIResp struct {
 }
 
 func NewBochaSearchTool(relay *state.RelayContext, apiKey string) WebSearchTool {
-	return &BochaSearchTool{relay: relay, apiKey: apiKey}
+	return &BochaSearchTool{st: relay, apiKey: apiKey}
 }
 
 func (t *BochaSearchTool) Info(_ context.Context) (*schema.ToolInfo, error) {
@@ -85,8 +86,8 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 		return "", err
 	}
 
-	inter, inf := t.relay.Interaction, t.relay.Info
-	if err = inter.WriteEvent(inter.SearchStartEvent()); err != nil { // 开始搜索
+	inf := t.st.Info
+	if err = t.st.EventStream.Write(interaction.SearchStartEvent()); err != nil { // 开始搜索
 		return "", err
 	}
 
@@ -101,7 +102,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 
 	// SSE: 查找多少篇?
 	find := resp.Data.WebPages.TotalEstimatedMatches%50 + len(resp.Data.WebPages.Value)
-	if err = inter.WriteEvent(inter.SearchFindEvent(find)); err != nil {
+	if err = t.st.EventStream.Write(interaction.SearchFindEvent(find)); err != nil {
 		return "", err
 	}
 	// 随机引用一下, 避免每次引用次数都是一样多
@@ -110,7 +111,7 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 	}
 	// SSE: 选择多少篇
 	choose := len(resp.Data.WebPages.Value)
-	if err = inter.WriteEvent(inter.SearchChooseEvent(choose)); err != nil {
+	if err = t.st.EventStream.Write(interaction.SearchChooseEvent(choose)); err != nil {
 		return "", err
 	}
 
@@ -127,11 +128,11 @@ func (t *BochaSearchTool) InvokableRun(ctx context.Context, jsonStr string, _ ..
 			SiteName: v.SiteName, SiteIcon: v.SiteIcon, DatePublished: v.DatePublished}
 		cite = append(cite, c)
 		// SSE: 返回引用
-		if err = inter.WriteEvent(inter.SearchCiteEvent(c)); err != nil {
+		if err = t.st.EventStream.Write(interaction.SearchCiteEvent(c)); err != nil {
 			return "", err
 		}
 	}
-	if err = inter.WriteEvent(inter.SearchEndEvent()); err != nil {
+	if err = t.st.EventStream.Write(interaction.SearchEndEvent()); err != nil {
 		return "", err
 	}
 	inf.SearchInfo = &info.SearchInfo{Find: find, Choose: choose, Cite: cite}

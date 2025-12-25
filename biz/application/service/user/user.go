@@ -254,9 +254,7 @@ func (u *UserService) UpdateProfile(ctx context.Context, req *core_api.BasicUser
 		update[cst.Avatar] = *req.Avatar
 	}
 	if req.Profile != nil {
-		if req.Profile.Role != nil {
-			update[cst.Profile+"."+cst.Role] = *req.Profile.Role
-		}
+		update[cst.Profile] = req.Profile
 	}
 
 	// 一次性更新所有字段
@@ -281,9 +279,14 @@ func (u *UserService) GetProfile(ctx context.Context, req *core_api.BasicUserGet
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ErrGetProfile)
 	}
-	profile := &core_api.Profile{}
+	var profile *core_api.Profile
+
 	if usr.Profile != nil {
-		profile.Role = &usr.Profile.Role
+		profile = &core_api.Profile{
+			Role:    usr.Profile.Role,
+			Grade:   usr.Profile.Grade,
+			Subject: usr.Profile.Subject,
+		}
 	}
 	return &core_api.BasicUserGetProfileResp{
 		Resp:    util.Success(),

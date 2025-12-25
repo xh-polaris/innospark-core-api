@@ -20,7 +20,7 @@ import (
 
 type data struct {
 	Code int32  `json:"code"`
-	Msg  string `json:"message"`
+	Msg  string `json:"msg"`
 }
 
 // PostProcess 处理http响应, resp要求指针或接口类型
@@ -66,7 +66,7 @@ func makeResponse(resp any) map[string]any {
 	// 构建返回数据
 	v = v.Elem()
 	r := v.FieldByName("Resp").Elem()
-	response := map[string]any{"code": r.FieldByName("Code").Int(), "message": r.FieldByName("Msg").String()}
+	response := map[string]any{"code": r.FieldByName("Code").Int(), "msg": r.FieldByName("Msg").String()}
 
 	data := make(map[string]any)
 	for i := 0; i < v.NumField(); i++ {
