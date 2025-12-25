@@ -24,6 +24,7 @@ func MMsgToEMsg(msg *mmsg.Message) *schema.Message {
 		Role:    schema.RoleType(mmsg.RoleItoS[msg.Role]),
 		Content: msg.Content,
 		Name:    msg.MessageId.Hex(),
+		Extra:   map[string]any{"ocr": msg.Ext.Ocr},
 	}
 	if len(msg.UserInputMultiContent) != 0 {
 		for _, uimc := range msg.UserInputMultiContent {

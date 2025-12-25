@@ -72,6 +72,9 @@ func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, o
 		if len(i.UserInputMultiContent) > 0 {
 			i.Content = util.GetInputText(i)
 			i.UserInputMultiContent = nil
+			if ocr, ok := i.Extra["ocr"]; ok {
+				i.Content = "ocr的识别结果是" + ocr.(string) + "\n用户问题\n" + i.Content
+			}
 		}
 		single = append(single, i)
 	}
