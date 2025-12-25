@@ -279,7 +279,7 @@ func (u *UserService) GetProfile(ctx context.Context, req *core_api.BasicUserGet
 	if err != nil {
 		return nil, errorx.WrapByCode(err, errno.ErrGetProfile)
 	}
-	var profile *core_api.Profile
+	var profile = &core_api.Profile{}
 
 	if usr.Profile != nil {
 		profile = &core_api.Profile{
