@@ -110,14 +110,14 @@ const (
 )
 
 // BuildChatModel 构建不同模型
-func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Message) (err error) {
+func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Message) (_ []*schema.Message, err error) {
 	info := st.Info
 	if info.ModelInfo.BotId == "code-gen" {
 		info.ModelInfo.Model = model.Claude4Sonnet
 		format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: cst.User, Content: conf.GetConfig().ARK.CodeGenTemplate}).Format(ctx,
 			map[string]any{"query": info.OriginMessage.Content})
 		if err != nil {
-			return err
+			return nil, err
 		}
 		// 找到最近一条有效的用户消息, 主要是为了适配regen的情况
 		for _, m := range in {
@@ -137,7 +137,7 @@ func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Me
 		info.ModelInfo.Model = strings.TrimSuffix(info.ModelInfo.Model, "-VL")
 		in, err = prompt_inject.CoTeaSysInject(ctx, in, st)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	// 写入模型事件
@@ -146,9 +146,9 @@ func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Me
 		info.ModelInfo.BotId,
 		info.ModelInfo.BotName,
 	)); err != nil {
-		return err
+		return nil, err
 	}
-	return err
+	return in, nil
 }
 
 func needVL(in []*schema.Message) bool {

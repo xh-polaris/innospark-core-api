@@ -33,7 +33,7 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 	// 转换存储域消息为模型域消息
 	messages := message.MMsgToEMsgList(history)
 	// 构建模型
-	if err = BuildChatModel(ctx, st, messages); err != nil {
+	if messages, err = BuildChatModel(ctx, st, messages); err != nil {
 		return err
 	}
 	subCtx, cancel := context.WithCancel(ctx)
