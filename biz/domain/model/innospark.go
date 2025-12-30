@@ -69,14 +69,9 @@ func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, o
 	var raw *schema.StreamReader[*schema.Message]
 	var single []*schema.Message
 	for _, i := range in {
-		newMsg := &schema.Message{
-			Content:               i.Content,
-			UserInputMultiContent: i.UserInputMultiContent,
-			Extra:                 make(map[string]any),
-		}
-		// 复制 Extra 中的内容
-		for k, v := range i.Extra {
-			newMsg.Extra[k] = v
+		newMsg, err := util.CopyMessage(i)
+		if err != nil {
+			return nil, err
 		}
 		if len(newMsg.UserInputMultiContent) > 0 {
 			newMsg.Content = util.GetInputText(newMsg)

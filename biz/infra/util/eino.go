@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
+	"github.com/jinzhu/copier"
 )
 
 func GetState[I any](ctx context.Context) (relay I, err error) {
@@ -98,4 +99,12 @@ func RemoveImg(m *schema.Message) {
 		m.UserInputMultiContent = ipt
 	}
 	return
+}
+
+func CopyMessage(m *schema.Message) (*schema.Message, error) {
+	var msg schema.Message
+	if err := copier.Copy(&msg, m); err != nil {
+		return nil, err
+	}
+	return &msg, nil
 }
