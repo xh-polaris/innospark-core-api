@@ -113,7 +113,7 @@ func (h *HistoryManager) AddMessage(ctx context.Context, id string, msg *message
 		return
 	}
 	// add to cache
-	if err = h.CacheMessages(ctx, key(id), []*message.Message{msg}, false); err != nil {
+	if err = h.CacheMessages(ctx, id, []*message.Message{msg}, false); err != nil {
 		logs.Errorf("cache msgs err: %s", err)
 	}
 	return

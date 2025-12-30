@@ -69,17 +69,25 @@ func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, o
 	var raw *schema.StreamReader[*schema.Message]
 	var single []*schema.Message
 	for _, i := range in {
-		if len(i.UserInputMultiContent) > 0 {
-			i.Content = util.GetInputText(i)
-			i.UserInputMultiContent = nil
-			if ocr, ok := i.Extra["ocr"]; ok {
-				i.Content = "ocr的识别结果是" + ocr.(string) + "\n用户问题\n" + i.Content
+		newMsg := &schema.Message{
+			Content:               i.Content,
+			UserInputMultiContent: i.UserInputMultiContent,
+			Extra:                 make(map[string]any),
+		}
+		// 复制 Extra 中的内容
+		for k, v := range i.Extra {
+			newMsg.Extra[k] = v
+		}
+		if len(newMsg.UserInputMultiContent) > 0 {
+			newMsg.Content = util.GetInputText(newMsg)
+			newMsg.UserInputMultiContent = nil
+			if ocr, ok := newMsg.Extra["ocr"]; ok {
+				newMsg.Content = "ocr的识别结果是" + ocr.(string) + "\n用户问题\n" + newMsg.Content
 			}
 		}
-		single = append(single, i)
+		single = append(single, newMsg)
 	}
-	in = single
-	if raw, err = c.cli.Stream(ctx, in, opts...); err != nil {
+	if raw, err = c.cli.Stream(ctx, single, opts...); err != nil {
 		return nil, err
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
