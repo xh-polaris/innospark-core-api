@@ -1,8 +1,10 @@
 package conf
 
 type AgentPrompts struct {
-	Template string
-	Key      []string
+	ExtractInfo   bool
+	ExtractPrompt string
+	Template      string
+	Key           []string
 }
 
 // CoTea 相关配置

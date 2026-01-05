@@ -62,11 +62,17 @@ func NewInfo(c *app.RequestContext, req *core_api.CompletionsReq, u *user.User, 
 		},
 		Sensitive: &Sensitive{}, // 命中的敏感词
 	}
-	inf.Ext["query"] = req.Messages[0].Content                         // 将用户原始提问存入query中, 简化可能存在的提示词注入
-	profile := util.NilDefault(u.Profile, &user.Profile{})             // 个性化信息
-	inf.Ext[cst.Profile+"."+cst.Role] = util.Deref(profile.Role)       // 用户角色
-	inf.Ext[cst.Profile+"."+cst.Grade] = util.Deref(profile.Grade)     // 用户年级
-	inf.Ext[cst.Profile+"."+cst.Subject] = util.Deref(profile.Subject) // 学科
+	inf.Ext["query"] = req.Messages[0].Content             // 将用户原始提问存入query中, 简化可能存在的提示词注入
+	profile := util.NilDefault(u.Profile, &user.Profile{}) // 个性化信息
+	if v, ok := inf.Ext[cst.Role]; (!ok || v == "") && profile.Role != nil {
+		inf.Ext[cst.Role] = util.Deref(profile.Role) // 用户角色
+	}
+	if v, ok := inf.Ext[cst.Grade]; (!ok || v == "") && profile.Grade != nil {
+		inf.Ext[cst.Grade] = util.Deref(profile.Grade) // 用户年级
+	}
+	if v, ok := inf.Ext[cst.Subject]; (!ok || v == "") && profile.Subject != nil {
+		inf.Ext[cst.Subject] = util.Deref(profile.Subject) // 学科
+	}
 	return inf
 }
 

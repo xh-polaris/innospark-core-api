@@ -60,7 +60,7 @@ func ModelEvent(model, bid, bname string) (*event.Event, error) {
 
 // EndEvent 结束事件
 func (i *Interaction) EndEvent() error {
-	return i.sse.Write(&sse.Event{Type: cst.EventEnd, Data: []byte(cst.EventNotifyValue)})
+	return i.SSE.Write(&sse.Event{Type: cst.EventEnd, Data: []byte(cst.EventNotifyValue)})
 }
 
 //// ErrorEvent 错误事件
@@ -99,6 +99,16 @@ func SearchCiteEvent(cite *mmsg.Cite) (*event.Event, error) {
 		SiteIcon:      cite.SiteIcon,      // 引用站点图标
 		DatePublished: cite.DatePublished} // 引用发布时间
 	return MarshEvent(cst.EventSearchCite, c)
+}
+
+// ExtractInfoEvent 表单提取事件
+func ExtractInfoEvent() (*event.Event, error) {
+	return EventWithoutMarshal(cst.EventExtractInfo, []byte(cst.EventNotifyValue)), nil
+}
+
+// ExtractInfoEndEvent 表单提取结束事件
+func ExtractInfoEndEvent(obj any) (*event.Event, error) {
+	return MarshEvent(cst.EventExtractInfoEnd, obj)
 }
 
 // MarshEvent 序列化一个消息

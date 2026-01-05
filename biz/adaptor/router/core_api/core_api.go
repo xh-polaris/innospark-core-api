@@ -52,9 +52,11 @@ func Register(r *server.Hertz) {
 		_conversation.POST("/create", append(_createconversationMw(), core_api.CreateConversation)...)
 		_conversation.POST("/delete", append(_deleteconversationMw(), core_api.DeleteConversation)...)
 		_conversation.POST("/get", append(_getconversationMw(), core_api.GetConversation)...)
+		_conversation.POST("/get_ext", append(_getconversationextMw(), core_api.GetConversationExt)...)
 		_conversation.POST("/list", append(_listconversationMw(), core_api.ListConversation)...)
 		_conversation.POST("/rename", append(_renameconversationMw(), core_api.RenameConversation)...)
 		_conversation.POST("/search", append(_searchconversationMw(), core_api.SearchConversation)...)
+		_conversation.POST("/update_ext", append(_updateconversationextMw(), core_api.UpdateConversationExt)...)
 	}
 	{
 		_intelligence := root.Group("/intelligence", _intelligenceMw()...)

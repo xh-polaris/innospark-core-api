@@ -105,6 +105,36 @@ func GetConversation(ctx context.Context, c *app.RequestContext) {
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
 
+// GetConversationExt .
+// @router /conversation/get_ext [POST]
+func GetConversationExt(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.GetConversationExtReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := conversation.ConversationSVC.GetConversationExt(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
+// UpdateConversationExt .
+// @router /conversation/update_ext [POST]
+func UpdateConversationExt(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req core_api.UpdateConversationExtReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := conversation.ConversationSVC.UpdateConversationExt(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}
+
 // DeleteConversation .
 // @router /conversation/delete [POST]
 func DeleteConversation(ctx context.Context, c *app.RequestContext) {

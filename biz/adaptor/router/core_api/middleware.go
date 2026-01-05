@@ -220,3 +220,13 @@ func _userstatisticMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getconversationextMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateconversationextMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -24,7 +24,7 @@ var Interrupt = errors.New("interrupt")
 
 // Interaction 交互域, 负责下游消息组装与转换, 并响应给前端
 type Interaction struct {
-	sse   *ss.SSEStream       // SSE流
+	SSE   *ss.SSEStream       // SSE流
 	event *event.EventStream  // 事件流
 	st    *state.RelayContext // 状态上下文
 
@@ -36,7 +36,7 @@ type Interaction struct {
 // NewInteraction 创建交互
 func NewInteraction(st *state.RelayContext) (i *Interaction) {
 	i = &Interaction{st: st,
-		sse:   ss.NewSSEStream(st.Info.RequestContext),
+		SSE:   ss.NewSSEStream(st.Info.RequestContext),
 		event: st.EventStream,
 		containers: map[int]*strings.Builder{
 			cst.EventMessageContentTypeText:    {}, // 文本消息
@@ -46,7 +46,7 @@ func NewInteraction(st *state.RelayContext) (i *Interaction) {
 	return
 }
 func (i *Interaction) Close() error {
-	return i.sse.Close()
+	return i.SSE.Close()
 }
 func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 	defer i.collect() // 收集各类型消息
@@ -88,7 +88,7 @@ func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 }
 
 func (i *Interaction) handleSSE(e *sse.Event) error {
-	if err := i.sse.Write(e); err != nil {
+	if err := i.SSE.Write(e); err != nil {
 		return Interrupt
 	}
 	return nil
@@ -117,7 +117,7 @@ func (i *Interaction) sendSuggest() error {
 				logs.Error("[interaction] chat event err: %v", err)
 				continue
 			}
-			if err = i.sse.Write(ce.SSEEvent); err != nil {
+			if err = i.SSE.Write(ce.SSEEvent); err != nil {
 				return Interrupt
 			}
 		}
@@ -149,7 +149,7 @@ func (i *Interaction) handleChatModel(msg *schema.Message) (err error) {
 	if err != nil {
 		return
 	}
-	if err = i.sse.Write(ce.SSEEvent); err != nil {
+	if err = i.SSE.Write(ce.SSEEvent); err != nil {
 		return Interrupt
 	}
 	return nil

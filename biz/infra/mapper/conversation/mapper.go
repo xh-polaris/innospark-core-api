@@ -25,6 +25,8 @@ const (
 
 type MongoMapper interface {
 	CreateNewConversation(ctx context.Context, uid, botId string) (c *Conversation, err error)
+	GetConversation(ctx context.Context, cid string) (c *Conversation, err error)
+	UpdateConversationExt(ctx context.Context, cid string, ext map[string]string) error
 	ListConversations(ctx context.Context, uid string, page *basic.Page) (cs []*Conversation, hasMore bool, err error)
 	UpdateConversationBrief(ctx context.Context, uid, cid, brief string) (err error)
 	DeleteConversation(ctx context.Context, uid, cid string) (err error)
@@ -149,4 +151,25 @@ func (m *mongoMapper) SearchConversations(ctx context.Context, uid, key string, 
 	}
 	cs, hasMore = util.SplitAndHasMore(cs, page)
 	return cs, hasMore, err
+}
+
+func (m *mongoMapper) GetConversation(ctx context.Context, cid string) (*Conversation, error) {
+	oid, err := primitive.ObjectIDFromHex(cid)
+	if err != nil {
+		logs.Errorf("[mapper] [conversation] [GetConversation] from hex err:%s", errorx.ErrorWithoutStack(err))
+		return nil, err
+	}
+	c := Conversation{}
+	err = m.conn.FindOne(ctx, cacheKeyPrefix+cid, &c, bson.M{cst.Id: oid})
+	return &c, err
+}
+func (m *mongoMapper) UpdateConversationExt(ctx context.Context, cid string, ext map[string]string) error {
+	oid, err := primitive.ObjectIDFromHex(cid)
+	if err != nil {
+		logs.Errorf("[mapper] [conversation] [UpdateConversationExt] from hex err:%s", errorx.ErrorWithoutStack(err))
+		return err
+	}
+	_, err = m.conn.UpdateOne(ctx, cacheKeyPrefix+cid, bson.M{cst.Id: oid},
+		bson.M{cst.Set: bson.M{cst.UpdateTime: time.Now(), cst.Ext: ext}})
+	return err
 }

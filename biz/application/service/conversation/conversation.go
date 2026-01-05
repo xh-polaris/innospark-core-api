@@ -219,3 +219,32 @@ func (s *ConversationService) SearchConversation(ctx context.Context, req *core_
 	// 返回响应
 	return resp, nil
 }
+
+func (s *ConversationService) GetConversationExt(ctx context.Context, c *core_api.GetConversationExtReq) (*core_api.GetConversationExtResp, error) {
+	// 鉴权
+	_, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+	conv, err := s.ConversationMapper.GetConversation(ctx, c.ConversationId)
+	if err != nil {
+		logs.Errorf("get conversation error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.ConversationGetErrCode)
+	}
+	return &core_api.GetConversationExtResp{Resp: util.Success(), Ext: conv.Ext}, nil
+}
+
+func (s *ConversationService) UpdateConversationExt(ctx context.Context, c *core_api.UpdateConversationExtReq) (*core_api.UpdateConversationExtResp, error) {
+	// 鉴权
+	_, err := adaptor.ExtractUserId(ctx)
+	if err != nil {
+		logs.Errorf("extract user id error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.UnAuthErrCode)
+	}
+	if err := s.ConversationMapper.UpdateConversationExt(ctx, c.ConversationId, c.Ext); err != nil {
+		logs.Errorf("update conversation ext error: %s", errorx.ErrorWithoutStack(err))
+		return nil, errorx.WrapByCode(err, errno.ConversationExtUpdateErrCode)
+	}
+	return &core_api.UpdateConversationExtResp{Resp: util.Success()}, nil
+}

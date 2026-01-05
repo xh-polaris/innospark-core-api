@@ -12,6 +12,7 @@ const (
 	ConversationDeleteErrCode        = 30005
 	ConversationSearchErrCode        = 30006
 	ConversationGenerateBriefErrCode = 30007
+	ConversationExtUpdateErrCode     = 30008
 )
 
 func init() {
@@ -48,6 +49,11 @@ func init() {
 	code.Register(
 		ConversationGenerateBriefErrCode,
 		"生成对话摘要失败",
+		code.WithAffectStability(false),
+	)
+	code.Register(
+		ConversationExtUpdateErrCode,
+		"更新对话扩展信息失败",
 		code.WithAffectStability(false),
 	)
 }

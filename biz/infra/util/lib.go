@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
@@ -156,4 +157,20 @@ func IsImg(s string) bool {
 		}
 	}
 	return false
+}
+
+func PurifyJson(raw string) string {
+	s := strings.TrimSpace(raw)
+
+	// 去掉开头的 ``` 和可选语言标识
+	reStart := regexp.MustCompile("^```\\w*")
+	s = reStart.ReplaceAllString(s, "")
+	s = strings.TrimSpace(s)
+
+	// 去掉结尾的 ```
+	reEnd := regexp.MustCompile("```$")
+	s = reEnd.ReplaceAllString(s, "")
+	s = strings.TrimSpace(s)
+
+	return s
 }

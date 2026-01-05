@@ -31,13 +31,15 @@ const (
 	// EventEnd 流结束
 	EventEnd = "end"
 	// EventNotifyValue 仅作标记, 无实际值
-	EventNotifyValue  = "{}"
-	EventSearchStart  = "searchStart"
-	EventSearchEnd    = "searchEnd"
-	EventSearchFind   = "searchFind"
-	EventSearchChoose = "searchChoice"
-	EventSearchCite   = "searchCite"
-	EventError        = "error"
+	EventNotifyValue    = "{}"
+	EventSearchStart    = "searchStart"
+	EventSearchEnd      = "searchEnd"
+	EventSearchFind     = "searchFind"
+	EventSearchChoose   = "searchChoice"
+	EventSearchCite     = "searchCite"
+	EventError          = "error"
+	EventExtractInfo    = "extractInfo"
+	EventExtractInfoEnd = "extractInfoEnd"
 )
 
 // Event中各种类型枚举值
@@ -92,6 +94,7 @@ const (
 	Phone          = "phone"
 	Action         = "action"
 	Type           = "type"
+	Ext            = "ext"
 
 	Status        = "status"
 	DeletedStatus = -1
