@@ -125,6 +125,7 @@ func (s *ConversationService) ListConversation(ctx context.Context, req *core_ap
 			BotId:          conv.BotId,
 			CreateTime:     conv.CreateTime.Unix(),
 			UpdateTime:     conv.UpdateTime.Unix(),
+			Ext:            conv.Ext,
 		}
 	}
 
