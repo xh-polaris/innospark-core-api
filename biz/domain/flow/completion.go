@@ -109,7 +109,7 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 }
 
 func needExtract(st *state.RelayContext, messages []*schema.Message) bool {
-	if conf.GetConfig().CoTea.AgentPrompts[st.Info.ModelInfo.BotId[6:]].ExtractInfo && len(messages) <= 2 {
+	if len(st.Info.ModelInfo.BotId) > 6 && conf.GetConfig().CoTea.AgentPrompts[st.Info.ModelInfo.BotId[6:]].ExtractInfo && len(messages) <= 2 {
 		if v, ok := st.Info.Ext["info.completed"]; ok && v == "false" {
 			return true
 		}
