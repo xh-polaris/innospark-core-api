@@ -18,8 +18,9 @@ type transferType int
 
 // OCR 识别图片返回Tex公式
 func OCR(ctx context.Context, baseURL, key, imgURL string, imgType transferType) (string, error) {
-	h := http.Header{"content-type": []string{"application/json"}, "X-API-KEY": []string{key}}
+	h := http.Header{"content-type": []string{"application/json"}}
 	b := make(map[string]interface{})
+	b["api_key"] = key
 
 	switch imgType {
 	case Base64Transfer: // base64
