@@ -3,8 +3,10 @@ package util
 import (
 	"context"
 	"errors"
-	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
 	"net/http"
+
+	"github.com/xh-polaris/innospark-core-api/biz/infra/util/httpx"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 const (
@@ -29,6 +31,7 @@ func OCR(ctx context.Context, baseURL, imgURL string, imgType transferType) (str
 	// 默认prompt："请帮我把图片中的公式转为LaTex"
 	resp, err := httpx.GetHttpClient().Post(ctx, baseURL, h, b)
 	if err != nil || resp["status"] != "success" {
+		logs.Error("ocr failed: ", err)
 		return "", errors.New("call ocr model failed")
 	}
 	return resp["result"].(string), nil

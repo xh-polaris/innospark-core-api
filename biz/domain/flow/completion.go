@@ -72,16 +72,20 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 	go func() {
 		defer wg.Done()
 		err1 = inter.HandleEvent(subCtx)
+		logs.CtxErrorf(subCtx, "handle event error: %s", err1)
 	}()
 	// 构建图并执行, 有效数据会通过st.EventStream传递给interaction
 	go func() {
 		defer wg.Done()
 		_, err2 = StreamExecuteFlow(BuildFlow(st), subCtx, messages)
+		logs.CtxErrorf(subCtx, "execute flow error: %s", err2)
 	}()
 	wg.Wait()
 
-	if (err1 != nil && !errors.Is(err1, interaction.Interrupt)) || (err2 != nil && !errors.Is(err2, interaction.Interrupt)) {
-		return err
+	if err1 != nil && !errors.Is(err1, interaction.Interrupt) {
+		return err1
+	} else if err2 != nil && !errors.Is(err2, interaction.Interrupt) {
+		return err2
 	}
 
 	if needSuggest(st) {
