@@ -12,6 +12,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/domain/memory"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/ac"
@@ -23,8 +24,9 @@ import (
 var CompletionsSVC *CompletionsService
 
 type CompletionsService struct {
-	Memory     *memory.MemoryManager
-	UserMapper user.MongoMapper
+	Memory             *memory.MemoryManager
+	UserMapper         user.MongoMapper
+	ConversationMapper conversation.MongoMapper
 }
 
 func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Context, req *core_api.CompletionsReq) error {
@@ -69,5 +71,5 @@ func (s *CompletionsService) Completions(c *app.RequestContext, ctx context.Cont
 	}
 	st := state.NewState(c, req, u, oids[0], oids[0])
 
-	return flow.DoCompletions(ctx, st, s.Memory)
+	return flow.DoCompletions(ctx, st, s.Memory, s.ConversationMapper)
 }

@@ -15,13 +15,14 @@ import (
 	dmodel "github.com/xh-polaris/innospark-core-api/biz/domain/model"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/conversation"
 	mmsg "github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/ctxcache"
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
-func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.MemoryManager) (err error) {
+func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.MemoryManager, conv conversation.MongoMapper) (err error) {
 	var history []*mmsg.Message
 
 	ctx = ctxcache.Init(ctx)
@@ -54,7 +55,7 @@ func DoCompletions(ctx context.Context, st *state.RelayContext, memory *memory.M
 	}()
 	// 特殊agent第一次对话, 表单提取
 	if needExtract(st, messages) {
-		if err = extractInfo(ctx, inter, subCtx, st, messages); err != nil {
+		if err = extractInfo(ctx, inter, subCtx, st, messages, conv); err != nil {
 			return err
 		}
 		// 结束消息
@@ -119,7 +120,7 @@ func needExtract(st *state.RelayContext, messages []*schema.Message) bool {
 	return false
 }
 
-func extractInfo(ctx context.Context, inter *interaction.Interaction, subCtx context.Context, st *state.RelayContext, messages []*schema.Message) (err error) {
+func extractInfo(ctx context.Context, inter *interaction.Interaction, subCtx context.Context, st *state.RelayContext, messages []*schema.Message, conv conversation.MongoMapper) (err error) {
 	// 提取信息事件
 	eie, err := interaction.ExtractInfoEvent()
 	if err != nil {
@@ -157,6 +158,11 @@ func extractInfo(ctx context.Context, inter *interaction.Interaction, subCtx con
 	}
 	if err = inter.SSE.Write(eiee.SSEEvent); err != nil {
 		logs.CtxErrorf(subCtx, "send extract info event end error: %s", err)
+		return err
+	}
+	// 存储提取消息
+	if err = conv.UpdateConversationExt(ctx, st.Info.ConversationId.Hex(), info); err != nil {
+		logs.CtxErrorf(ctx, "update conversation ext error: %s", err)
 		return err
 	}
 	return nil
