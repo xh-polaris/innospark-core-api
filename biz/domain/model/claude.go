@@ -22,7 +22,7 @@ const (
 	Claude4Sonnet = "claude-sonnet-4-5-20250929"
 )
 
-var MaxToken = 65535
+var MaxToken = 64000
 
 type ClaudeChatModel struct {
 	cli   *openai.ChatModel
