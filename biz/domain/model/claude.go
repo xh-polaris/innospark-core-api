@@ -11,6 +11,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 func init() {
@@ -52,6 +53,7 @@ func (c *ClaudeChatModel) Generate(ctx context.Context, in []*schema.Message, op
 func (c *ClaudeChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...model.Option) (processReader *schema.StreamReader[*schema.Message], err error) {
 	var raw *schema.StreamReader[*schema.Message]
 	if raw, err = c.cli.Stream(ctx, in, opts...); err != nil {
+		logs.Error("claude err: %s", err)
 		return nil, err
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)

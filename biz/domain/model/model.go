@@ -80,10 +80,14 @@ func (m *ModelFactory) Stream(ctx context.Context, in []*schema.Message, opts ..
 		}
 	}
 	var cm model.ToolCallingChatModel
+	var sr *schema.StreamReader[*schema.Message]
 	if cm, err = m.get(ctx); err != nil {
 		return nil, err
 	}
-	return cm.Stream(ctx, reverse, opts...)
+	if sr, err = cm.Stream(ctx, reverse, opts...); err != nil {
+		return nil, err
+	}
+	return sr, nil
 }
 
 func (m *ModelFactory) WithTools(tools []*schema.ToolInfo) (model.ToolCallingChatModel, error) {
