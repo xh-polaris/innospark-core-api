@@ -42,7 +42,7 @@ func BuildFlow(st *state.RelayContext) Flow {
 		st.Info.ModelInfo.OCR = true
 
 		ocr := compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (_ []*schema.Message, err error) {
-			return DoOCR(ctx, st, conf.GetConfig().OCR.URL, conf.GetConfig().OCR.Prompt, input)
+			return DoOCR(ctx, st, conf.GetConfig().OCR.URL, conf.GetConfig().OCR.Prompt, conf.GetConfig().OCR.Key, input)
 		})
 		_ = flow.AddLambdaNode(OCR, ocr, compose.WithNodeName(OCR))
 	}

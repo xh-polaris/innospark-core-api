@@ -19,7 +19,7 @@ func init() {
 }
 
 const (
-	Claude4Sonnet = "claude-4-sonnet"
+	Claude4Sonnet = "claude-sonnet-4-5-20250929"
 )
 
 var MaxToken = 65535

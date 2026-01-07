@@ -10,14 +10,14 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
-func DoOCR(ctx context.Context, st *state.RelayContext, baseURL, prompts string, input []*schema.Message) (_ []*schema.Message, err error) {
+func DoOCR(ctx context.Context, st *state.RelayContext, baseURL, prompts, key string, input []*schema.Message) (_ []*schema.Message, err error) {
 	var (
 		tmp string
 		ocr strings.Builder
 	)
 	for _, at := range st.Info.OriginMessage.Attaches {
 		if util.IsImg(at) {
-			if tmp, err = util.OCR(ctx, baseURL, at, util.URLTransfer); err != nil {
+			if tmp, err = util.OCR(ctx, baseURL, key, at, util.URLTransfer); err != nil {
 				return nil, err
 			}
 			ocr.WriteString(tmp)
