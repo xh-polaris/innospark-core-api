@@ -7,18 +7,19 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/ark"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
+	arkmodel "github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 	"github.com/xh-polaris/innospark-core-api/biz/conf"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 )
 
 func init() {
-	RegisterModel(Doubao15Pro32K, NewDoubao15Pro32KChatModel)
+	RegisterModel(DoubaoFlash, NewDoubaoFlashChatModel)
 }
 
-const (
-	Doubao15Pro32K = "doubao-1-5-pro-32k-250115"
-	ARKBeijing     = "https://ark.cn-beijing.volces.com/api/v3"
+var (
+	DoubaoFlash = conf.GetConfig().ARK.FlashModel
+	ARKBeijing  = conf.GetConfig().ARK.Endpoint
 )
 
 type ARKChatModel struct {
@@ -26,16 +27,18 @@ type ARKChatModel struct {
 	model string
 }
 
-func NewDoubao15Pro32KChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
+func NewDoubaoFlashChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
 	var cli *ark.ChatModel
 	cli, err = ark.NewChatModel(ctx, &ark.ChatModelConfig{
-		BaseURL:    ARKBeijing,
-		Region:     "cn-beijing",
-		APIKey:     conf.GetConfig().ARK.APIKey,
-		Model:      Doubao15Pro32K,
-		HTTPClient: nil,
+		BaseURL:     ARKBeijing,
+		Region:      "cn-beijing",
+		APIKey:      conf.GetConfig().ARK.APIKey,
+		Model:       DoubaoFlash,
+		HTTPClient:  nil,
+		Thinking:    &arkmodel.Thinking{Type: arkmodel.ThinkingTypeDisabled},
+		Temperature: &conf.GetConfig().ARK.FlashTemperature,
 	})
-	return &ARKChatModel{cli: cli, model: Doubao15Pro32K}, nil
+	return &ARKChatModel{cli: cli, model: DoubaoFlash}, nil
 }
 
 func (c *ARKChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
@@ -49,7 +52,7 @@ func (c *ARKChatModel) Stream(ctx context.Context, in []*schema.Message, opts ..
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
 	switch c.model {
-	case Doubao15Pro32K:
+	case DoubaoFlash:
 		go c.process(ctx, raw, processWriter)
 	default:
 		raw.Close()

@@ -23,8 +23,11 @@ type Bocha struct {
 
 // ARK 火山配置
 type ARK struct {
-	APIKey          string
-	CodeGenTemplate string
+	Endpoint         string
+	FlashModel       string
+	FlashTemperature float32
+	APIKey           string
+	CodeGenTemplate  string
 }
 
 // Claude 配置

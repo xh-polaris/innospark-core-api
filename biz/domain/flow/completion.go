@@ -179,7 +179,7 @@ func extract(ctx context.Context, st *state.RelayContext, messages []*schema.Mes
 		newInfo map[string]string
 	)
 	// 提取表单
-	if m, err = dmodel.NewDoubao15Pro32KChatModel(ctx, st.Info.UserId.Hex(), ""); err != nil {
+	if m, err = dmodel.NewDoubaoFlashChatModel(ctx, st.Info.UserId.Hex(), ""); err != nil {
 		logs.CtxErrorf(ctx, "new model error: %s", err)
 		return nil, err
 	}
