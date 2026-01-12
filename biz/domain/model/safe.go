@@ -30,7 +30,7 @@ func NewSafeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingCh
 		APIKey:     conf.GetConfig().InnoSpark.DefaultAPIKey,
 		BaseURL:    conf.GetConfig().InnoSpark.DefaultBaseURL,
 		APIVersion: APIVersion,
-		Model:      DefaultModel,
+		Model:      SafeModel,
 		User:       &uid,
 		HTTPClient: util.NewDebugClient(),
 	})
@@ -38,7 +38,7 @@ func NewSafeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingCh
 		return nil, err
 	}
 
-	return &SafeInnosparkChatModel{cli: cli, model: DefaultModel}, nil
+	return &SafeInnosparkChatModel{cli: cli, model: SafeModel}, nil
 }
 
 func (c *SafeInnosparkChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
