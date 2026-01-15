@@ -15,17 +15,35 @@ import (
 func init() {
 	RegisterModel(DefaultModel, NewDefaultChatModel)
 	RegisterModel(DeepThinkModel, NewDeepThinkChatModel)
+	RegisterModel(InnoSpark235B, New235BChatModel)
 }
 
 const (
 	DefaultModel   = "InnoSpark"
 	DeepThinkModel = "InnoSpark-R"
+	InnoSpark235B  = "InnoSpark-235B"
 	APIVersion     = "v1"
 )
 
 type InnosparkChatModel struct {
 	cli   *openai.ChatModel
 	model string
+}
+
+func New235BChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
+	var cli *openai.ChatModel
+	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
+		APIKey:     conf.GetConfig().InnoSpark.DefaultAPIKey,
+		BaseURL:    conf.GetConfig().InnoSpark.DefaultBaseURL,
+		APIVersion: APIVersion,
+		Model:      conf.GetConfig().InnoSpark.InnoSpark235BVersion, // 235B的版本号
+		User:       &uid,
+		HTTPClient: util.NewDebugClient(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InnosparkChatModel{cli: cli, model: InnoSpark235B}, nil
 }
 
 func NewDefaultChatModel(ctx context.Context, uid, _ string) (_ model.ToolCallingChatModel, err error) {
@@ -86,7 +104,7 @@ func (c *InnosparkChatModel) Stream(ctx context.Context, in []*schema.Message, o
 		return nil, err
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
-	if c.model == DefaultModel {
+	if c.model == DefaultModel || c.model == InnoSpark235B {
 		go c.process(ctx, raw, processWriter)
 	} else if c.model == DeepThinkModel {
 		go c.deepThinkProcess(ctx, raw, processWriter)

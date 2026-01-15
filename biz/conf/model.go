@@ -7,12 +7,13 @@ type Suggest struct {
 
 // InnoSpark 启创配置
 type InnoSpark struct {
-	DefaultBaseURL   string
-	DefaultAPIKey    string
-	DeepThinkBaseURL string
-	DeepThinkAPIKey  string
-	VlmURL           string
-	VlmAPIKey        string
+	DefaultBaseURL       string
+	DefaultAPIKey        string
+	DeepThinkBaseURL     string
+	DeepThinkAPIKey      string
+	VlmURL               string
+	VlmAPIKey            string
+	InnoSpark235BVersion string
 }
 
 // Bocha 博查搜索API

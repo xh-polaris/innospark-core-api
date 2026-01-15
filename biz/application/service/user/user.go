@@ -54,7 +54,7 @@ func (u *UserService) SendVerifyCode(ctx context.Context, req *core_api.SendVeri
 		return &core_api.SendVerifyCodeResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
