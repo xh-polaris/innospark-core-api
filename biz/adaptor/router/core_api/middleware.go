@@ -230,3 +230,8 @@ func _updateconversationextMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getweeklystatsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

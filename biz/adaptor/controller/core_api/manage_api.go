@@ -86,3 +86,11 @@ func UserStatistic(ctx context.Context, c *app.RequestContext) {
 	resp, err := manageapp.ManageSVC.UserStatistics(ctx, &req)
 	adaptor.PostProcess(ctx, c, &req, resp, err)
 }
+
+// GetWeeklyStats .
+// @router /admin/statistic/weekly [POST]
+func GetWeeklyStats(ctx context.Context, c *app.RequestContext) {
+	var req manage.GetWeeklyStatsReq
+	resp, err := manageapp.ManageSVC.GetWeeklyStats(ctx, &req)
+	adaptor.PostProcess(ctx, c, &req, resp, err)
+}

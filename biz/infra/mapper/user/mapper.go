@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
@@ -24,7 +25,7 @@ const (
 )
 
 type MongoMapper interface {
-	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error) // 查找或创建一个用户
+	FindOrCreateUser(ctx context.Context, id string, phone string, login bool) (*User, error)
 	FindById(ctx context.Context, id string) (*User, error)
 
 	CheckForbidden(ctx context.Context, id string) (*User, int, bool, time.Time, error)
@@ -33,7 +34,8 @@ type MongoMapper interface {
 	UnForbidden(ctx context.Context, id string) error
 	ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error)
 	CountUserByCreateTime(ctx context.Context, time time.Time, after bool) (int64, error)
-
+	CountUserByCreateTimeBetween(ctx context.Context, start, end time.Time) (int64, error)
+	CountDAU(ctx context.Context, start, end time.Time) (int64, error)
 	UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error
 	existField(ctx context.Context, field string, value interface{}) (bool, error)
 	ExistUsername(ctx context.Context, username string) (bool, error)
@@ -196,8 +198,78 @@ func (m *mongoMapper) CountUserByCreateTime(ctx context.Context, t time.Time, af
 	if after {
 		filter = bson.M{cst.CreateTime: bson.M{cst.GTE: t}} // 统计 t 之后（含 t）
 	} else {
-		filter = bson.M{cst.CreateTime: bson.M{cst.LT: t}} // 统计 t 之前
+		filter = bson.M{cst.CreateTime: bson.M{cst.LT: t}}
 	}
-	total, err := m.conn.CountDocuments(ctx, filter)
-	return total, err
+	return m.conn.CountDocuments(ctx, filter)
+}
+
+// CountUserByCreateTimeBetween 统计 [start, end) 区间内注册的用户数
+func (m *mongoMapper) CountUserByCreateTimeBetween(ctx context.Context, start, end time.Time) (int64, error) {
+	filter := bson.M{
+		cst.CreateTime: bson.M{
+			cst.GTE: start,
+			cst.LT:  end,
+		},
+	}
+	return m.conn.CountDocuments(ctx, filter)
+}
+
+// CountDAU 统计 [start, end) 区间内的日均活跃用户数
+// 按 login_time 去重后按天分组，返回四舍五入后的均值
+func (m *mongoMapper) CountDAU(ctx context.Context, start, end time.Time) (int64, error) {
+	pipeline := bson.A{
+		// 过滤时间范围
+		bson.M{"$match": bson.M{
+			cst.LoginTime: bson.M{
+				cst.GTE: start,
+				cst.LT:  end,
+			},
+		}},
+		// 为每条文档附加「按上海时区截断到天」的日期字符串
+		bson.M{"$addFields": bson.M{
+			"_dateKey": bson.M{
+				"$dateToString": bson.M{
+					"format":   "%Y-%m-%d",
+					"date":     "$" + cst.LoginTime,
+					"timezone": "Asia/Shanghai",
+				},
+			},
+		}},
+		// 按 (userId, 日期) 去重，同一用户同一天只计一次
+		bson.M{"$group": bson.M{
+			"_id": bson.M{
+				"userId":  "$_id",
+				"dateKey": "$_dateKey",
+			},
+		}},
+		// 按日期聚合，统计每天活跃人数
+		bson.M{"$group": bson.M{
+			"_id":        "$_id.dateKey",
+			"dailyCount": bson.M{"$sum": 1},
+		}},
+		// 对所有天求平均
+		bson.M{"$group": bson.M{
+			"_id":    nil,
+			"avgDAU": bson.M{"$avg": "$dailyCount"},
+		}},
+	}
+
+	type dauResult struct {
+		AvgDAU float64 `bson:"avgDAU"`
+	}
+
+	cursor, err := m.conn.Collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return 0, err
+	}
+	defer cursor.Close(ctx)
+
+	var res []dauResult
+	if err = cursor.All(ctx, &res); err != nil {
+		return 0, err
+	}
+	if len(res) == 0 {
+		return 0, nil
+	}
+	return int64(math.Round(res[0].AvgDAU)), nil
 }

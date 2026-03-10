@@ -216,3 +216,84 @@ func calcLinearRegression(acc []*manage.UserStatisticsResp_Item) *manage.UserSta
 		B: b,
 	}
 }
+
+var shanghaiLoc = func() *time.Location {
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		// 容器内缺少 tzdata 时降级到固定 +8 偏移
+		return time.FixedZone("CST", 8*60*60)
+	}
+	return loc
+}()
+
+func (m *ManageService) GetWeeklyStats(ctx context.Context, req *manage.GetWeeklyStatsReq) (*manage.GetWeeklyStatsResp, error) {
+	if err := checkAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	thisTuesday, lastTuesday, twoAgoTuesday := calcWeekBounds(time.Now())
+	monthStart := calcMonthStart(time.Now())
+	tomorrow := truncDay(time.Now().In(shanghaiLoc)).Add(24 * time.Hour)
+
+	// 注册总用户数
+	totalUsers, err := m.UserMapper.CountUserByCreateTime(ctx, time.Time{}, true)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+
+	// 本周期新注册（上周二~本周二）
+	newUsersThisWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, lastTuesday, thisTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+
+	// 上周期新注册（上上周二~上周二）
+	newUsersLastWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, twoAgoTuesday, lastTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+
+	// 本周期日均 DAU（上周二~本周二，7 天）
+	weeklyAvgDAU, err := m.UserMapper.CountDAU(ctx, lastTuesday, thisTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+
+	// 本月日均 DAU（自然月 1 日~明天，即含今天）
+	monthlyAvgDAU, err := m.UserMapper.CountDAU(ctx, monthStart, tomorrow)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+
+	return &manage.GetWeeklyStatsResp{
+		Resp:             util.Success(),
+		TotalUsers:       totalUsers,
+		NewUsersThisWeek: newUsersThisWeek,
+		NewUsersLastWeek: newUsersLastWeek,
+		WeeklyAvgDAU:     weeklyAvgDAU,
+		MonthlyAvgDAU:    monthlyAvgDAU,
+		WeekStart:        lastTuesday.Format(time.RFC3339),
+		WeekEnd:          thisTuesday.Format(time.RFC3339),
+	}, nil
+}
+
+// calcWeekBounds 计算本周二、上周二、上上周二（均为 Asia/Shanghai 00:00）
+func calcWeekBounds(now time.Time) (thisTuesday, lastTuesday, twoAgoTuesday time.Time) {
+	now = now.In(shanghaiLoc)
+	daysBack := (int(now.Weekday()) - 2 + 7) % 7
+	thisTuesday = truncDay(now.AddDate(0, 0, -daysBack))
+	lastTuesday = thisTuesday.AddDate(0, 0, -7)
+	twoAgoTuesday = lastTuesday.AddDate(0, 0, -7)
+	return
+}
+
+// calcMonthStart 返回当月 1 日 00:00 Asia/Shanghai
+func calcMonthStart(now time.Time) time.Time {
+	now = now.In(shanghaiLoc)
+	return time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, shanghaiLoc)
+}
+
+// truncDay 将时间截断到当天 00:00:00（保留时区）
+func truncDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+}
