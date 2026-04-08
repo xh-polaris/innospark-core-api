@@ -56,6 +56,9 @@ func MustAddEdge[I any, O any](g *compose.Graph[I, O], start, end string) {
 }
 
 func AddExtra(m *schema.Message, key string, value any) {
+	if m == nil {
+		return
+	}
 	if m.Extra == nil {
 		m.Extra = make(map[string]any)
 	}
