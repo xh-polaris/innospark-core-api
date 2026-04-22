@@ -59,7 +59,7 @@ func (s *ConversationService) GenerateBrief(ctx context.Context, req *core_api.G
 	m, err := openai.NewChatModel(context.Background(), &openai.ChatModelConfig{
 		BaseURL: conf.GetConfig().InnoSpark.DefaultBaseURL,
 		APIKey:  conf.GetConfig().InnoSpark.DefaultAPIKey,
-		Model:   "InnoSpark",
+		Model:   "InnoSpark-235B",
 	})
 	//m, err := ark.NewChatModel(ctx, &ark.ChatModelConfig{
 	//	BaseURL: "https://ark.cn-beijing.volces.com/api/v3",
