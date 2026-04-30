@@ -105,7 +105,7 @@ func (u *UserService) CheckVerifyCode(ctx context.Context, req *core_api.CheckVe
 		return &core_api.CheckVerifyCodeResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
@@ -138,7 +138,7 @@ func (u *UserService) Register(ctx context.Context, req *core_api.BasicUserRegis
 		return &core_api.BasicUserRegisterResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
@@ -171,7 +171,7 @@ func (u *UserService) Login(ctx context.Context, req *core_api.BasicUserLoginReq
 		return &core_api.BasicUserLoginResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
@@ -223,7 +223,7 @@ func (u *UserService) ResetPassword(ctx context.Context, req *core_api.BasicUser
 		return &core_api.BasicUserResetPasswordResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
@@ -317,7 +317,7 @@ func (u *UserService) ThirdPartyLogin(ctx context.Context, req *core_api.ThirdPa
 		return &core_api.ThirdPartyLoginResp{
 			Resp: &basic.Response{
 				Code: int32(resp["code"].(float64)),
-				Msg:  resp["message"].(string),
+				Msg:  resp["msg"].(string),
 			},
 		}, nil
 	}
