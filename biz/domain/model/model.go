@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 	"github.com/xh-polaris/innospark-core-api/biz/domain/state"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 type getModelFunc func(ctx context.Context, uid, botId string) (model.ToolCallingChatModel, error)
@@ -24,6 +25,7 @@ func RegisterModel(name string, f getModelFunc) {
 func getModel(ctx context.Context, model, uid, botId string) (model.ToolCallingChatModel, error) {
 	fn, ok := models[model]
 	if !ok {
+		logs.Error("model not found: %s", model)
 		return nil, NoSuchModel
 	}
 	return fn(ctx, uid, botId)

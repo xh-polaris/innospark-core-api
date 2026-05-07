@@ -14,12 +14,14 @@ import (
 func init() {
 	RegisterModel(InnoSparkVL, NewQwenChatModel)
 	RegisterModel(InnoSparkRVL, NewQwenChatModelWithThinking)
+	RegisterModel(InnoSpark235BVL, NewQwenChatModel)
 }
 
 const (
-	InnoSparkVL  = "InnoSpark-VL"
-	InnoSparkRVL = "InnoSpark-R-VL"
-	VLMFlash     = "qwen3-vl-flash"
+	InnoSparkVL     = "InnoSpark-VL"
+	InnoSparkRVL    = "InnoSpark-R-VL"
+	InnoSpark235BVL = "InnoSpark-235B-VL"
+	VLMFlash        = "qwen3-vl-flash"
 )
 
 type QwenChatModel struct {
