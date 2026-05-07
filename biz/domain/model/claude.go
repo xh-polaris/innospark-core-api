@@ -14,9 +14,10 @@ import (
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
-var ClaudeSonnet = conf.GetConfig().Claude.Sonnet
+var ClaudeSonnet string
 
 func init() {
+	ClaudeSonnet = conf.GetConfig().Claude.Sonnet
 	RegisterModel(ClaudeSonnet, NewClaudeChatModel)
 }
 

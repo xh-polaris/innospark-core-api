@@ -113,7 +113,7 @@ const (
 func BuildChatModel(ctx context.Context, st *state.RelayContext, in []*schema.Message) (_ []*schema.Message, err error) {
 	info := st.Info
 	if info.ModelInfo.BotId == "code-gen" {
-		info.ModelInfo.Model = model.Claude4Sonnet
+		info.ModelInfo.Model = model.ClaudeSonnet
 		format, err := prompt.FromMessages(schema.FString, &schema.Message{Role: cst.User, Content: conf.GetConfig().ARK.CodeGenTemplate}).Format(ctx,
 			map[string]any{"query": info.OriginMessage.Content})
 		if err != nil {
