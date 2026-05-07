@@ -67,7 +67,7 @@ func (i *Interaction) HandleEvent(ctx context.Context) (err error) {
 				if errors.Is(err, io.EOF) { // 正常结束
 					return Interrupt
 				}
-				return
+				return err
 			}
 			switch e.Type {
 			case event.SSE:

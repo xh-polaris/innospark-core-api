@@ -14,6 +14,7 @@ type InnoSpark struct {
 	VlmURL               string
 	VlmAPIKey            string
 	InnoSpark235BVersion string
+	BriefModel           string
 }
 
 // Bocha 博查搜索API
@@ -35,4 +36,5 @@ type ARK struct {
 type Claude struct {
 	BaseURL string
 	APIKey  string
+	Sonnet  string
 }

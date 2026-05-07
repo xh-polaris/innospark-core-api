@@ -14,13 +14,11 @@ import (
 	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
-func init() {
-	RegisterModel(Claude4Sonnet, NewClaudeChatModel)
-}
+var ClaudeSonnet = conf.GetConfig().Claude.Sonnet
 
-const (
-	Claude4Sonnet = "claude-sonnet-4-5-20250929"
-)
+func init() {
+	RegisterModel(ClaudeSonnet, NewClaudeChatModel)
+}
 
 var MaxToken = 64000
 
@@ -34,7 +32,7 @@ func NewClaudeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCalling
 	cli, err = openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:     conf.GetConfig().Claude.APIKey,
 		BaseURL:    conf.GetConfig().Claude.BaseURL,
-		Model:      Claude4Sonnet,
+		Model:      ClaudeSonnet,
 		MaxTokens:  &MaxToken,
 		User:       &uid,
 		HTTPClient: util.NewDebugClient(),
@@ -42,7 +40,7 @@ func NewClaudeChatModel(ctx context.Context, uid, _ string) (_ model.ToolCalling
 	if err != nil {
 		return nil, err
 	}
-	return &ClaudeChatModel{cli: cli, model: Claude4Sonnet}, nil
+	return &ClaudeChatModel{cli: cli, model: ClaudeSonnet}, nil
 }
 
 func (c *ClaudeChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (*schema.Message, error) {
@@ -58,7 +56,7 @@ func (c *ClaudeChatModel) Stream(ctx context.Context, in []*schema.Message, opts
 	}
 	processReader, processWriter := schema.Pipe[*schema.Message](5)
 	switch c.model {
-	case Claude4Sonnet:
+	case ClaudeSonnet:
 		go c.process(ctx, raw, processWriter)
 	default:
 		raw.Close()
