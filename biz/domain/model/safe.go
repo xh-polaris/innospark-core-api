@@ -9,6 +9,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/cst"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
+	"github.com/xh-polaris/innospark-core-api/pkg/logs"
 )
 
 func init() {
@@ -50,6 +51,9 @@ func (c *SafeInnosparkChatModel) Stream(ctx context.Context, in []*schema.Messag
 	go func() {
 		defer processWriter.Close()
 		message, err := c.cli.Generate(ctx, in, opts...)
+		if err != nil {
+			logs.Errorf("safe err:%s", err)
+		}
 		util.AddExtra(message, cst.EventMessageContentType, cst.EventMessageContentTypeText)
 		processWriter.Send(message, err)
 	}()
