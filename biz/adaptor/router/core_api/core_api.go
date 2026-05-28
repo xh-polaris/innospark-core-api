@@ -32,6 +32,7 @@ func Register(r *server.Hertz) {
 		{
 			_statistic := _admin.Group("/statistic", _statisticMw()...)
 			_statistic.POST("/user", append(_userstatisticMw(), core_api.UserStatistic)...)
+			_statistic.POST("/weekly", append(_getweeklystatsMw(), core_api.GetWeeklyStats)...)
 		}
 	}
 	{

@@ -8,6 +8,7 @@ const (
 	ErrForbidden       = 100_000_003
 	ErrUpdateUserField = 100_000_004
 	ErrGetProfile      = 100_000_005
+	ErrGetWeeklyStats  = 100_000_006
 )
 
 func init() {
@@ -34,6 +35,11 @@ func init() {
 	code.Register(
 		ErrGetProfile,
 		"获取用户信息失败",
+		code.WithAffectStability(false),
+	)
+	code.Register(
+		ErrGetWeeklyStats,
+		"获取周报统计失败",
 		code.WithAffectStability(false),
 	)
 }

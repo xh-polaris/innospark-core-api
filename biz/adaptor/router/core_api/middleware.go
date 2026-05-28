@@ -221,6 +221,11 @@ func _userstatisticMw() []app.HandlerFunc {
 	return nil
 }
 
+func _getweeklystatsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _getconversationextMw() []app.HandlerFunc {
 	// your code...
 	return nil

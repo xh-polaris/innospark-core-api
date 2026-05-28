@@ -62,6 +62,6 @@ func InitService(deps *AppDependency) {
 	feedbackapp.InitFeedbackSVC(deps.MessageMapper, deps.FeedbackMapper, deps.His)
 	userapp.InitUserSVC(deps.UserMapper)
 	intelligence.InitIntelligenceSVC()
-	manageapp.InitManageSVC(deps.UserMapper, deps.FeedbackMapper)
+	manageapp.InitManageSVC(deps.UserMapper, deps.FeedbackMapper, deps.MessageMapper)
 	system.InitAttachSVC(deps.COS, deps.UserMapper)
 }

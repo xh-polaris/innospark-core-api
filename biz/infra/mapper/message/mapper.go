@@ -3,6 +3,7 @@ package message
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/basic"
 	"github.com/xh-polaris/innospark-core-api/biz/conf"
@@ -30,6 +31,7 @@ type MongoMapper interface {
 	Feedback(ctx context.Context, mid primitive.ObjectID, feedback int32) (_ *Message, err error)
 	RetrieveMessages(ctx context.Context, conversation string, size int) (msgs []*Message, err error)
 	InsertOne(ctx context.Context, msg *Message) error
+	CountActiveUsers(ctx context.Context, start, end time.Time) (int64, error)
 }
 
 type mongoMapper struct {
@@ -123,4 +125,27 @@ func (m *mongoMapper) Feedback(ctx context.Context, mid primitive.ObjectID, feed
 		return nil, err
 	}
 	return &ori, err
+}
+
+// CountActiveUsers 统计 [start, end) 内发过消息（role=user）的去重用户数
+func (m *mongoMapper) CountActiveUsers(ctx context.Context, start, end time.Time) (int64, error) {
+	pipeline := bson.A{
+		bson.M{"$match": bson.M{
+			cst.CreateTime: bson.M{cst.GTE: start, cst.LT: end},
+			"role":         cst.UserEnum,
+		}},
+		bson.M{"$group": bson.M{"_id": "$" + cst.UserId}},
+		bson.M{"$count": "total"},
+	}
+	type countResult struct {
+		Total int64 `bson:"total"`
+	}
+	var res []countResult
+	if err := m.conn.Aggregate(ctx, &res, pipeline); err != nil {
+		return 0, err
+	}
+	if len(res) == 0 {
+		return 0, nil
+	}
+	return res[0].Total, nil
 }
