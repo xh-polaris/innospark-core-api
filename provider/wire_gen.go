@@ -51,6 +51,7 @@ func NewProvider() (*Provider, error) {
 	manageService := &service.ManageService{
 		UserMapper:     userMongoMapper,
 		FeedbackMapper: feedbackMongoMapper,
+		MessageMapper:  mongoMapper,
 	}
 	cosInfra := storage.NewCOSInfra()
 	attachService := &service.AttachService{

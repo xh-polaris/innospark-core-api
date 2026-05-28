@@ -29,6 +29,10 @@ func Register(r *server.Hertz) {
 			_feedback1 := _admin.Group("/feedback", _feedback1Mw()...)
 			_feedback1.POST("/list", append(_listfeedbackMw(), core_api.ListFeedback)...)
 		}
+		{
+			_statistic := _admin.Group("/statistic", _statisticMw()...)
+			_statistic.POST("/weekly", append(_getweeklystatsMw(), core_api.GetWeeklyStats)...)
+		}
 	}
 	{
 		_agents := root.Group("/agents", _agentsMw()...)

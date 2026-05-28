@@ -33,6 +33,8 @@ type MongoMapper interface {
 	Forbidden(ctx context.Context, id string, expire time.Time) error
 	UnForbidden(ctx context.Context, id string) error
 	ListUser(ctx context.Context, page *basic.Page, status, sortedBy, reverse int32) (int64, []*User, error)
+	CountUserByCreateTime(ctx context.Context, t time.Time, after bool) (int64, error)
+	CountUserByCreateTimeBetween(ctx context.Context, start, end time.Time) (int64, error)
 
 	UpdateField(ctx context.Context, uid primitive.ObjectID, update bson.M) error
 	existField(ctx context.Context, field string, value interface{}) (bool, error)
@@ -192,4 +194,19 @@ func (m *mongoMapper) existField(ctx context.Context, field string, value interf
 // ExistUsername 检查用户名是否存在
 func (m *mongoMapper) ExistUsername(ctx context.Context, username string) (bool, error) {
 	return m.existField(ctx, cst.Name, username)
+}
+
+func (m *mongoMapper) CountUserByCreateTime(ctx context.Context, t time.Time, after bool) (int64, error) {
+	var filter bson.M
+	if after {
+		filter = bson.M{cst.CreateTime: bson.M{"$gte": t}}
+	} else {
+		filter = bson.M{cst.CreateTime: bson.M{cst.LT: t}}
+	}
+	return m.conn.CountDocuments(ctx, filter)
+}
+
+func (m *mongoMapper) CountUserByCreateTimeBetween(ctx context.Context, start, end time.Time) (int64, error) {
+	filter := bson.M{cst.CreateTime: bson.M{"$gte": start, cst.LT: end}}
+	return m.conn.CountDocuments(ctx, filter)
 }

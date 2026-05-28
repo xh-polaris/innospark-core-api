@@ -210,3 +210,13 @@ func _basicusergetprofileMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _statisticMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getweeklystatsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

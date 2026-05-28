@@ -34,6 +34,7 @@ type MongoMapper interface {
 	AllMessage(ctx context.Context, conversation string) ([]*Message, error)
 	ListMessage(ctx context.Context, conversation string, page *basic.Page) (msgs []*Message, hasMore bool, err error)
 	Feedback(ctx context.Context, mid primitive.ObjectID, feedback int32) (err error)
+	CountActiveUsers(ctx context.Context, start, end time.Time) (int64, error)
 }
 
 type mongoMapper struct {
@@ -241,4 +242,27 @@ func (m *mongoMapper) Feedback(ctx context.Context, mid primitive.ObjectID, feed
 		}
 	}
 	return err
+}
+
+// CountActiveUsers 统计 [start, end) 内发过消息（role=user）的去重用户数
+func (m *mongoMapper) CountActiveUsers(ctx context.Context, start, end time.Time) (int64, error) {
+	pipeline := bson.A{
+		bson.M{"$match": bson.M{
+			cst.CreateTime: bson.M{"$gte": start, cst.LT: end},
+			"role":         cst.UserEnum,
+		}},
+		bson.M{"$group": bson.M{"_id": "$" + cst.UserId}},
+		bson.M{"$count": "total"},
+	}
+	type countResult struct {
+		Total int64 `bson:"total"`
+	}
+	var res []countResult
+	if err := m.conn.Aggregate(ctx, &res, pipeline); err != nil {
+		return 0, err
+	}
+	if len(res) == 0 {
+		return 0, nil
+	}
+	return res[0].Total, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/xh-polaris/innospark-core-api/biz/application/dto/manage"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/config"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/feedback"
+	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/message"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/mapper/user"
 	"github.com/xh-polaris/innospark-core-api/biz/infra/util"
 	"github.com/xh-polaris/innospark-core-api/pkg/errorx"
@@ -20,11 +21,13 @@ type IManageService interface {
 	ListUser(ctx context.Context, req *manage.ListUserReq) (resp *manage.ListUserResp, err error)
 	Forbidden(ctx context.Context, req *manage.ForbiddenUserReq) (resp *manage.ForbiddenUserResp, err error)
 	ListFeedback(ctx context.Context, req *manage.ListFeedBackReq) (resp *manage.ListFeedBackResp, err error)
+	GetWeeklyStats(ctx context.Context, req *manage.GetWeeklyStatsReq) (resp *manage.GetWeeklyStatsResp, err error)
 }
 
 type ManageService struct {
 	UserMapper     user.MongoMapper
 	FeedbackMapper feedback.MongoMapper
+	MessageMapper  message.MongoMapper
 }
 
 var ManageServiceSet = wire.NewSet(
@@ -121,4 +124,70 @@ func checkAdmin(ctx context.Context) error {
 		return errorx.New(errno.UnAuthErrCode)
 	}
 	return nil
+}
+
+var shanghaiLoc = func() *time.Location {
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		return time.FixedZone("CST", 8*60*60)
+	}
+	return loc
+}()
+
+func (m *ManageService) GetWeeklyStats(ctx context.Context, req *manage.GetWeeklyStatsReq) (*manage.GetWeeklyStatsResp, error) {
+	if err := checkAdmin(ctx); err != nil {
+		return nil, err
+	}
+	thisTuesday, lastTuesday, twoAgoTuesday := calcWeekBounds(time.Now())
+	monthStart := calcMonthStart(time.Now())
+	tomorrow := truncDay(time.Now().In(shanghaiLoc)).Add(24 * time.Hour)
+
+	totalUsers, err := m.UserMapper.CountUserByCreateTime(ctx, time.Time{}, true)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+	newUsersThisWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, lastTuesday, thisTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+	newUsersLastWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, twoAgoTuesday, lastTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+	weeklyActiveUsers, err := m.MessageMapper.CountActiveUsers(ctx, lastTuesday, thisTuesday)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+	monthlyActiveUsers, err := m.MessageMapper.CountActiveUsers(ctx, monthStart, tomorrow)
+	if err != nil {
+		return nil, errorx.New(errno.ErrGetWeeklyStats)
+	}
+	return &manage.GetWeeklyStatsResp{
+		Resp:             util.Success(),
+		TotalUsers:       totalUsers,
+		NewUsersThisWeek: newUsersThisWeek,
+		NewUsersLastWeek: newUsersLastWeek,
+		WeeklyAvgDAU:     weeklyActiveUsers,
+		MonthlyAvgDAU:    monthlyActiveUsers,
+		WeekStart:        lastTuesday.Format(time.RFC3339),
+		WeekEnd:          thisTuesday.Format(time.RFC3339),
+	}, nil
+}
+
+func calcWeekBounds(now time.Time) (thisTuesday, lastTuesday, twoAgoTuesday time.Time) {
+	now = now.In(shanghaiLoc)
+	daysBack := (int(now.Weekday()) - 2 + 7) % 7
+	thisTuesday = truncDay(now.AddDate(0, 0, -daysBack))
+	lastTuesday = thisTuesday.AddDate(0, 0, -7)
+	twoAgoTuesday = lastTuesday.AddDate(0, 0, -7)
+	return
+}
+
+func calcMonthStart(now time.Time) time.Time {
+	now = now.In(shanghaiLoc)
+	return time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, shanghaiLoc)
+}
+
+func truncDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
