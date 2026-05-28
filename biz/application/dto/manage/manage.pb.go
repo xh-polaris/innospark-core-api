@@ -1350,3 +1350,19 @@ func file_core_api_manage_proto_init() {
 	file_core_api_manage_proto_goTypes = nil
 	file_core_api_manage_proto_depIdxs = nil
 }
+
+// GetWeeklyStatsReq is the request for GetWeeklyStats.
+type GetWeeklyStatsReq struct {
+}
+
+// GetWeeklyStatsResp is the response for GetWeeklyStats.
+type GetWeeklyStatsResp struct {
+	Resp             *basic.Response `protobuf:"bytes,1,opt,name=resp,proto3" json:"resp"`
+	TotalUsers       int64           `protobuf:"varint,2,opt,name=totalUsers,proto3" json:"totalUsers"`
+	NewUsersThisWeek int64           `protobuf:"varint,3,opt,name=newUsersThisWeek,proto3" json:"newUsersThisWeek"`
+	NewUsersLastWeek int64           `protobuf:"varint,4,opt,name=newUsersLastWeek,proto3" json:"newUsersLastWeek"`
+	WeeklyAvgDAU     int64           `protobuf:"varint,5,opt,name=weeklyAvgDAU,proto3" json:"weeklyAvgDAU"`
+	MonthlyAvgDAU    int64           `protobuf:"varint,6,opt,name=monthlyAvgDAU,proto3" json:"monthlyAvgDAU"`
+	WeekStart        string          `protobuf:"bytes,7,opt,name=weekStart,proto3" json:"weekStart"`
+	WeekEnd          string          `protobuf:"bytes,8,opt,name=weekEnd,proto3" json:"weekEnd"`
+}
