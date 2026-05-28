@@ -231,15 +231,16 @@ func (m *ManageService) GetWeeklyStats(ctx context.Context, req *manage.GetWeekl
 	if err := checkAdmin(ctx); err != nil {
 		return nil, err
 	}
-	thisTuesday, lastTuesday, twoAgoTuesday := calcWeekBounds(time.Now())
+	_, lastTuesday, twoAgoTuesday := calcWeekBounds(time.Now())
 	monthStart := calcMonthStart(time.Now())
-	tomorrow := truncDay(time.Now().In(shanghaiLoc)).Add(24 * time.Hour)
+	today := truncDay(time.Now().In(shanghaiLoc))
+	tomorrow := today.Add(24 * time.Hour)
 
 	totalUsers, err := m.UserMapper.CountUserByCreateTime(ctx, time.Time{}, true)
 	if err != nil {
 		return nil, errorx.New(errno.ErrGetWeeklyStats)
 	}
-	newUsersThisWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, lastTuesday, thisTuesday)
+	newUsersThisWeek, err := m.UserMapper.CountUserByCreateTimeBetween(ctx, lastTuesday, tomorrow)
 	if err != nil {
 		return nil, errorx.New(errno.ErrGetWeeklyStats)
 	}
@@ -247,7 +248,7 @@ func (m *ManageService) GetWeeklyStats(ctx context.Context, req *manage.GetWeekl
 	if err != nil {
 		return nil, errorx.New(errno.ErrGetWeeklyStats)
 	}
-	weeklyActiveUsers, err := m.MessageMapper.CountActiveUsers(ctx, lastTuesday, thisTuesday)
+	weeklyActiveUsers, err := m.MessageMapper.CountActiveUsers(ctx, lastTuesday, tomorrow)
 	if err != nil {
 		return nil, errorx.New(errno.ErrGetWeeklyStats)
 	}
@@ -263,7 +264,7 @@ func (m *ManageService) GetWeeklyStats(ctx context.Context, req *manage.GetWeekl
 		WeeklyAvgDAU:     weeklyActiveUsers,
 		MonthlyAvgDAU:    monthlyActiveUsers,
 		WeekStart:        lastTuesday.Format(time.RFC3339),
-		WeekEnd:          thisTuesday.Format(time.RFC3339),
+		WeekEnd:          today.Format(time.RFC3339),
 	}, nil
 }
 
